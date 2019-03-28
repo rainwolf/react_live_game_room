@@ -2,13 +2,17 @@ import '../redux_actions/actionTypes';
 import { CONNECT_SERVER } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
+import User from './UserClass';
 import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
-    addTableMessage, addMove} from "./utils";
+    addTableMessage, addMove, changeGameState, changeTimer,
+    serverTableMessage} from "./utils";
 
+
+const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
 
 const initialState = {
-    users: {},
+    users: { 'game server': server },
     tables: {},
     room_messages: [],
     connected: false,
@@ -65,11 +69,15 @@ function liveGameApp (state = initialState, action) {
                 addTableMessage(json.dsgTextTableEvent, newState);
             } else if (json.dsgMoveTableEvent) {
                 addMove(json.dsgMoveTableEvent, newState);
+            } else if (json.dsgGameStateTableEvent) {
+                changeGameState(json.dsgGameStateTableEvent, newState);
+            } else if (json.dsgTimerChangeTableEvent) {
+                changeTimer(json.dsgTimerChangeTableEvent, newState);
+            } else if (json.dsgSystemMessageTableEvent) {
+                serverTableMessage(json.dsgSystemMessageTableEvent, newState);
             }
+        // {"dsgSystemMessageTableEvent":{"message":"iostest\u0027s rating has gone from 1213 to 1516.","player":"system","table":1,"time":1553711457959}}
         // {"dsgSetPlayingPlayerTableEvent":{"seat":2,"player":"iostest","table":1,"time":1553629064097}} rootReducer.js:35
-        // {"dsgGameStateTableEvent":{"state":2,"changeText":"game 1 of set started","gameInSet":1,"table":1,"time":1553629064101}} rootReducer.js:35
-        // {"dsgMoveTableEvent":{"move":180,"moves":[180],"player":"rainwolf","table":1,"time":1553629064102}}
-            // console.log(json);
             break;
         default: break;
     }

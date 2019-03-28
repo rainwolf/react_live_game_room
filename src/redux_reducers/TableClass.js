@@ -4,9 +4,9 @@ class Table {
     constructor(tableState) {
         this.seats = [undefined, "", ""];
         this.players = [];
-        this.clocks = [ { minutes: tableState.initialMinutes, seconds: 0 },
+        this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
             { minutes: tableState.initialMinutes, seconds: 0 } ];
-        this.updateTable(tableState)
+        this.updateTable(tableState);
     }
     
     player_color = (p) => {
@@ -113,6 +113,11 @@ class Table {
                 break;
             } 
         }
+    };
+    
+    swap = () => {
+        this.seats = [undefined, this.seats[2], this.seats[1]];
+        this.clocks = [undefined, this.clocks[2], this.clocks[1]];
     };
 }
 

@@ -3,12 +3,13 @@ import { connect } from 'react-redux';
 import { send_message } from "../redux_actions/actionTypes";
 import PropTypes from 'prop-types';
 import User from "../redux_reducers/UserClass";
-import Game from '../redux_reducers/GameClass';
+import { Game } from '../redux_reducers/GameClass';
 import Table from '../redux_reducers/TableClass';
 import Board from '../Components/Board/Board';
 import Grid from '@material-ui/core/Grid';
 import ChatComponent from '../Components/Chat/ChatComponent';
 import Button from '@material-ui/core/Button';
+import Modal from '@material-ui/core/Modal';
 
 const mapStateToProps = state => {
     return {
@@ -118,6 +119,21 @@ const UnconnectedTable = (props) => {
                             </Button>
                             <Button variant="contained" color="primary" onClick={() => sit(2)}>
                                 Sit 2
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={resign}>
+                                resign
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={requestUndo}>
+                                request undo
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={requestCancel}>
+                                request cancel
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={stand}>
+                                stand
+                            </Button>
+                            <Button variant="contained" color="primary" onClick={leave}>
+                                exit table
                             </Button>
                         </div>
                     </Grid>

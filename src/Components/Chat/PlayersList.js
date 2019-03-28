@@ -43,10 +43,11 @@ function PlayersList(props) {
         <List className={classes.root}>
             {Object.keys(players).map((name, i) => {
                     const player = players[name];
+                    if ('game server' === name) { return undefined; }
                     return (
                         <ListItem key={i} >
                             <ListItemAvatar>
-                                <Avatar alt="Remy Sharp" src={player.avatar} />
+                                <Avatar alt={name} src={player.avatar} />
                             </ListItemAvatar>
                             <ListItemText
                                 primary={player.userhtml}

@@ -1,7 +1,8 @@
 import Table from './TableClass';
 import User from './UserClass';
-import Game from './GameClass';
+import { Game, GameState } from './GameClass';
 
+// TODO player in table is updated as well
 export function processUser(userdata, state) {
     let user;
     if (state.users[userdata.name]) {
@@ -13,7 +14,8 @@ export function processUser(userdata, state) {
 }
        
 export function addRoomMessage(data, state) {
-    const messages = state.room_messages.slice();
+    // const messages = state.room_messages.slice();
+    const messages = [...state.room_messages];
     const user = state.users[data.player];
     messages.push( {
         message: data.text,
@@ -117,11 +119,42 @@ export function addMove(data, state) {
             game.addMove(data.move);
         } else {
             game.reset();
-            
             for(let i = 0; i < data.moves.length; i++) {
                 game.addMove(data.moves[i]);
             }
         } 
     }
     state.game = game;
+}
+
+export function changeGameState(data, state) {
+    if (data.table === state.table) {
+        let game =  Object.assign( Object.create( Object.getPrototypeOf(state.game)), state.game);
+        if ((game.gameState.state === GameState.State.NOT_STARTED || game.gameState.state === GameState.State.HALFSET) 
+            && data.state === GameState.State.STARTED) {
+            game.reset();
+        } 
+        game.gameState.state = data.state;
+        state.game = game;
+        if (data.changeText) {
+            addTableMessage({player: 'game server', text: data.changeText}, state);
+        } 
+    } 
+}
+
+export function changeTimer(data, state) {
+    if (data.table === state.table) {
+        const tables = { ...state.tables };
+        const table = tables[data.table];
+        const idx = table.seats.indexOf(data.player);
+        table.clocks[idx].minutes = data.minutes;
+        table.clocks[idx].seconds = data.seconds;
+        state.tables = tables;
+    }
+}
+
+export function serverTableMessage(data, state) {
+    if (data.table === state.table) {
+        addTableMessage({player: 'game server', text: data.message}, state);
+    }
 }
