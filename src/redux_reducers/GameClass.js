@@ -1,6 +1,23 @@
-'use strict';
+export const GameState = {
+    State: {
+        NOT_STARTED: 1,
+        STARTED: 2,
+        PAUSED: 3,
+        HALFSET: 4
+    },
+    DPenteState: {
+        NO_CHOICE: 0,
+        SWAPPED: 1,
+        NOT_SWAPPED: 2
+    },
+    GoState: {
+        PLAY: 0,
+        MARK_STONES: 1,
+        EVALUATE_STONES: 2
+    }
+};
 
-class Game {
+export class Game {
     constructor(gameState) {
         this.updateGameState(gameState);
         this.rated = false;
@@ -27,21 +44,21 @@ class Game {
         this.reset();
     }
     
-    copyOnto = (newGame) => {
-        newGame.captures = this.captures;
-        newGame.moves = this.moves;
-        newGame.goGroupsByPlayerAndID = this.goGroupsByPlayerAndID;
-        newGame.goStoneGroupIDsByPlayer = this.goStoneGroupIDsByPlayer;
-        newGame.koMove = this.koMove;
-        newGame.suicideAllowed = this.suicideAllowed;
-        newGame.goTerritoryByPlayer = this.goTerritoryByPlayer;
-        newGame.hasPass = this.hasPass; 
-        newGame.doublePass = this.doublePass;
-        newGame.goDeadStonesByPlayer = this.goDeadStonesByPlayer;
-        newGame.setGame(this.game);
-        newGame.rated = this.rated;
-        newGame.me = this.me;
-    };
+    // copyOnto = (newGame) => {
+    //     newGame.captures = this.captures;
+    //     newGame.moves = this.moves;
+    //     newGame.goGroupsByPlayerAndID = this.goGroupsByPlayerAndID;
+    //     newGame.goStoneGroupIDsByPlayer = this.goStoneGroupIDsByPlayer;
+    //     newGame.koMove = this.koMove;
+    //     newGame.suicideAllowed = this.suicideAllowed;
+    //     newGame.goTerritoryByPlayer = this.goTerritoryByPlayer;
+    //     newGame.hasPass = this.hasPass; 
+    //     newGame.doublePass = this.doublePass;
+    //     newGame.goDeadStonesByPlayer = this.goDeadStonesByPlayer;
+    //     newGame.setGame(this.game);
+    //     newGame.rated = this.rated;
+    //     newGame.me = this.me;
+    // };
     
     updateGameState = (gameState) => {
         Object.assign(this, gameState);
@@ -102,6 +119,12 @@ class Game {
         this.hasPass = false; this.doublePass = false;
         this.goDeadStonesByPlayer = {1: [], 2: []};
         this.#resetAbstractBoard();
+        
+        this.gameState = {
+            state: GameState.State.NOT_STARTED,
+            dPenteState: GameState.DPenteState.NO_CHOICE,
+            goState: GameState.GoState.PLAY
+        }
     };
     #resetAbstractBoard = () => {
         for (let i = 0; i < 19; i++) {
@@ -262,7 +285,7 @@ class Game {
         this.abstractBoard[x][y] = player;
     };
     #replayGomokuGame = (until) => {
-        this.#resetAbstractBoard();
+        // this.#resetAbstractBoard();
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let color = 1 + (i%2);
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
@@ -274,7 +297,7 @@ class Game {
         this.#detectPenteCapture(x, y, player);
     };
     #replayPenteGame = (until) => {
-        this.#resetAbstractBoard();
+        // this.#resetAbstractBoard();
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let color = 1 + (i%2);
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
@@ -289,7 +312,7 @@ class Game {
         this.#detectKeryoPenteCapture(x, y, player);
     };
     #replayKeryoPenteGame = (until) => {
-        this.#resetAbstractBoard();
+        // this.#resetAbstractBoard();
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let color = 1 + (i%2);
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
@@ -300,7 +323,7 @@ class Game {
         }
     };
     #replayConnect6Game = (until) => {
-        this.#resetAbstractBoard();
+        // this.#resetAbstractBoard();
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let color = (((i % 4) === 0) || ((i % 4) === 3)) ? 1 : 2;
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
@@ -308,7 +331,7 @@ class Game {
         }
     };
     #replayGPenteGame = (until) => {
-        this.#resetAbstractBoard();
+        // this.#resetAbstractBoard();
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let color = 1 + (i%2);
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
@@ -324,7 +347,7 @@ class Game {
         this.#detectPenteCapture(x, y, player);
     };
     #replayPoofPenteGame = (until) => {
-        this.#resetAbstractBoard();
+        // this.#resetAbstractBoard();
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let color = 1 + (i%2);
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
@@ -975,4 +998,4 @@ class Game {
 
 }
 
-export default Game;
+// export default Game;

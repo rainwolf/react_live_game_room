@@ -46,9 +46,12 @@ const BoardSquare = (props) => {
             default: return bottomrightcorner(size);
         }
     };
-    const enterExitHandler = (e) => {
+    const enterHandler = (e) => {
         if (props.clickHandler === undefined) { return; }
-        toggleShow(!showStone);
+        toggleShow(true);
+    };
+    const exitHandler = (e) => {
+        toggleShow(false);
     };
     const clickHandler = (e) => {
         if (props.clickHandler === undefined) { return; }
@@ -62,10 +65,10 @@ const BoardSquare = (props) => {
         y = 10*Math.floor(parseInt(props.id)/gridsize),
         x = 10*(parseInt(props.id)%gridsize);
     return (
-        <g key={props.id} viewBox={'0 0 15 15'} 
+        <g key={'square'+props.id} viewBox={'0 0 15 15'} 
              height={size*1.5} width={size*1.5}
-             onMouseEnter={enterExitHandler}
-             onMouseLeave={enterExitHandler}
+             onMouseEnter={enterHandler}
+             onMouseLeave={exitHandler}
              onClick={clickHandler}
              transform={'translate('+x+','+y+')'}
         >

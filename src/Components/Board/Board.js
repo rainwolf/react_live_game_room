@@ -1,5 +1,6 @@
 import React  from 'react';
 import BoardSquare from './BoardSquare';
+import {GameState} from "../../redux_reducers/GameClass";
 
 
 const Board = (props) => {
@@ -13,7 +14,7 @@ const Board = (props) => {
         let player_colors = [undefined, 'white-stone-gradient', 'black-stone-gradient'];
         if (game.isGo()) { player_colors = [undefined, 'black-stone-gradient', 'white-stone-gradient']; }
         let hover = player_colors[game.currentColor()];
-        const myTurn = table.isMyTurn(game);
+        const myTurn = table.isMyTurn(game) && game.gameState.state === GameState.State.STARTED;
         // console.log('my turn: ', myTurn)
         for(let j = 0; j < gridsize; j++) {
             for (let i = 0; i < gridsize; i++) {
@@ -27,13 +28,17 @@ const Board = (props) => {
                     squaretype = 9;
                 } else if (m === gridsize * (gridsize - 1)) {
                     squaretype = 7;
-                } else if (Math.floor(m / gridsize) === 0) {
+                } else if (j === 0) {
+                // } else if (Math.floor(m / gridsize) === 0) {
                     squaretype = 2;
-                } else if (Math.floor(m / gridsize) === gridsize - 1) {
+                } else if (j === gridsize - 1) {
+                // } else if (Math.floor(m / gridsize) === gridsize - 1) {
                     squaretype = 8;
-                } else if (m % gridsize === 0) {
+                // } else if (m % gridsize === 0) {
+                } else if (i === 0) {
                     squaretype = 4;
-                } else if (m % gridsize === gridsize - 1) {
+                // } else if (m % gridsize === gridsize - 1) {
+                } else if (i === gridsize - 1) {
                     squaretype = 6;
                 } else {
                     squaretype = 5;
