@@ -15,7 +15,9 @@ const Board = (props) => {
         if (game.isGo()) { player_colors = [undefined, 'black-stone-gradient', 'white-stone-gradient']; }
         let hover = player_colors[game.currentColor()];
         const myTurn = table.isMyTurn(game) && game.gameState.state === GameState.State.STARTED;
-        // console.log('my turn: ', myTurn)
+        // console.log('my turn: ', myTurn);
+        // console.log('my turn: ', table.isMyTurn(game));
+        // console.log('makeBoard');
         for(let j = 0; j < gridsize; j++) {
             for (let i = 0; i < gridsize; i++) {
                 const m = j*gridsize + i;
@@ -79,7 +81,7 @@ const Board = (props) => {
             dots.forEach(d => { board[d].part = 52; });
         } 
         
-        return board.map(p => BoardSquare(p));
+        return board.map(p => <BoardSquare {...p}/>);
     };
     const makeCoordinateBoundaries = (gridsize) => {
         const coordinateLetters =['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];

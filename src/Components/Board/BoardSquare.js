@@ -1,84 +1,93 @@
-import React, { useState } from 'react';
+import React, { Component, useState } from 'react';
 import Stone from './Stone';
 
 
-const BoardSquare = (props) => {
+// BoardSquare = (props) => {
+class BoardSquare extends Component {
     
-    const [showStone, toggleShow] = useState(false);
+    constructor(props) {
+        super(props);
+        this.state = {showStone: false};
+    }
+    // [showStone, toggleShow] = useState(false);
     
-    const up = (size, transform) => {
+    up = (size, transform) => {
         return (
-            <line key={props.id + transform} className='boardline' x1={size/2} y1={size/2}
+            <line key={this.props.id + transform} className='boardline' x1={size/2} y1={size/2}
                   x2={size/2} y2={0}
                   transform={transform}
             />
         )
     };
-    const left = (size) => { return up(size, 'rotate(-90 '+(size/2)+' '+(size/2)+')') };
-    const right = (size) => { return up(size, 'rotate(90 '+(size/2)+' '+(size/2)+')') };
-    const down = (size) => { return up(size, 'rotate(180 '+(size/2)+' '+(size/2)+')') };
-    const cross = (size) => { return ( [up(size), left(size), right(size), down(size)] ) };
-    const topside = (size) => { return ( [left(size), right(size), down(size)] ) };
-    const bottomside = (size) => { return ( [up(size), left(size), right(size)] ) };
-    const leftside = (size) => { return ( [up(size), right(size), down(size)] ) };
-    const rightside = (size) => { return ( [up(size), left(size), down(size)] ) };
-    const upperleftcorner = (size) => { return ( [right(size), down(size)] ) };
-    const upperrightcorner = (size) => { return ( [left(size), down(size)] ) };
-    const bottomleftcorner = (size) => { return ( [up(size), right(size)] ) };
-    const bottomrightcorner = (size) => { return ( [up(size), left(size)] ) };
-    const crosscircle = (size) => { return ( [<circle className='boardcircle' key={props.id + 'circle'} 
-                                      cx={size/2} cy={size/2} r={size/5} fill='none'/>, 
-    up(size), left(size), right(size), down(size)] ) };
-    const crossdot = (size) => { return ( [up(size), left(size), right(size), down(size), 
-         <circle className='boarddot' key={props.id + 'dot'} cx={size/2} cy={size/2} r={size/8} />] ) };
-    const boardpart = (size) => {
-         switch(props.part) {
-            case 1: return upperleftcorner(size);
-            case 2: return topside(size);
-            case 3: return upperrightcorner(size);
-            case 4: return leftside(size);
-            case 5: return cross(size);
-            case 51: return crosscircle(size);
-            case 52: return crossdot(size);
-            case 6: return rightside(size);
-            case 7: return bottomleftcorner(size);
-            case 8: return bottomside(size);
-            default: return bottomrightcorner(size);
+    left = (size) => { return this.up(size, 'rotate(-90 '+(size/2)+' '+(size/2)+')') };
+    right = (size) => { return this.up(size, 'rotate(90 '+(size/2)+' '+(size/2)+')') };
+    down = (size) => { return this.up(size, 'rotate(180 '+(size/2)+' '+(size/2)+')') };
+    cross = (size) => { return ( [this.up(size), this.left(size), this.right(size), this.down(size)] ) };
+    topside = (size) => { return ( [this.left(size), this.right(size), this.down(size)] ) };
+    bottomside = (size) => { return ( [this.up(size), this.left(size), this.right(size)] ) };
+    leftside = (size) => { return ( [this.up(size), this.right(size), this.down(size)] ) };
+    rightside = (size) => { return ( [this.up(size), this.left(size), this.down(size)] ) };
+    upperleftcorner = (size) => { return ( [this.right(size), this.down(size)] ) };
+    upperrightcorner = (size) => { return ( [this.left(size), this.down(size)] ) };
+    bottomleftcorner = (size) => { return ( [this.up(size), this.right(size)] ) };
+    bottomrightcorner = (size) => { return ( [this.up(size), this.left(size)] ) };
+    crosscircle = (size) => { return ( [<circle className='boardcircle' key={this.props.id + 'circle'} 
+                                      cx={size/2} cy={size/2} r={size/5} fill='none'/>,
+        this.up(size), this.left(size), this.right(size), this.down(size)] ) };
+    crossdot = (size) => { return ( [this.up(size), this.left(size), this.right(size), this.down(size), 
+         <circle className='boarddot' key={this.props.id + 'dot'} cx={size/2} cy={size/2} r={size/8} />] ) };
+    boardpart = (size) => {
+         switch(this.props.part) {
+            case 1: return this.upperleftcorner(size);
+            case 2: return this.topside(size);
+            case 3: return this.upperrightcorner(size);
+            case 4: return this.leftside(size);
+            case 5: return this.cross(size);
+            case 51: return this.crosscircle(size);
+            case 52: return this.crossdot(size);
+            case 6: return this.rightside(size);
+            case 7: return this.bottomleftcorner(size);
+            case 8: return this.bottomside(size);
+            default: return this.bottomrightcorner(size);
         }
     };
-    const enterHandler = (e) => {
-        if (props.clickHandler === undefined) { return; }
-        toggleShow(true);
+    enterHandler = (e) => {
+        if (this.props.clickHandler === undefined) { return; }
+        this.setState({showStone: true});
+        // toggleShow(true);
     };
-    const exitHandler = (e) => {
-        toggleShow(false);
+    exitHandler = (e) => {
+        this.setState({showStone: false});
+        // toggleShow(false);
     };
-    const clickHandler = (e) => {
-        if (props.clickHandler === undefined) { return; }
-        props.clickHandler(e.target.id);
-        toggleShow(false);
+    clickHandler = (e) => {
+        if (this.props.clickHandler === undefined) { return; }
+        this.props.clickHandler(e.target.id);
+        // toggleShow(false);
+        this.setState({showStone: false});
     };
 
-    
-    const gridsize = props.gridsize,
-        size = 10,
-        y = 10*Math.floor(parseInt(props.id)/gridsize),
-        x = 10*(parseInt(props.id)%gridsize);
-    return (
-        <g key={'square'+props.id} viewBox={'0 0 15 15'} 
-             height={size*1.5} width={size*1.5}
-             onMouseEnter={enterHandler}
-             onMouseLeave={exitHandler}
-             onClick={clickHandler}
-             transform={'translate('+x+','+y+')'}
-        >
-            <rect id={props.id} width={size+1} height={size+1}
-                   fillOpacity={0.0} />
-            {boardpart(size)}
-            {props.stone && Stone({size: 10, id: props.stone})}
-            {showStone && Stone({size: 10, id: props.hover, opacity: 0.6})}
-        </g>
-    );
+    render () {
+        const gridsize = this.props.gridsize,
+            size = 10,
+            y = 10*Math.floor(parseInt(this.props.id)/gridsize),
+            x = 10*(parseInt(this.props.id)%gridsize);
+        return (
+            <g key={'square'+this.props.id} viewBox={'0 0 15 15'}
+               height={size*1.5} width={size*1.5}
+               onMouseEnter={this.enterHandler}
+               onMouseLeave={this.exitHandler}
+               onClick={this.clickHandler}
+               transform={'translate('+x+','+y+')'}
+            >
+                <rect id={this.props.id} width={size+1} height={size+1}
+                      fillOpacity={0.0} />
+                {this.boardpart(size)}
+                {this.props.stone && Stone({size: 10, id: this.props.stone})}
+                {this.state.showStone && Stone({size: 10, id: this.props.hover, opacity: 0.6})}
+            </g>
+        );
+    }
 };
 
 export default BoardSquare;
