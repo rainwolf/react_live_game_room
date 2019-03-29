@@ -35,6 +35,7 @@ export function changeTableState(tableState, state) {
         tables[tableState.table].updateTable(tableState);
     } else {
         tables[tableState.table] = new Table(tableState);
+        tables[tableState.table].me = state.me;
     }
     if (state.table === tableState.table) {
         let game = new Game();
@@ -51,6 +52,7 @@ export function joinTable(joinEvent, state) {
     let table = tables[joinEvent.table];
     if (table === undefined) {  
         table = new Table({table: joinEvent.table});
+        table.me = state.me;
         tables[joinEvent.table] = table;
     }
     if (joinEvent.player === state.me) {
@@ -79,17 +81,19 @@ export function exitTable(exitEvent, state) {
     state.tables = tables;
 }
 
-export function sitTable(sitEvent, state) {
+export function sitTable(data, state) {
     const tables = { ...state.tables };
-    const table = tables[sitEvent.table];
-    table.sit(sitEvent.player, sitEvent.seat);
+    const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+    table.sit(data.player, data.seat);
+    tables[data.table] = table;
     state.tables = tables;
 }
 
-export function standTable(standEvent, state) {
+export function standTable(data, state) {
     const tables = { ...state.tables };
-    const table = tables[standEvent.table];
-    table.stand(standEvent.player);
+    const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+    table.stand(data.player);
+    tables[data.table] = table;
     state.tables = tables;
 }
 
@@ -145,10 +149,11 @@ export function changeGameState(data, state) {
 export function changeTimer(data, state) {
     if (data.table === state.table) {
         const tables = { ...state.tables };
-        const table = tables[data.table];
+        const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
         const idx = table.seats.indexOf(data.player);
         table.clocks[idx].minutes = data.minutes;
         table.clocks[idx].seconds = data.seconds;
+        tables[data.table] = table;
         state.tables = tables;
     }
 }

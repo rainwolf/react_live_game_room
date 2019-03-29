@@ -4,8 +4,6 @@ class Table {
     constructor(tableState) {
         this.seats = [undefined, "", ""];
         this.players = [];
-        this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
-            { minutes: tableState.initialMinutes, seconds: 0 } ];
         this.updateTable(tableState);
     }
     
@@ -20,6 +18,9 @@ class Table {
     };
     
     isMyTurn = (game) => {
+        // console.log('me ', this.me);
+        // console.log('this.seats ', this.seats);
+        // console.log('currentplayer ', game.currentPlayer());
         return this.me === this.seats[game.currentPlayer()];
     };
     
@@ -88,6 +89,8 @@ class Table {
     
     updateTable = (tableState) => {
         Object.assign(this, tableState);
+        this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
+            { minutes: tableState.initialMinutes, seconds: 0 } ];
     };
     
     addPlayer = (player) => {
