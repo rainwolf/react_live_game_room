@@ -93,6 +93,11 @@ class Table {
             { minutes: tableState.initialMinutes, seconds: 0 } ];
     };
     
+    resetClocks = () => {
+        this.clocks = [undefined, { minutes: this.initialMinutes, seconds: 0 },
+            { minutes: this.initialMinutes, seconds: 0 } ];
+    };
+    
     addPlayer = (player) => {
         this.players.push(player); 
     };

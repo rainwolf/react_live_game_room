@@ -1,15 +1,13 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import Stone from './Stone';
 
 
-// BoardSquare = (props) => {
 class BoardSquare extends Component {
     
     constructor(props) {
         super(props);
         this.state = {showStone: false};
     }
-    // [showStone, toggleShow] = useState(false);
     
     up = (size, transform) => {
         return (
@@ -54,16 +52,13 @@ class BoardSquare extends Component {
     enterHandler = (e) => {
         if (this.props.clickHandler === undefined) { return; }
         this.setState({showStone: true});
-        // toggleShow(true);
     };
     exitHandler = (e) => {
         this.setState({showStone: false});
-        // toggleShow(false);
     };
     clickHandler = (e) => {
         if (this.props.clickHandler === undefined) { return; }
         this.props.clickHandler(e.target.id);
-        // toggleShow(false);
         this.setState({showStone: false});
     };
 

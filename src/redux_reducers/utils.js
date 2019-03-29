@@ -2,11 +2,11 @@ import Table from './TableClass';
 import User from './UserClass';
 import { Game, GameState } from './GameClass';
 
-// TODO player in table is updated as well
 export function processUser(userdata, state) {
     let user;
     if (state.users[userdata.name]) {
         user = state.users[userdata.name];
+        user.updateUser(userdata);
     } else {
         user = new User(userdata);
     }
@@ -137,6 +137,11 @@ export function changeGameState(data, state) {
         if ((game.gameState.state === GameState.State.NOT_STARTED || game.gameState.state === GameState.State.HALFSET) 
             && data.state === GameState.State.STARTED) {
             game.reset();
+            const tables = { ...state.tables };
+            const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+            table.resetClocks();
+            tables[data.table] = table;
+            state.tables = tables;
         } 
         game.gameState.state = data.state;
         state.game = game;

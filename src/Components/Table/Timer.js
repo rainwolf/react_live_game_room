@@ -18,36 +18,58 @@ class UnconnectedTimer extends Component {
     
     constructor(props) {
         super(props);
-        this.state = {...props.table.clocks[props.seat]};
+        this.state = { running: false, ...props.table.clocks[props.seat]};
+        this.state.time_left = this.state.minutes * 60 + this.state.seconds;
     }
     
     ticktock = () => {
+        let newState = { ...this.state };
         if (!this.props.table.timed || 
             (this.props.game.currentPlayer() !== this.props.seat) || 
             this.props.game.gameState.state !== GameState.State.STARTED) {
+            if (newState.running) {
+                newState.running = false;
+                this.setState(newState);
+            } 
             return;
-        } 
-        let newState = { ...this.state };
-        if (newState.seconds === 0) {
-            if (newState.minutes > 0) {
-                newState.seconds = 59;
-                newState.minutes -= 1;
-            }
-        } else {
-            newState.seconds -= 1;
         }
+        if (!newState.running) {
+            newState.running = true;
+            newState.start_time = new Date();
+        }
+        const now = new Date();
+        const passed_seconds = Math.round((now.getTime() - newState.start_time.getTime())/1000);
+        // const time_left = newState.minutes + newState.seconds*60;
+        if (newState.time_left > passed_seconds) {
+            const new_time = newState.time_left - passed_seconds;
+            newState.seconds = new_time % 60;
+            newState.minutes = Math.floor(new_time / 60);
+        } else {
+            newState.seconds = 0;
+            newState.minutes = 0;
+        }
+        // if (newState.seconds === 0) {
+        //     if (newState.minutes > 0) {
+        //         newState.seconds = 59;
+        //         newState.minutes -= 1;
+        //     }
+        // } else {
+        //     newState.seconds -= 1;
+        // }
         this.setState(newState);
     };
 
 
     componentWillReceiveProps(nextProps) {
-        this.setState( { ...this.state, ...nextProps.table.clocks[nextProps.seat]} );
+        const newState = { ...this.state, ...nextProps.table.clocks[nextProps.seat]};
+        newState.time_left = newState.minutes * 60 + newState.seconds;
+        this.setState( newState );
     }
     
     
     componentDidMount() {
         let newState = { ...this.state };
-        newState.timer = setInterval(this.ticktock, 1000);
+        newState.timer = setInterval(this.ticktock, 300);
         this.setState(newState);
     }
 
