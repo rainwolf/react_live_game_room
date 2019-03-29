@@ -48,20 +48,14 @@ class UnconnectedTimer extends Component {
             newState.seconds = 0;
             newState.minutes = 0;
         }
-        // if (newState.seconds === 0) {
-        //     if (newState.minutes > 0) {
-        //         newState.seconds = 59;
-        //         newState.minutes -= 1;
-        //     }
-        // } else {
-        //     newState.seconds -= 1;
-        // }
         this.setState(newState);
     };
 
 
+    
     componentWillReceiveProps(nextProps) {
-        const newState = { ...this.state, ...nextProps.table.clocks[nextProps.seat]};
+        const newTime = nextProps.table.clocks[nextProps.seat];
+        const newState = { ...this.state, ...newTime };
         newState.time_left = newState.minutes * 60 + newState.seconds;
         this.setState( newState );
     }

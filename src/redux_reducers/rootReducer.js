@@ -1,12 +1,12 @@
 import '../redux_actions/actionTypes';
-import { CONNECT_SERVER } from "../redux_actions/actionTypes";
+import { CONNECT_SERVER, SET_TIMER } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
 import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
-    serverTableMessage} from "./utils";
+    serverTableMessage, adjustTimer} from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -25,6 +25,9 @@ const initialState = {
 function liveGameApp (state = initialState, action) {
     let newState = { ...state };
     switch(action.type) {
+        case SET_TIMER:
+            adjustTimer(action.payload, newState);
+            break;
         case CONNECT_SERVER:
             newState.server = action.payload;
             break;

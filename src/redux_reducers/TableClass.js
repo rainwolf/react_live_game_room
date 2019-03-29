@@ -4,6 +4,8 @@ class Table {
     constructor(tableState) {
         this.seats = [undefined, "", ""];
         this.players = [];
+        this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
+            { minutes: tableState.initialMinutes, seconds: 0 } ];
         this.updateTable(tableState);
     }
     
@@ -88,9 +90,11 @@ class Table {
     };
     
     updateTable = (tableState) => {
+        if (this.initialMinutes !== tableState.initialMinutes) {
+            this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
+                { minutes: tableState.initialMinutes, seconds: 0 } ];
+        } 
         Object.assign(this, tableState);
-        this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
-            { minutes: tableState.initialMinutes, seconds: 0 } ];
     };
     
     resetClocks = () => {
@@ -121,6 +125,11 @@ class Table {
                 break;
             } 
         }
+    };
+    
+    adjustTimer = (data) => {
+        this.clocks = [...this.clocks];
+        this.clocks[data.player] = { minutes: data.minutes, seconds: data.seconds };
     };
     
     swap = () => {

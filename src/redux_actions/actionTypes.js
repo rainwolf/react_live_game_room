@@ -2,6 +2,7 @@ import { WEBSOCKET_CONNECT, WEBSOCKET_SEND } from '@giantmachines/redux-websocke
 
 export const CONNECT_SERVER = 'CONNECT_SERVER';
 // export const SERVER_CONNECTED = 'SERVER_CONNECTED';
+export const SET_TIMER = 'SET_TIMER';
 
 export function connectServer(server) {
     return {
@@ -27,3 +28,9 @@ export function send_message(payload) {
     }
 }
 
+export function set_timer(payload) {
+    return {
+        type: SET_TIMER,
+        payload: payload
+    }
+}

@@ -168,3 +168,11 @@ export function serverTableMessage(data, state) {
         addTableMessage({player: 'game server', text: data.message}, state);
     }
 }
+
+export function adjustTimer(data, state) {
+    const tables = { ...state.tables };
+    const table = Object.assign( Object.create( Object.getPrototypeOf(tables[state.table])), tables[state.table]);
+    table.adjustTimer(data);
+    tables[state.table] = table;
+    state.tables = tables;
+}
