@@ -11,6 +11,9 @@ import ChatComponent from '../Components/Chat/ChatComponent';
 import Button from '@material-ui/core/Button';
 import Modal from '@material-ui/core/Modal';
 
+import Seat from '../Components/Table/Seat';
+import Timer from '../Components/Table/Timer';
+
 const mapStateToProps = state => {
     return {
         users: state.users,
@@ -66,12 +69,6 @@ const UnconnectedTable = (props) => {
     const leave = () => {
         props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: props.table.table, time: 0}});
     };
-    const sit = (seat) => {
-        props.send_message({dsgSitTableEvent: {seat: seat, table: props.table.table, time: 0}});
-    };
-    const stand = () => {
-        props.send_message({dsgStandTableEvent: {table: props.table.table, time: 0}});
-    };
     const cancelReply = (accept) => {
         props.send_message({dsgCancelReplyTableEvent: {accepted: accept, player: props.table.me, table: props.table.table, time: 0}});
     };
@@ -111,30 +108,27 @@ const UnconnectedTable = (props) => {
                       style={{width: '100%', height: '100%'}}>
                     <Grid item style={{maxWidth: '100%', flex: '1 1 auto', overflow: 'auto', minHeight: '0px'}}>
                         <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
-                            <Button variant="contained" color="primary" onClick={play}>
-                                Play
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={() => sit(1)}>
-                                Sit 1
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={() => sit(2)}>
-                                Sit 2
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={resign}>
-                                resign
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={requestUndo}>
-                                request undo
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={requestCancel}>
-                                request cancel
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={stand}>
-                                stand
-                            </Button>
-                            <Button variant="contained" color="primary" onClick={leave}>
-                                exit table
-                            </Button>
+                            <Timer seat={1}/>
+                            <Seat seat={1}/>
+                            <Timer seat={2}/>
+                            <Seat seat={2}/>
+                            <div>
+                                <Button variant="contained" color="primary" onClick={play}>
+                                    Play
+                                </Button>
+                                <Button variant="contained" color="primary" onClick={resign}>
+                                    resign
+                                </Button>
+                                <Button variant="contained" color="primary" onClick={requestUndo}>
+                                    request undo
+                                </Button>
+                                <Button variant="contained" color="primary" onClick={requestCancel}>
+                                    request cancel
+                                </Button>
+                                <Button variant="contained" color="primary" onClick={leave}>
+                                    exit table
+                                </Button>
+                            </div>
                         </div>
                     </Grid>
                     <Grid item style={{height: '40%'}}>
