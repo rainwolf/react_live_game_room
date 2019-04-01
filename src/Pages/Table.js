@@ -11,6 +11,7 @@ import ChatComponent from '../Components/Chat/ChatComponent';
 import Button from '@material-ui/core/Button';
 import UndoModal from '../Components/Table/UndoModal';
 import CancelModal from '../Components/Table/CancelModal';
+import DPenteChoiceModal from '../Components/Table/DPenteChoiceModal';
 
 import Seat from '../Components/Table/Seat';
 import Timer from '../Components/Table/Timer';
@@ -136,6 +137,7 @@ const UnconnectedTable = (props) => {
 
             <UndoModal/>
             <CancelModal/>
+            <DPenteChoiceModal/>
         </div>
     );
 };

@@ -7,7 +7,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, adjustTimer, undoRequested, undoReply,
-    cancelRequested} from "./utils";
+    cancelRequested, swapSeats, setPlayingPlayerTable} from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -85,7 +85,13 @@ function liveGameApp (state = initialState, action) {
                 undoReply(json.dsgUndoReplyTableEvent, newState);
             } else if (json.dsgCancelRequestTableEvent) {
                 cancelRequested(json.dsgCancelRequestTableEvent, newState);
+            } else if (json.dsgSwapSeatsTableEvent) {
+                swapSeats(json.dsgSwapSeatsTableEvent, newState);
+            } else if (json.dsgSetPlayingPlayerTableEvent) {
+                setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
             }
+        //    {"dsgSetPlayingPlayerTableEvent":{"seat":1,"player":"iostest","table":1,"time":1554124915697}}
+        // {"dsgSwapSeatsTableEvent":{"swap":true,"silent":false,"player":"iostest","table":1,"time":1554122803745}}
         // {"dsgSetPlayingPlayerTableEvent":{"seat":2,"player":"iostest","table":1,"time":1553629064097}} rootReducer.js:35
             break;
         default: break;
