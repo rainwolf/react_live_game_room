@@ -176,3 +176,26 @@ export function adjustTimer(data, state) {
     tables[state.table] = table;
     state.tables = tables;
 }
+
+export function undoRequested(data, state) {
+    if (data.table === state.table) {
+        const tables = { ...state.tables };
+        const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+        table.undo_requested = state.users[data.player].userhtml;
+        tables[data.table] = table;
+        state.tables = tables;
+    }
+}
+
+export function undoReply(data, state) {
+    if (data.table === state.table) {
+        const tables = { ...state.tables };
+        const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+        delete table.undo_requested;
+        if (data.accepted) {
+            state.game.undoMove();
+        } 
+        tables[data.table] = table;
+        state.tables = tables;
+    }
+}

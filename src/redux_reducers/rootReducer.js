@@ -6,7 +6,7 @@ import User from './UserClass';
 import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
-    serverTableMessage, adjustTimer} from "./utils";
+    serverTableMessage, adjustTimer, undoRequested, undoReply} from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -78,8 +78,12 @@ function liveGameApp (state = initialState, action) {
                 changeTimer(json.dsgTimerChangeTableEvent, newState);
             } else if (json.dsgSystemMessageTableEvent) {
                 serverTableMessage(json.dsgSystemMessageTableEvent, newState);
+            } else if (json.dsgUndoRequestTableEvent) {
+                undoRequested(json.dsgUndoRequestTableEvent, newState);
+            } else if (json.dsgUndoReplyTableEvent) {
+                undoReply(json.dsgUndoReplyTableEvent, newState);
             }
-        // {"dsgSystemMessageTableEvent":{"message":"iostest\u0027s rating has gone from 1213 to 1516.","player":"system","table":1,"time":1553711457959}}
+        //    {"dsgUndoReplyTableEvent":{"accepted":false,"player":"rainwolf","table":1,"time":1554117635194}}
         // {"dsgSetPlayingPlayerTableEvent":{"seat":2,"player":"iostest","table":1,"time":1553629064097}} rootReducer.js:35
             break;
         default: break;

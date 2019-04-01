@@ -81,7 +81,7 @@ class UnconnectedTimer extends Component {
             </div>
         );
     };
-}
+};
 
 UnconnectedTimer.propTypes = {
     seat: PropTypes.number.isRequired,

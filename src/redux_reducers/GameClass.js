@@ -134,6 +134,12 @@ export class Game {
         }
     };
     
+    undoMove = () => {
+        const new_moves = this.moves.slice(0, this.moves.length - 1);
+        this.moves = new_moves;
+        this.replayGame();
+    };
+    
     replayGame = (until) => {
         if (until === undefined) {
             until = this.moves.length;
