@@ -83,7 +83,7 @@ export function exitTable(exitEvent, state) {
 
 export function sitTable(data, state) {
     const tables = { ...state.tables };
-    const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+    const table = tables[data.table].newInstance();
     table.sit(data.player, data.seat);
     tables[data.table] = table;
     state.tables = tables;
@@ -91,7 +91,7 @@ export function sitTable(data, state) {
 
 export function standTable(data, state) {
     const tables = { ...state.tables };
-    const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+    const table = tables[data.table].newInstance();
     table.stand(data.player);
     tables[data.table] = table;
     state.tables = tables;
@@ -115,14 +115,12 @@ export function addTableMessage(data, state) {
 }
 
 export function addMove(data, state) {
-    // let game = new Game();
-    // state.game.copyOnto(game);
-    let game =  Object.assign( Object.create( Object.getPrototypeOf(state.game)), state.game);
+    const game =  state.game.newInstance();
     if (data.table === state.table) {
         if (data.moves.length === 1 && data.move === data.moves[0]) {
             game.addMove(data.move);
         } else {
-            game.reset();
+            game.resetBoard();
             for(let i = 0; i < data.moves.length; i++) {
                 game.addMove(data.moves[i]);
             }
@@ -133,7 +131,10 @@ export function addMove(data, state) {
 
 export function changeGameState(data, state) {
     if (data.table === state.table) {
-        let game =  Object.assign( Object.create( Object.getPrototypeOf(state.game)), state.game);
+        const game = state.game.newInstance();
+
+        // console.log('game state change from ', game.gameState.state, ' to ', data.state)
+
         if ((game.gameState.state === GameState.State.NOT_STARTED || game.gameState.state === GameState.State.HALFSET) 
             && data.state === GameState.State.STARTED) {
             game.reset();
@@ -143,8 +144,9 @@ export function changeGameState(data, state) {
             tables[data.table] = table;
             state.tables = tables;
         } 
-        game.gameState.state = data.state;
+        game.gameState = Object.assign(game.gameState, { state: data.state });
         state.game = game;
+        // console.log(JSON.stringify(state.game))
         if (data.changeText) {
             addTableMessage({player: 'game server', text: data.changeText}, state);
         } 
@@ -154,7 +156,7 @@ export function changeGameState(data, state) {
 export function changeTimer(data, state) {
     if (data.table === state.table) {
         const tables = { ...state.tables };
-        const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+        const table = tables[data.table].newInstance();
         const idx = table.seats.indexOf(data.player);
         table.clocks[idx].minutes = data.minutes;
         table.clocks[idx].seconds = data.seconds;
@@ -171,7 +173,7 @@ export function serverTableMessage(data, state) {
 
 export function adjustTimer(data, state) {
     const tables = { ...state.tables };
-    const table = Object.assign( Object.create( Object.getPrototypeOf(tables[state.table])), tables[state.table]);
+    const table = tables[state.table].newInstance();
     table.adjustTimer(data);
     tables[state.table] = table;
     state.tables = tables;
@@ -181,7 +183,7 @@ export function undoRequested(data, state) {
     if (data.table === state.table) {
         if (state.tables[data.table].iAmPlaying() && state.tables[data.table].isMyTurn(state.game)) {
             const tables = { ...state.tables };
-            const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+            const table = tables[state.table].newInstance();
             table.undo_requested = state.users[data.player].userhtml;
             tables[data.table] = table;
             state.tables = tables;
@@ -193,10 +195,12 @@ export function undoRequested(data, state) {
 export function undoReply(data, state) {
     if (data.table === state.table) {
         const tables = { ...state.tables };
-        const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+        const table = tables[state.table].newInstance();
         delete table.undo_requested;
         if (data.accepted) {
-            state.game.undoMove();
+            const game = state.game.newInstance();
+            game.undoMove();
+            state.game = game;
         } 
         tables[data.table] = table;
         state.tables = tables;
@@ -208,7 +212,7 @@ export function cancelRequested(data, state) {
     if (data.table === state.table) {
         if (state.tables[data.table].iAmPlaying() && state.me !== data.player) {
             const tables = { ...state.tables };
-            const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+            const table = tables[state.table].newInstance();
             table.cancel_requested = state.users[data.player].userhtml;
             tables[data.table] = table;
             state.tables = tables;
@@ -222,3 +226,29 @@ export function cancelRequested(data, state) {
 //         addTableMessage({player: 'game server', text: 'set cancellation ' + (data.accepted?'accepted':'denied')}, state);
 //     }
 // }
+
+export function swapSeats(data, state) {
+    if (data.table === state.table) {
+        if (!data.silent) {
+            // console.log('swapping at utils')
+            const tables = { ...state.tables };
+            const table = tables[state.table].newInstance();
+            table.swap();
+            tables[data.table] = table;
+            state.tables = tables;
+        }
+        const game = state.game.newInstance();
+        game.gameState.dPenteState = data.swapped?GameState.DPenteState.SWAPPED:GameState.DPenteState.NOT_SWAPPED;
+        state.game = game;
+    }    
+}
+
+export function setPlayingPlayerTable(data, state) {
+    if (data.table === state.table) {
+        const tables = { ...state.tables };
+        const table = tables[state.table].newInstance();
+        table.seats[data.seat] = data.player;
+        tables[data.table] = table;
+        state.tables = tables;
+    }
+}

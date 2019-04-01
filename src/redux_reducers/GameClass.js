@@ -44,21 +44,26 @@ export class Game {
         this.reset();
     }
     
-    // copyOnto = (newGame) => {
-    //     newGame.captures = this.captures;
-    //     newGame.moves = this.moves;
-    //     newGame.goGroupsByPlayerAndID = this.goGroupsByPlayerAndID;
-    //     newGame.goStoneGroupIDsByPlayer = this.goStoneGroupIDsByPlayer;
-    //     newGame.koMove = this.koMove;
-    //     newGame.suicideAllowed = this.suicideAllowed;
-    //     newGame.goTerritoryByPlayer = this.goTerritoryByPlayer;
-    //     newGame.hasPass = this.hasPass; 
-    //     newGame.doublePass = this.doublePass;
-    //     newGame.goDeadStonesByPlayer = this.goDeadStonesByPlayer;
-    //     newGame.setGame(this.game);
-    //     newGame.rated = this.rated;
-    //     newGame.me = this.me;
-    // };
+    newInstance = () => {
+        const newGame = new Game();
+        newGame.captures = this.captures;
+        newGame.moves = this.moves;
+        newGame.goGroupsByPlayerAndID = this.goGroupsByPlayerAndID;
+        newGame.goStoneGroupIDsByPlayer = this.goStoneGroupIDsByPlayer;
+        newGame.koMove = this.koMove;
+        newGame.suicideAllowed = this.suicideAllowed;
+        newGame.goTerritoryByPlayer = this.goTerritoryByPlayer;
+        newGame.hasPass = this.hasPass; 
+        newGame.doublePass = this.doublePass;
+        newGame.goDeadStonesByPlayer = this.goDeadStonesByPlayer;
+        newGame.setGame(this.game);
+        newGame.rated = this.rated;
+        newGame.me = this.me;
+        newGame.gameState = { ...this.gameState };
+        newGame.abstractBoard = this.abstractBoard;
+        
+        return newGame;
+    };
     
     updateGameState = (gameState) => {
         Object.assign(this, gameState);
@@ -81,7 +86,13 @@ export class Game {
         } else if (this.#isDPente()) {
             if (this.moves.length < 4) {
                 return 1;
-            } 
+            } else if (this.moves.length === 4) {
+                if (this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE) {
+                    return 2;                    
+                } else {
+                    return 1;
+                }
+            }
         }
         return (1 + (this.moves.length % 2));
     };
@@ -108,7 +119,26 @@ export class Game {
         return this.game > 18;
     };
     
+    dPenteChoice = () => {
+        // console.log('dpente ', this.#isDPente())
+        // console.log('moves ', this.moves.length)
+        // console.log('state ', JSON.stringify(this.gameState))
+        // console.log('dp state ', this.gameState.dPenteState)
+        return this.#isDPente() && this.moves.length === 4 &&
+            this.gameState.state === GameState.State.STARTED &&
+            this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE;
+    };
+    
     reset = () => {
+        this.resetBoard();
+        
+        this.gameState = {
+            state: GameState.State.NOT_STARTED,
+            dPenteState: GameState.DPenteState.NO_CHOICE,
+            goState: GameState.GoState.PLAY
+        }
+    };
+    resetBoard = () => {
         this.captures = [undefined, 0, 0];
         this.moves = [];
         this.goGroupsByPlayerAndID = {1: {}, 2: {}};
@@ -119,12 +149,6 @@ export class Game {
         this.hasPass = false; this.doublePass = false;
         this.goDeadStonesByPlayer = {1: [], 2: []};
         this.#resetAbstractBoard();
-        
-        this.gameState = {
-            state: GameState.State.NOT_STARTED,
-            dPenteState: GameState.DPenteState.NO_CHOICE,
-            goState: GameState.GoState.PLAY
-        }
     };
     #resetAbstractBoard = () => {
         for (let i = 0; i < 19; i++) {

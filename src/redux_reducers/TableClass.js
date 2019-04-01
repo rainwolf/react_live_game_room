@@ -1,13 +1,34 @@
+import {Game} from "./GameClass";
+
 const PRIVATE_TABLE = 2;
 
 class Table {
     constructor(tableState) {
         this.seats = [undefined, "", ""];
         this.players = [];
-        this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
-            { minutes: tableState.initialMinutes, seconds: 0 } ];
-        this.updateTable(tableState);
+        if (tableState) {
+            this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
+                { minutes: tableState.initialMinutes, seconds: 0 } ];
+            this.updateTable(tableState);
+        } 
     }
+
+    newInstance = () => {
+        const newTable = new Table();
+        newTable.seats = [...this.seats];
+        newTable.players = [...this.players];
+        newTable.clocks = [...this.clocks];
+        newTable.me = this.me;
+        newTable.table = this.table;
+        newTable.timed = this.timed;
+        newTable.initialMinutes = this.initialMinutes;
+        newTable.incrementalSeconds = this.incrementalSeconds;
+        newTable.rated = this.rated;
+        newTable.game = this.game;
+        newTable.tableType = this.tableType;
+        
+        return newTable;
+    };
     
     player_color = (p) => {
         if (this.game > 18) {
@@ -133,13 +154,22 @@ class Table {
     };
     
     swap = () => {
+        // console.log('swapping at table')
         this.seats = [undefined, this.seats[2], this.seats[1]];
         this.clocks = [undefined, this.clocks[2], this.clocks[1]];
     };
     
     iAmPlaying = () => {
         return this.me === this.seats[1] || this.me === this.seats[2]; 
-    }
+    };
+    
+    myDPenteChoice = (game) => {
+        // console.log('my turn ', this.isMyTurn(game));
+        // console.log('dpente choice ', game.dPenteChoice());
+        //
+        // console.log('myDPenteChoice gamestate ', JSON.stringify(game.gameState));
+        return this.isMyTurn(game) && game.dPenteChoice();
+    };
 }
 
 export default Table;
