@@ -136,6 +136,10 @@ class Table {
         this.seats = [undefined, this.seats[2], this.seats[1]];
         this.clocks = [undefined, this.clocks[2], this.clocks[1]];
     };
+    
+    iAmPlaying = () => {
+        return this.me === this.seats[1] || this.me === this.seats[2]; 
+    }
 }
 
 export default Table;

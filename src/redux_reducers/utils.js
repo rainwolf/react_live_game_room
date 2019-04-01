@@ -179,11 +179,14 @@ export function adjustTimer(data, state) {
 
 export function undoRequested(data, state) {
     if (data.table === state.table) {
-        const tables = { ...state.tables };
-        const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
-        table.undo_requested = state.users[data.player].userhtml;
-        tables[data.table] = table;
-        state.tables = tables;
+        if (state.tables[data.table].iAmPlaying() && state.tables[data.table].isMyTurn(state.game)) {
+            const tables = { ...state.tables };
+            const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+            table.undo_requested = state.users[data.player].userhtml;
+            tables[data.table] = table;
+            state.tables = tables;
+        }
+        addTableMessage({player: 'game server', text: 'undo requested'}, state);
     }
 }
 
@@ -197,5 +200,25 @@ export function undoReply(data, state) {
         } 
         tables[data.table] = table;
         state.tables = tables;
+        addTableMessage({player: 'game server', text: 'undo ' + (data.accepted?'accepted':'denied')}, state);
     }
 }
+
+export function cancelRequested(data, state) {
+    if (data.table === state.table) {
+        if (state.tables[data.table].iAmPlaying() && state.me !== data.player) {
+            const tables = { ...state.tables };
+            const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+            table.cancel_requested = state.users[data.player].userhtml;
+            tables[data.table] = table;
+            state.tables = tables;
+        }
+        addTableMessage({player: 'game server', text: 'set cancellation requested'}, state);
+    }
+}
+
+// export function cancelReply(data, state) {
+//     if (data.table === state.table) {
+//         addTableMessage({player: 'game server', text: 'set cancellation ' + (data.accepted?'accepted':'denied')}, state);
+//     }
+// }

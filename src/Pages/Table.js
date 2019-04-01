@@ -10,6 +10,7 @@ import Grid from '@material-ui/core/Grid';
 import ChatComponent from '../Components/Chat/ChatComponent';
 import Button from '@material-ui/core/Button';
 import UndoModal from '../Components/Table/UndoModal';
+import CancelModal from '../Components/Table/CancelModal';
 
 import Seat from '../Components/Table/Seat';
 import Timer from '../Components/Table/Timer';
@@ -68,12 +69,6 @@ const UnconnectedTable = (props) => {
     };
     const leave = () => {
         props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: props.table.table, time: 0}});
-    };
-    const cancelReply = (accept) => {
-        props.send_message({dsgCancelReplyTableEvent: {accepted: accept, player: props.table.me, table: props.table.table, time: 0}});
-    };
-    const undoReply = (accept) => {
-        props.send_message({dsgUndoReplyTableEvent: {accepted: accept, player: props.table.me, table: props.table.table, time: 0}});
     };
     const rejectGoAssessment = () => {
         props.send_message({dsgRejectGoStateEvent: {player: props.table.me, table: props.table.table, time: 0}});
@@ -138,8 +133,9 @@ const UnconnectedTable = (props) => {
                     </Grid>
                 </Grid>
             </Grid>
-            
+
             <UndoModal/>
+            <CancelModal/>
         </div>
     );
 };
