@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { send_message } from "../redux_actions/actionTypes";
+import { send_message, toggleSettings } from "../redux_actions/actionTypes";
 import PropTypes from 'prop-types';
 import User from "../redux_reducers/UserClass";
 import { Game } from '../redux_reducers/GameClass';
@@ -30,6 +30,9 @@ const mapDispatchToProps = dispatch => {
     return {
         send_message: message => {
             dispatch(send_message(message));
+        },
+        toggle_settings: () => {
+            dispatch(toggleSettings());
         }
     }
 };
@@ -74,9 +77,6 @@ const UnconnectedTable = (props) => {
     };
     const rejectGoAssessment = () => {
         props.send_message({dsgRejectGoStateEvent: {player: props.table.me, table: props.table.table, time: 0}});
-    };
-    const swapSeats = (swap) => {
-        props.send_message({dsgSwapSeatsTableEvent: {swap: swap, silent: false, player: props.table.me, table: props.table.table, time: 0}});
     };
     const bootPlayer = (player) => {
         props.send_message({dsgBootTableEvent: {toBoot: player, player: props.table.me, table: props.table.table, time: 0}});
@@ -125,6 +125,9 @@ const UnconnectedTable = (props) => {
                                     </Button>
                                     <Button variant="contained" color="primary" onClick={leave}>
                                         exit table
+                                    </Button>
+                                    <Button variant="contained" color="primary" onClick={props.toggle_settings}>
+                                        settings
                                     </Button>
                                 </div>
                             </div>

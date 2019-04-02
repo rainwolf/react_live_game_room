@@ -73,7 +73,7 @@ const UnconnectedSettingsModal = (props) => {
     
     const send_change = (event) => {
         let correction = { [event.target.name]: event.target.value };
-        console.log(JSON.stringify(correction));
+        // console.log(JSON.stringify(correction));
         if (event.target.name === 'rated' || event.target.name === 'timed') {
             if (event.target.value === 'false') {
                 correction = { [event.target.name]: true };
@@ -99,7 +99,9 @@ const UnconnectedSettingsModal = (props) => {
                 // onClose={this.handleClose}
             >
                 <div style={getModalStyle()} className={classes.paper}>
-
+                    <Typography variant="h6" id="modal-title">
+                    Table settings
+                    </Typography>
                     <List className={classes.root}>
                         <ListItem key='game' >
                             <ListItemText
@@ -110,13 +112,16 @@ const UnconnectedSettingsModal = (props) => {
                                 value={table.game}
                                 input={
                                     <OutlinedInput
-                                        // labelWidth={this.state.labelWidth}
+                                        labelWidth={0}
                                         name="game"
                                         id="outlined-age-simple"
                                     />
                                 }
                             >
-                                {[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>
+                                {/*{[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>*/}
+                                    {/*<MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>*/}
+                                {/*)}*/}
+                                {Array.from({length: 24}, (v, i) => i+1).map(game =>
                                     <MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>
                                 )}
                             </Select>                        
@@ -153,7 +158,7 @@ const UnconnectedSettingsModal = (props) => {
                                 value={table.initialMinutes}
                                 input={
                                     <OutlinedInput
-                                        // labelWidth={this.state.labelWidth}
+                                        labelWidth={0}
                                         name="initialMinutes"
                                         id="outlined-age-simple"
                                     />
@@ -174,7 +179,7 @@ const UnconnectedSettingsModal = (props) => {
                             value={table.incrementalSeconds}
                             input={
                             <OutlinedInput
-                            // labelWidth={this.state.labelWidth}
+                            labelWidth={0}
                             name="incrementalSeconds"
                             id="outlined-age-simple"
                             />
@@ -199,14 +204,11 @@ const UnconnectedSettingsModal = (props) => {
                         </ListItem>
                     </List>
                     
-                    {/*<Typography variant="h6" id="modal-title">*/}
-                        {/*Undo requested*/}
-                    {/*</Typography>*/}
                     {/*<Typography variant="subtitle1" id="simple-modal-description">*/}
                         {/*{table.undo_requested} requests to undo their last move.*/}
                     {/*</Typography>*/}
                     {/*<Button onClick={() => reply_undo(true)}>Accept</Button>*/}
-                    <Button onClick={props.toggle_settings}>Done</Button>
+                    <Button variant="contained" color="primary" onClick={props.toggle_settings}>Done</Button>
                 </div>
             </Modal>
         </div>

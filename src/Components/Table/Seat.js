@@ -33,46 +33,32 @@ const UnconnectedSeat = (props) => {
     
     if (table.seats[seat] === "") {
         return (
-            <Button variant="contained" color="primary" 
+            <Button variant="contained" color="primary" className={'button-glow'}
                     onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }>
                 Take Seat
             </Button>
         );
     } else {
         const player = users[table.seats[seat]];
-        if (game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) {
-            return (
-                <div>
-                    <ListItem key={seat} >
-                        <ListItemAvatar>
-                            <Avatar alt={table.seats[seat]} src={player.avatar} />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={player.userhtml}
-                            secondary={player.rating(table.game)}
-                        />
-                    </ListItem>
-                    <Button variant="contained" color="primary" 
+        return (
+            <div>
+                <ListItem key={seat} >
+                    <ListItemAvatar>
+                        <Avatar alt={table.seats[seat]} src={player.avatar} />
+                    </ListItemAvatar>
+                    <ListItemText
+                        primary={player.userhtml}
+                        secondary={player.rating(table.game)}
+                    />
+                </ListItem>
+                {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
+                    <Button variant="contained" color="primary"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }>
                         Leave seat
                     </Button>
-                </div>
-            );
-        } else {
-            return (
-                <div>
-                    <ListItem key={seat} >
-                        <ListItemAvatar>
-                            <Avatar alt={table.seats[seat]} src={player.avatar} />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={player.userhtml}
-                            secondary={player.rating(table.game)}
-                        />
-                    </ListItem>
-                </div>
-            )
-        }
+                }
+            </div>
+        );
     }
 };
 
