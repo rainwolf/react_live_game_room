@@ -38,7 +38,7 @@ const UnconnectedSeat = (props) => {
                 Take Seat
             </Button>
         );
-    } else if (table.seats[seat] !== "") {
+    } else if (table.seats[seat] !== "" && users[table.seats[seat]]) {
         const player = users[table.seats[seat]];
         return (
             <div>

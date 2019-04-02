@@ -76,7 +76,7 @@ class UnconnectedTimer extends Component {
         return (
             <div>
                 <Typography variant="h4">
-                    {minutes+':'+seconds}
+                    {this.props.table.timed ? minutes+':'+seconds : '-:-'}
                 </Typography>
             </div>
         );
