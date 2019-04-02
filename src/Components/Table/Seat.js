@@ -31,14 +31,14 @@ const mapDispatchToProps = dispatch => {
 const UnconnectedSeat = (props) => {
     const { seat, users, game, table } = props;
     
-    if (table.seats[seat] === "") {
+    if (table.seats[seat] === "" && table.seats[3-seat] !== table.me) {
         return (
             <Button variant="contained" color="primary" className={'button-glow'}
                     onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }>
                 Take Seat
             </Button>
         );
-    } else {
+    } else if (table.seats[seat] !== "") {
         const player = users[table.seats[seat]];
         return (
             <div>
@@ -50,15 +50,19 @@ const UnconnectedSeat = (props) => {
                         primary={player.userhtml}
                         secondary={player.rating(table.game)}
                     />
-                </ListItem>
-                {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
+                    {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
                     <Button variant="contained" color="primary"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }>
                         Leave seat
                     </Button>
-                }
+                    }
+                </ListItem>
             </div>
         );
+    } else {
+        return (
+            <div></div>
+        )
     }
 };
 

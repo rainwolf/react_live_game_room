@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { send_message, toggleSettings } from "../redux_actions/actionTypes";
 import PropTypes from 'prop-types';
 import User from "../redux_reducers/UserClass";
-import { Game } from '../redux_reducers/GameClass';
+import {Game, GameState} from '../redux_reducers/GameClass';
 import Table from '../redux_reducers/TableClass';
 import Board from '../Components/Board/Board';
 import Grid from '@material-ui/core/Grid';
@@ -40,6 +40,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedTable = (props) => {
 
+    const { users, game, messages, table } = props;
     const [height, setHeight] = useState(0);
     const ref = useRef(null);
 
@@ -50,45 +51,45 @@ const UnconnectedTable = (props) => {
     const sendTableText = (event) => {
         const str = event.target.value;
         if(event.key === 'Enter' && str !== '') {
-            props.send_message({dsgTextTableEvent: {text: str, table: props.table.table, time: 0}});
+            props.send_message({dsgTextTableEvent: {text: str, table: table.table, time: 0}});
             event.target.value = "";
         }
     };
     const sendMove = (move) => {
-        props.send_message({dsgMoveTableEvent: {move: move, moves: [move], player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
     };
     const requestCancel = () => {
-        props.send_message({dsgCancelRequestTableEvent: {player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
     };
     const resign = () => {
-        props.send_message({dsgResignTableEvent: {player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgResignTableEvent: {player: table.me, table: table.table, time: 0}});
     };
     const requestUndo = () => {
-        props.send_message({dsgUndoRequestTableEvent: {player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgUndoRequestTableEvent: {player: table.me, table: table.table, time: 0}});
     };
     const forceCancelResign = (resign) => {
-        props.send_message({dsgForceCancelResignTableEvent: {action:(resign?2:1), player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgForceCancelResignTableEvent: {action:(resign?2:1), player: table.me, table: table.table, time: 0}});
     };
     const play = () => {
-        props.send_message({dsgPlayTableEvent: {table: props.table.table, time: 0}});
+        props.send_message({dsgPlayTableEvent: {table: table.table, time: 0}});
     };
     const leave = () => {
-        props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: props.table.table, time: 0}});
+        props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: table.table, time: 0}});
     };
     const rejectGoAssessment = () => {
-        props.send_message({dsgRejectGoStateEvent: {player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgRejectGoStateEvent: {player: table.me, table: table.table, time: 0}});
     };
     const bootPlayer = (player) => {
-        props.send_message({dsgBootTableEvent: {toBoot: player, player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgBootTableEvent: {toBoot: player, player: table.me, table: table.table, time: 0}});
     };
     const invitePlayer = (player, message) => {
-        props.send_message({dsgBootTableEvent: {toInvite: player, inviteText: message, player: props.table.me, table: props.table.table, time: 0}});
+        props.send_message({dsgBootTableEvent: {toInvite: player, inviteText: message, player: table.me, table: table.table, time: 0}});
     };
     
     let table_users = {};
-    props.table.players.forEach(player => {
-        if (props.users[player]) {
-            table_users[player] = props.users[player];
+    table.players.forEach(player => {
+        if (users[player]) {
+            table_users[player] = users[player];
         }
     });
     
@@ -97,7 +98,7 @@ const UnconnectedTable = (props) => {
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 <Grid item style={{height: '100%'}}>
                     <div ref={ref} style={{height: '100%', width: height}}>
-                        <Board game={props.table.game} gameObj={props.game} table={props.table}
+                        <Board game={table.game} gameObj={game} table={table}
                                clickHandler={sendMove}/>
                     </div>
                 </Grid>
@@ -111,9 +112,13 @@ const UnconnectedTable = (props) => {
                                 <Timer seat={2}/>
                                 <Seat seat={2}/>
                                 <div>
-                                    <Button variant="contained" color="primary" onClick={play}>
-                                        Play
-                                    </Button>
+                                    {((game.gameState.state === GameState.State.NOT_STARTED ||
+                                        game.gameState.state === GameState.State.HALFSET) && table.iAmPlaying()) &&
+                                        <Button variant="contained" color="primary"
+                                                onClick={play} className={'button-glow'}>
+                                            Play
+                                        </Button>
+                                    }
                                     <Button variant="contained" color="primary" onClick={resign}>
                                         resign
                                     </Button>
@@ -133,7 +138,7 @@ const UnconnectedTable = (props) => {
                             </div>
                         </Grid>
                         <Grid item style={{height: '40%'}}>
-                            <ChatComponent messages={props.messages} game={props.table.game} users={table_users} sendText={sendTableText}/>
+                            <ChatComponent messages={messages} game={table.game} users={table_users} sendText={sendTableText}/>
                         </Grid>
                     </Grid>
                 </Grid>
