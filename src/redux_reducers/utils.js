@@ -32,7 +32,9 @@ export function exitUser(name, state) {
 export function changeTableState(tableState, state) {
     let tables = { ...state.tables };
     if (tables[tableState.table]) {
-        tables[tableState.table].updateTable(tableState);
+        const table = tables[tableState.table].newInstance(); 
+        table.updateTable(tableState);
+        tables[tableState.table] = table;
     } else {
         tables[tableState.table] = new Table(tableState);
         tables[tableState.table].me = state.me;

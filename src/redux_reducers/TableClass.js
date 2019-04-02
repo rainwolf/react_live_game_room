@@ -7,10 +7,12 @@ class Table {
         this.seats = [undefined, "", ""];
         this.players = [];
         if (tableState) {
-            this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
-                { minutes: tableState.initialMinutes, seconds: 0 } ];
+            this.clocks = [undefined, {minutes: tableState.initialMinutes, seconds: 0},
+                {minutes: tableState.initialMinutes, seconds: 0}];
             this.updateTable(tableState);
-        } 
+        } else {
+            this.clocks = [undefined, {minutes: 0, seconds: 0}, {minutes: 0, seconds: 0}];
+        }
     }
 
     newInstance = () => {
@@ -77,34 +79,37 @@ class Table {
         return style;
     };
     
-    game_name = () => {
+    game_name = (g) => {
+        if (g === undefined) {
+            g = this.game;
+        } 
         let name;
-        if (this.game < 3) {
+        if (g < 3) {
             name = 'Pente';
-        } else if (this.game < 5) {
+        } else if (g < 5) {
             name = 'Keryo-Pente';
-        } else if (this.game < 7) {
+        } else if (g < 7) {
             name = 'Gomoku';
-        } else if (this.game < 9) {
+        } else if (g < 9) {
             name = 'D-Pente';
-        } else if (this.game < 11) {
+        } else if (g < 11) {
             name = 'G-Pente';
-        } else if (this.game < 13) {
+        } else if (g < 13) {
             name = 'Poof-Pente';
-        } else if (this.game < 15) {
+        } else if (g < 15) {
             name = 'Connect6';
-        } else if (this.game < 17) {
+        } else if (g < 17) {
             name = 'Boat-Pente';
-        } else if (this.game < 19) {
+        } else if (g < 19) {
             name = 'DK-Pente';
-        } else if (this.game < 21) {
+        } else if (g < 21) {
             name = 'Go';
-        } else if (this.game < 23) {
+        } else if (g < 23) {
             name = 'Go (9x9)';
-        } else if (this.game < 25) {
+        } else if (g < 25) {
             name = 'Go (13x13)';
         }
-        if (this.game % 2 === 0) {
+        if (g % 2 === 0) {
             return 'Speed '+name;
         }
         return name;

@@ -1,5 +1,5 @@
 import '../redux_actions/actionTypes';
-import { CONNECT_SERVER, SET_TIMER } from "../redux_actions/actionTypes";
+import { CONNECT_SERVER, SET_TIMER, TOGGLE_SETTINGS } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -39,6 +39,9 @@ function liveGameApp (state = initialState, action) {
         case WEBSOCKET_CLOSED:
             console.log('socket closed');
             return initialState;
+        case TOGGLE_SETTINGS:
+            if (newState.showSettings) { delete newState.showSettings; } else { newState.showSettings = true; }
+            break;
         case WEBSOCKET_MESSAGE:
             console.log(action.payload.data);
             const json = JSON.parse(action.payload.data);

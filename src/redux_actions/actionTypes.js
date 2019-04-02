@@ -3,6 +3,7 @@ import { WEBSOCKET_CONNECT, WEBSOCKET_SEND } from '@giantmachines/redux-websocke
 export const CONNECT_SERVER = 'CONNECT_SERVER';
 // export const SERVER_CONNECTED = 'SERVER_CONNECTED';
 export const SET_TIMER = 'SET_TIMER';
+export const TOGGLE_SETTINGS = 'TOGGLE_SETTINGS';
 
 export function connectServer(server) {
     return {
@@ -32,5 +33,13 @@ export function set_timer(payload) {
     return {
         type: SET_TIMER,
         payload: payload
+    }
+}
+
+export function toggleSettings() {
+    // console.log('send '+ JSON.stringify(payload));
+    return {
+        type: TOGGLE_SETTINGS,
+        payload: undefined
     }
 }
