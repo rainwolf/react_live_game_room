@@ -400,28 +400,31 @@ export class Game {
         this.hasPass = false; this.doublePass = false;
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let move = this.moves[i];
-            if (move === passMove) {
-                if (this.hasPass) {
-                    this.doublePass = true;
-                } else {
-                    this.hasPass = true;
-                }
-            } else {
-                this.hasPass = false;
-            }
-            if (move !== passMove && !this.doublePass) {
-                let player = 1 + (i%2);
-                this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
-                this.#addGoMove(move, 3-player);
-            } else if (this.doublePass && move !== passMove) {
-                let pos = this.getPosition(move);
-                if (pos === 1) {
-                    p1DeadStones.push(move);
-                } else if (pos === 2) {
-                    p2DeadStones.push(move);
-                }
-                this.#setPosition(move, 0);
-            }
+            // if (move === passMove) {
+            //     if (this.hasPass) {
+            //         this.doublePass = true;
+            //     } else {
+            //         this.hasPass = true;
+            //     }
+            // } else {
+            //     this.hasPass = false;
+            // }
+            let player = 1 + (i%2);
+            // this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
+            this.#addGoMove(move, player);
+            // if (move !== passMove && !this.doublePass) {
+            //     let player = 1 + (i%2);
+            //     this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
+            //     this.#addGoMove(move, 3-player);
+            // } else if (this.doublePass && move !== passMove) {
+            //     let pos = this.getPosition(move);
+            //     if (pos === 1) {
+            //         p1DeadStones.push(move);
+            //     } else if (pos === 2) {
+            //         p2DeadStones.push(move);
+            //     }
+            //     this.#setPosition(move, 0);
+            // }
         }
     };
 
@@ -429,21 +432,29 @@ export class Game {
     #addGoMove = (x, y, currentPlayer) => {
         const move = this.gridSize * y + x;
         if (move === this.gridSize*this.gridSize) {
-            if (this.hasPass) {
-                this.doublePass = true;
-            } else {
-                this.hasPass = true;
+            if (this.gameState.goState === GameState.GoState.MARK_STONES) {
+                this.gameState.goState = GameState.GoState.EVALUATE_STONES;
+            } else if (this.gameState.goState === GameState.GoState.PLAY) {
+                if (this.hasPass) {
+                    this.doublePass = true;
+                    this.gameState.goState = GameState.GoState.MARK_STONES;
+                } else {
+                    this.hasPass = true;
+                }
             }
         } else {
             this.hasPass = false;
+            this.doublePass = false;
         }
         if (move >= this.gridSize*this.gridSize) {
             return;
         }
-        if (this.doublePass) {
+        // if (this.doublePass) {
+        if (this.gameState.goState === GameState.GoState.MARK_STONES) {
             let pos = this.getPosition(move);
             this.goDeadStonesByPlayer[pos].push(move);
             this.#setPosition(move, 0);
+            return;
         } 
         let opponent = 3 - currentPlayer;
         // console.log(goStoneGroupIDsByPlayer);
