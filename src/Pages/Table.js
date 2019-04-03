@@ -13,9 +13,8 @@ import UndoModal from '../Components/Table/UndoModal';
 import CancelModal from '../Components/Table/CancelModal';
 import DPenteChoiceModal from '../Components/Table/DPenteChoiceModal';
 import SettingsModal from '../Components/Table/SettingsModal';
+import GameInfoPanel from '../Components/Table/GameInfoPanel';
 
-import Seat from '../Components/Table/Seat';
-import Timer from '../Components/Table/Timer';
 
 const mapStateToProps = state => {
     return {
@@ -107,11 +106,8 @@ const UnconnectedTable = (props) => {
                           style={{width: '100%', height: '100%'}}>
                         <Grid item style={{maxWidth: '100%', flex: '1 1 auto', overflow: 'auto', minHeight: '0px'}}>
                             <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
-                                <Timer seat={1}/>
-                                <Seat seat={1}/>
-                                <Timer seat={2}/>
-                                <Seat seat={2}/>
                                 <div>
+                                    <GameInfoPanel/>
                                     {((game.gameState.state === GameState.State.NOT_STARTED ||
                                         game.gameState.state === GameState.State.HALFSET) && table.iAmPlaying()) &&
                                         <Button variant="contained" color="primary"

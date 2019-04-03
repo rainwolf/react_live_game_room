@@ -10,7 +10,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
-
+import SimpleStone from '../Board/SimpleStone';
+import Grid from '@material-ui/core/Grid';
 
 const mapStateToProps = state => {
     return {
@@ -33,17 +34,27 @@ const UnconnectedSeat = (props) => {
     
     if (table.seats[seat] === "" && table.seats[3-seat] !== table.me) {
         return (
-            <Button variant="contained" color="primary" className={'button-glow'}
-                    onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }>
-                Take Seat
-            </Button>
+            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                  style={{width: '100%', height: '100%'}}>
+                <Grid item xs>
+                    <SimpleStone size={40} id={table.player_color(seat)}/>
+                </Grid>
+                <Grid item xs>
+                    <Button variant="contained" color="primary" className={'button-glow'}
+                            onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }
+                    style={{marginLeft:10, marginBottom:28}}>
+                        Take Seat
+                    </Button>
+                </Grid>
+            </Grid>
         );
     } else if (table.seats[seat] !== "" && users[table.seats[seat]]) {
         const player = users[table.seats[seat]];
         return (
             <div>
                 <ListItem key={seat} >
-                    <ListItemAvatar>
+                    <SimpleStone size={40} id={table.player_color(seat)}/>
+                    <ListItemAvatar style={{marginLeft:10}}>
                         <Avatar alt={table.seats[seat]} src={player.avatar} />
                     </ListItemAvatar>
                     <ListItemText
@@ -52,7 +63,8 @@ const UnconnectedSeat = (props) => {
                     />
                     {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
                     <Button variant="contained" color="primary"
-                            onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }>
+                            onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }
+                            style={{marginLeft:10, marginBottom:20}}>
                         Leave seat
                     </Button>
                     }
@@ -61,7 +73,9 @@ const UnconnectedSeat = (props) => {
         );
     } else {
         return (
-            <div></div>
+            <div>
+                <SimpleStone size={40} id={table.player_color(seat)}/>
+            </div>
         )
     }
 };

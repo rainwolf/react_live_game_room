@@ -90,6 +90,9 @@ const UnconnectedSettingsModal = (props) => {
             player: table.me, table: table.table, time:0}, correction)});
     };
 
+    const incrementalSeconds = Array.from({length: 60}, (v, i) => i);
+    const initialMinutes = Array.from({length: 30}, (v, i) => i+1);
+    
     return (
         <div>
             <Modal
@@ -164,7 +167,7 @@ const UnconnectedSettingsModal = (props) => {
                                     />
                                 }
                             >
-                                {Array.from({length: 30}, (v, i) => i+1).map(m =>
+                                {initialMinutes.map(m =>
                                     <MenuItem key={m} value={m}>{m}</MenuItem>
                                 )}
                             </Select>
@@ -185,7 +188,7 @@ const UnconnectedSettingsModal = (props) => {
                             />
                         }
                             >
-                        {Array.from({length: 59}, (v, i) => i).map(m =>
+                        {incrementalSeconds.map(m =>
                             <MenuItem key={m} value={m}>{m}</MenuItem>
                             )}
                             </Select>

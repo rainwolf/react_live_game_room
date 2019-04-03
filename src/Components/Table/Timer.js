@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {Game, GameState} from "../../redux_reducers/GameClass";
 import Table from "../../redux_reducers/TableClass";
 import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
 
 
 const mapStateToProps = state => {
@@ -74,11 +75,11 @@ class UnconnectedTimer extends Component {
     render () {
         const { minutes, seconds } = this.state;
         return (
-            <div>
+            <Paper style={{textAlign: 'center'}}>
                 <Typography variant="h4">
                     {this.props.table.timed ? minutes+':'+seconds : '-:-'}
                 </Typography>
-            </div>
+            </Paper>
         );
     };
 };
