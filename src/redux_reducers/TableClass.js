@@ -115,6 +115,10 @@ class Table {
         return name;
     };
     
+    gameHasCaptures = () => {
+        return this.game < 5 || this.game > 6;    
+    };
+    
     updateTable = (tableState) => {
         if (this.initialMinutes !== tableState.initialMinutes) {
             this.clocks = [undefined, { minutes: tableState.initialMinutes, seconds: 0 },
@@ -166,6 +170,10 @@ class Table {
     
     iAmPlaying = () => {
         return this.me === this.seats[1] || this.me === this.seats[2]; 
+    };
+    
+    fullSeats = () => {
+        return this.seats[1] !== '' && this.seats[2] !== '';    
     };
     
     myDPenteChoice = (game) => {

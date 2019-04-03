@@ -42,7 +42,7 @@ const UnconnectedSeat = (props) => {
                 <Grid item xs>
                     <Button variant="contained" color="primary" className={'button-glow'}
                             onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }
-                    style={{marginLeft:10, marginBottom:28}}>
+                    style={{marginLeft:10}}>
                         Take Seat
                     </Button>
                 </Grid>
@@ -64,7 +64,7 @@ const UnconnectedSeat = (props) => {
                     {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
                     <Button variant="contained" color="primary"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }
-                            style={{marginLeft:10, marginBottom:20}}>
+                            style={{marginLeft:10, marginBottom:10}}>
                         Leave seat
                     </Button>
                     }

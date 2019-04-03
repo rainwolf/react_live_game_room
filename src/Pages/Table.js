@@ -93,7 +93,7 @@ const UnconnectedTable = (props) => {
     });
     
     return (
-        <div style={{width: '100%', height: '100%'}}>
+        <div style={{width: '80%', height: '100%'}}>
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 <Grid item style={{height: '100%'}}>
                     <div ref={ref} style={{height: '100%', width: height}}>
@@ -109,7 +109,8 @@ const UnconnectedTable = (props) => {
                                 <div>
                                     <GameInfoPanel/>
                                     {((game.gameState.state === GameState.State.NOT_STARTED ||
-                                        game.gameState.state === GameState.State.HALFSET) && table.iAmPlaying()) &&
+                                        game.gameState.state === GameState.State.HALFSET) && 
+                                        table.iAmPlaying() && table.fullSeats()) &&
                                         <Button variant="contained" color="primary"
                                                 onClick={play} className={'button-glow'}>
                                             Play

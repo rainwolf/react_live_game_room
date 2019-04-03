@@ -76,7 +76,7 @@ class UnconnectedTimer extends Component {
         const { minutes, seconds } = this.state;
         return (
             <Paper style={{textAlign: 'center'}}>
-                <Typography variant="h4">
+                <Typography variant="h3">
                     {this.props.table.timed ? minutes+':'+seconds : '-:-'}
                 </Typography>
             </Paper>

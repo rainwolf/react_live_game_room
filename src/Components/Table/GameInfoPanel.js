@@ -4,6 +4,7 @@ import {send_message, toggleSettings} from "../../redux_actions/actionTypes";
 import Grid from '@material-ui/core/Grid';
 import Seat from './Seat';
 import Timer from './Timer';
+import Captures from './Captures';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -54,7 +55,7 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Typography>
                         <Typography variant="subtitle1">
                             rated: {table.rated?'yes':'no'},&nbsp;
-                            {table.timed?('timed: '+table.initialMinutes+'/'+table.incrementalSeconds):'timed: no'},&nbsp;
+                            {table.timed?('timer: '+table.initialMinutes+'/'+table.incrementalSeconds):'timed: no'},&nbsp;
                             {table.tableType===1?'public ':'private '} table
                         </Typography>
                     </Paper>                    
@@ -72,14 +73,27 @@ const UnconnectedGameInfoPanel = (props) => {
                 </Grid>
                 <Grid item xs>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
-                        <Grid item style={{maxWidth: '50%', flex: '1 1 auto', minWidth: '0px'}}>
+                        <Grid item xs>
                             <Seat seat={1}/>
                         </Grid>
-                        <Grid item style={{maxWidth: '50%', flex: '1 1 auto', minWidth: '0px'}}>
+                        <Grid item xs>
                             <Seat seat={2}/>
                         </Grid>
                     </Grid>
                 </Grid>
+                {table.gameHasCaptures() &&
+                <Grid item xs>
+                    <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                          style={{width: '100%', height: '100%'}}>
+                        <Grid item xs>
+                            <Captures seat={1}/>
+                        </Grid>
+                        <Grid item xs>
+                            <Captures seat={2}/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                }
             </Grid>
         </div>
     );
