@@ -60,8 +60,9 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Typography>
                     </Paper>                    
                 </Grid>
+                {table.timed &&
                 <Grid item xs>
-                    <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} 
+                    <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
                         <Grid item xs>
                             <Timer seat={1}/>
@@ -71,6 +72,7 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Grid>
                     </Grid>
                 </Grid>
+                }
                 <Grid item xs>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                         <Grid item xs>
