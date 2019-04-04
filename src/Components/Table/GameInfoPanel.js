@@ -7,7 +7,9 @@ import Timer from './Timer';
 import Captures from './Captures';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
+import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import {GameState} from "../../redux_reducers/GameClass";
 
 const styles = theme => ({
     root: {
@@ -29,20 +31,29 @@ const mapStateToProps = state => {
     }
 };
 
-// const mapDispatchToProps = dispatch => {
-//     return {
-//         send_message: message => {
-//             dispatch(send_message(message));
-//         },
-//     }
-// };
+const mapDispatchToProps = dispatch => {
+    return {
+        send_message: message => {
+            dispatch(send_message(message));
+        },
+    }
+};
 
 
 
 
 
 const UnconnectedGameInfoPanel = (props) => {
-    const { table } = props;
+    const { table, game } = props;
+    const requestCancel = () => {
+        props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
+    };
+    const resign = () => {
+        props.send_message({dsgResignTableEvent: {player: table.me, table: table.table, time: 0}});
+    };
+    const requestUndo = () => {
+        props.send_message({dsgUndoRequestTableEvent: {player: table.me, table: table.table, time: 0}});
+    };
 
     return (
         <div style={{width: '100%', height: '100%', marginTop: 20}}>
@@ -96,12 +107,43 @@ const UnconnectedGameInfoPanel = (props) => {
                     </Grid>
                 </Grid>
                 }
+                {(table.iAmPlaying() && game.gameState.state === GameState.State.STARTED) &&
+                    <Grid item xs>
+                        <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                              style={{width: '100%', height: '100%'}}>
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary" onClick={resign}>
+                                        Resign
+                                    </Button>
+                                </div>
+                            </Grid>
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary" onClick={requestCancel}>
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </Grid>
+                            {!table.isMyTurn(game) &&
+                                <Grid item xs>
+                                    <div style={{width:'0%', margin: '0 auto'}}>
+                                        <Button variant="contained" color="primary" onClick={requestUndo}>
+                                            Undo
+                                        </Button>
+                                    </div>
+                                </Grid>
+                            }
+                        </Grid>
+                    </Grid>
+                }
+                
             </Grid>
         </div>
     );
 };
 
 
-const GameInfoPanel = connect(mapStateToProps)(withStyles(styles)(UnconnectedGameInfoPanel))
+const GameInfoPanel = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedGameInfoPanel))
 
 export default GameInfoPanel;

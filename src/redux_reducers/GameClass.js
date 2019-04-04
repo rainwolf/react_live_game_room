@@ -60,6 +60,11 @@ export class Game {
         newGame.rated = this.rated;
         newGame.me = this.me;
         newGame.gameState = { ...this.gameState };
+        // for (let i = 0; i < 19; i++ ) {
+        //     for (let j = 0; j < 19; j++ ) {
+        //         newGame.abstractBoard[i][j] = this.abstractBoard[i][j];
+        //     }
+        // }
         newGame.abstractBoard = this.abstractBoard;
         
         return newGame;
@@ -101,9 +106,9 @@ export class Game {
             return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
         } 
         const currentColor = 1 + (this.moves.length % 2);
-        if (this.isGo()) {
-            return 3 - currentColor;
-        }
+        // if (this.isGo()) {
+        //     return 3 - currentColor;
+        // }
         return currentColor;
     };
     // #isPoofPente = () => {
@@ -120,10 +125,6 @@ export class Game {
     };
     
     dPenteChoice = () => {
-        // console.log('dpente ', this.#isDPente())
-        // console.log('moves ', this.moves.length)
-        // console.log('state ', JSON.stringify(this.gameState))
-        // console.log('dp state ', this.gameState.dPenteState)
         return this.#isDPente() && this.moves.length === 4 &&
             this.gameState.state === GameState.State.STARTED &&
             this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE;
@@ -199,7 +200,7 @@ export class Game {
     };
     
     addMove = (move) => {
-        let x = move % 19, y = Math.floor(move / 19);
+        let x = move % this.gridSize, y = Math.floor(move / this.gridSize);
         if (this.game < 3) {
             let player = 1 + (this.moves.length%2);
             this.#addPenteMove(x, y, player);
@@ -411,7 +412,8 @@ export class Game {
             // }
             let player = 1 + (i%2);
             // this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
-            this.#addGoMove(move, player);
+            
+            this.#addGoMove(move % this.gridSize, Math.floor(move / this.gridSize), player);
             // if (move !== passMove && !this.doublePass) {
             //     let player = 1 + (i%2);
             //     this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
@@ -455,14 +457,13 @@ export class Game {
             this.goDeadStonesByPlayer[pos].push(move);
             this.#setPosition(move, 0);
             return;
-        } 
+        }
+        this.#setPosition(move, currentPlayer);
+
         let opponent = 3 - currentPlayer;
-        // console.log(goStoneGroupIDsByPlayer);
+
         let groupsByID = this.goGroupsByPlayerAndID[currentPlayer];
         let stoneGroupIDs = this.goStoneGroupIDsByPlayer[currentPlayer];
-        // console.log("currentPlayer: " + currentPlayer);
-        // console.log(groupsByID);
-        // console.log(stoneGroupIDs);
 
         this.#settleGroups(move, groupsByID, stoneGroupIDs);
         groupsByID = this.goGroupsByPlayerAndID[opponent];
@@ -484,8 +485,6 @@ export class Game {
                 this.#captureGroup(moveGroupID, groupsByID, stoneGroupIDs);
             }
         }
-
-        // console.log(abstractBoard);
     };
 
     #makeCaptures = (move, groupsByID, stoneGroupIDs, colorToCapture) => {
@@ -514,6 +513,7 @@ export class Game {
             this.koMove = -1;
         }
         this.captures[colorToCapture] += captures;
+        // console.log(captures);
         // if (colorToCapture === 1) {
         //     blackCaptures += captures;
         // } else {
@@ -531,7 +531,6 @@ export class Game {
         // console.log(groupsByID);
         if (neighborStoneGroup !== undefined) {
             if (this.#groupHasLiberties(neighborStoneGroup) === false) {
-                // console.log("capture");
                 if (this.koMove < 0 && neighborStoneGroup.length === 1 && this.#checkKo(move)) {
                     this.koMove = neighborStone;
                 } else {
@@ -609,7 +608,7 @@ export class Game {
         }
         if (Math.floor(stone/this.gridSize) !== 0) {
             let neighborStone = stone - this.gridSize;
-            let position = this.getPosition(neighborStone);
+            let position = this.getPosition(neighborStone, true);
             if (position !== 1 && position !== 2) {
                 return true;
             }
@@ -621,7 +620,6 @@ export class Game {
                 return true;
             }
         }
-        // console.log("no liberties for " + getMoveCoord(stone));
         return false;
     };
 

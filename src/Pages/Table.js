@@ -57,15 +57,6 @@ const UnconnectedTable = (props) => {
     const sendMove = (move) => {
         props.send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
     };
-    const requestCancel = () => {
-        props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
-    };
-    const resign = () => {
-        props.send_message({dsgResignTableEvent: {player: table.me, table: table.table, time: 0}});
-    };
-    const requestUndo = () => {
-        props.send_message({dsgUndoRequestTableEvent: {player: table.me, table: table.table, time: 0}});
-    };
     const forceCancelResign = (resign) => {
         props.send_message({dsgForceCancelResignTableEvent: {action:(resign?2:1), player: table.me, table: table.table, time: 0}});
     };
@@ -104,7 +95,7 @@ const UnconnectedTable = (props) => {
                 <Grid item style={{height:'100%', flex: '1', minWidth: '0px'}}>
                     <Grid container direction={'column'} alignItems={'stretch'}  wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
-                        <Grid item style={{maxWidth: '100%', flex: '1 1 auto', overflow: 'auto', minHeight: '0px'}}>
+                        <Grid item style={{maxWidth: '100%', flex: '1 1 auto', overflow: 'auto', minHeight: '0px', borderWidth: '1px', borderStyle: 'solid'}}>
                             <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
                                 <div>
                                     <GameInfoPanel/>
@@ -116,15 +107,6 @@ const UnconnectedTable = (props) => {
                                             Play
                                         </Button>
                                     }
-                                    <Button variant="contained" color="primary" onClick={resign}>
-                                        resign
-                                    </Button>
-                                    <Button variant="contained" color="primary" onClick={requestUndo}>
-                                        request undo
-                                    </Button>
-                                    <Button variant="contained" color="primary" onClick={requestCancel}>
-                                        request cancel
-                                    </Button>
                                     <Button variant="contained" color="primary" onClick={leave}>
                                         exit table
                                     </Button>

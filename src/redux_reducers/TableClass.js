@@ -43,9 +43,6 @@ class Table {
     };
     
     isMyTurn = (game) => {
-        // console.log('me ', this.me);
-        // console.log('this.seats ', this.seats);
-        // console.log('currentplayer ', game.currentPlayer());
         return this.me === this.seats[game.currentPlayer()];
     };
     
@@ -177,12 +174,9 @@ class Table {
     };
     
     myDPenteChoice = (game) => {
-        // console.log('my turn ', this.isMyTurn(game));
-        // console.log('dpente choice ', game.dPenteChoice());
-        //
-        // console.log('myDPenteChoice gamestate ', JSON.stringify(game.gameState));
         return this.isMyTurn(game) && game.dPenteChoice();
     };
+    
 }
 
 export default Table;
