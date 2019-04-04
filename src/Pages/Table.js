@@ -63,9 +63,6 @@ const UnconnectedTable = (props) => {
     const play = () => {
         props.send_message({dsgPlayTableEvent: {table: table.table, time: 0}});
     };
-    const leave = () => {
-        props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: table.table, time: 0}});
-    };
     const rejectGoAssessment = () => {
         props.send_message({dsgRejectGoStateEvent: {player: table.me, table: table.table, time: 0}});
     };
@@ -107,12 +104,6 @@ const UnconnectedTable = (props) => {
                                             Play
                                         </Button>
                                     }
-                                    <Button variant="contained" color="primary" onClick={leave}>
-                                        exit table
-                                    </Button>
-                                    <Button variant="contained" color="primary" onClick={props.toggle_settings}>
-                                        settings
-                                    </Button>
                                 </div>
                             </div>
                         </Grid>

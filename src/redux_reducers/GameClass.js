@@ -84,6 +84,10 @@ export class Game {
             this.gridSize = 13;
         }
     };
+
+    canNotLeave = () => {
+        return this.gameState.state === GameState.State.STARTED || this.gameState.state === GameState.State.HALFSET;    
+    };
     
     currentPlayer = () => {
         if (this.#isConnect6()) {

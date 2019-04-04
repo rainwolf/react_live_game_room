@@ -54,6 +54,13 @@ const UnconnectedGameInfoPanel = (props) => {
     const requestUndo = () => {
         props.send_message({dsgUndoRequestTableEvent: {player: table.me, table: table.table, time: 0}});
     };
+    const leave = () => {
+        props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: table.table, time: 0}});
+    };
+    const pass = () => {
+        const pass_move = game.gridSize*game.gridSize;
+        props.send_message({dsgMoveTableEvent: {move: pass_move, moves: [pass_move], player: table.me, table: table.table, time: 0}});
+    };
 
     return (
         <div style={{width: '100%', height: '100%', marginTop: 20}}>
@@ -111,6 +118,15 @@ const UnconnectedGameInfoPanel = (props) => {
                     <Grid item xs>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
+                            {(table.isMyTurn(game) && game.isGo()) &&
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary" onClick={pass}>
+                                        PASS
+                                    </Button>
+                                </div>
+                            </Grid>
+                            }
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" onClick={resign}>
@@ -133,6 +149,31 @@ const UnconnectedGameInfoPanel = (props) => {
                                         </Button>
                                     </div>
                                 </Grid>
+                            }
+                        </Grid>
+                    </Grid>
+                }
+                {(table.owner || table.canExit(game)) &&
+                    <Grid item xs>
+                        <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                              style={{width: '100%', height: '100%'}}>
+                            {table.owner &&
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary" onClick={props.toggle_settings}>
+                                        settings
+                                    </Button>
+                                </div>
+                            </Grid>
+                            }
+                            {table.canExit(game) &&
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary" onClick={leave}>
+                                        exit table
+                                    </Button>
+                                </div>
+                            </Grid>
                             }
                         </Grid>
                     </Grid>

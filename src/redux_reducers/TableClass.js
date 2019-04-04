@@ -46,6 +46,10 @@ class Table {
         return this.me === this.seats[game.currentPlayer()];
     };
     
+    canExit = (game) => {
+        return !(this.iAmPlaying() && game.canNotLeave());      
+    };
+    
     private = () => {
         return this.tableType === PRIVATE_TABLE;    
     };
