@@ -134,7 +134,7 @@ const UnconnectedTable = (props) => {
                                 </div>
                             </div>
                         </Grid>
-                        <Grid item style={{height: '40%'}}>
+                        <Grid item style={{height: '40%', borderWidth: '1px', borderStyle: 'solid'}}>
                             <ChatComponent messages={messages} game={table.game} users={table_users} sendText={sendTableText}/>
                         </Grid>
                     </Grid>
