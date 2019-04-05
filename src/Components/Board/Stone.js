@@ -2,7 +2,7 @@ import React from 'react';
 
 function Stone(props) {
     return (
-        <svg key={1} height={props.size*1.5} width={props.size*1.5}>
+        <svg key={props.id} height={props.size*1.5} width={props.size*1.5}>
             <radialGradient id={props.id} cx="40%" cy="40%" r="50%">
                 <stop offset="0%" stopColor='var(--color1)' />
                 <stop offset="100%" stopColor='var(--color2)' />

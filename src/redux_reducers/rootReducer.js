@@ -7,7 +7,8 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, adjustTimer, undoRequested, undoReply,
-    cancelRequested, swapSeats, setPlayingPlayerTable} from "./utils";
+    cancelRequested, swapSeats, setPlayingPlayerTable,
+    rejectGoState} from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -43,6 +44,7 @@ function liveGameApp (state = initialState, action) {
             if (newState.showSettings) { delete newState.showSettings; } else { newState.showSettings = true; }
             break;
         case PRESSED_PLAY:
+            newState.pressed_play = true;
             break;
         case WEBSOCKET_MESSAGE:
             console.log(action.payload.data);
@@ -94,7 +96,10 @@ function liveGameApp (state = initialState, action) {
                 swapSeats(json.dsgSwapSeatsTableEvent, newState);
             } else if (json.dsgSetPlayingPlayerTableEvent) {
                 setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
+            } else if (json.dsgRejectGoStateEvent) {
+                rejectGoState(json.dsgRejectGoStateEvent, newState);
             }
+            
         //    {"dsgSetPlayingPlayerTableEvent":{"seat":1,"player":"iostest","table":1,"time":1554124915697}}
         // {"dsgSwapSeatsTableEvent":{"swap":true,"silent":false,"player":"iostest","table":1,"time":1554122803745}}
         // {"dsgSetPlayingPlayerTableEvent":{"seat":2,"player":"iostest","table":1,"time":1553629064097}} rootReducer.js:35

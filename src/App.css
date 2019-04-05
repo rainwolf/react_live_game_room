@@ -45,6 +45,10 @@
     --color1: white;
     --color2: gainsboro;
 }
+#red-stone-gradient {
+    --color1: pink;
+    --color2: red;
+}
 .pente {
     fill: #FDDEA3;
 }

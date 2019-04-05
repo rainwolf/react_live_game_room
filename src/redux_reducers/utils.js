@@ -1,6 +1,7 @@
 import Table from './TableClass';
 import User from './UserClass';
 import { Game, GameState } from './GameClass';
+import move_sound from '../resources/sounds/move_sound.mp3';
 
 export function processUser(userdata, state) {
     let user;
@@ -128,6 +129,8 @@ export function addMove(data, state) {
                 game.addMove(data.moves[i]);
             }
         } 
+        const sound = new Audio(move_sound);
+        sound.play();
     }
     state.game = game;
 }
@@ -136,13 +139,15 @@ export function changeGameState(data, state) {
     if (data.table === state.table) {
         const game = state.game.newInstance();
 
-        // console.log('game state change from ', game.gameState.state, ' to ', data.state)
+        if (data.state !== game.gameState.state) {
+            delete state.pressed_play;
+        }
 
         if ((game.gameState.state === GameState.State.NOT_STARTED || game.gameState.state === GameState.State.HALFSET) 
             && data.state === GameState.State.STARTED) {
             game.reset();
             const tables = { ...state.tables };
-            const table = Object.assign( Object.create( Object.getPrototypeOf(tables[data.table])), tables[data.table]);
+            const table = tables[data.table].newInstance();
             table.resetClocks();
             tables[data.table] = table;
             state.tables = tables;
@@ -184,12 +189,12 @@ export function adjustTimer(data, state) {
 
 export function undoRequested(data, state) {
     if (data.table === state.table) {
-        if (state.tables[data.table].iAmPlaying() && state.tables[data.table].isMyTurn(state.game)) {
-            const tables = { ...state.tables };
-            const table = tables[state.table].newInstance();
-            table.undo_requested = state.users[data.player].userhtml;
-            tables[data.table] = table;
-            state.tables = tables;
+        const table = state.tables[data.table];
+        if (table.isMyTurn(state.game) 
+            || (table.iAmPlaying() 
+                && !table.isMyTurn(state.game)
+                && state.game.gameState.goState === GameState.GoState.MARK_STONES)) {
+            state.undo_requested = true;
         }
         addTableMessage({player: 'game server', text: 'undo requested'}, state);
     }
@@ -197,16 +202,12 @@ export function undoRequested(data, state) {
 
 export function undoReply(data, state) {
     if (data.table === state.table) {
-        const tables = { ...state.tables };
-        const table = tables[state.table].newInstance();
-        delete table.undo_requested;
+        delete state.undo_requested;
         if (data.accepted) {
             const game = state.game.newInstance();
             game.undoMove();
             state.game = game;
         } 
-        tables[data.table] = table;
-        state.tables = tables;
         addTableMessage({player: 'game server', text: 'undo ' + (data.accepted?'accepted':'denied')}, state);
     }
 }
@@ -254,4 +255,13 @@ export function setPlayingPlayerTable(data, state) {
         tables[data.table] = table;
         state.tables = tables;
     }
+}
+
+export function rejectGoState(data, state) {
+    if (data.table === state.table) {
+        const game = state.game.newInstance();
+        game.rejectGoState();
+        state.game = game;
+        addTableMessage({player: 'game server', text: data.player+' rejected the assessment, play continues.'}, state);
+    }    
 }

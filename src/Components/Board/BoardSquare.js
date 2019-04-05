@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Stone from './Stone';
+import Territory from './Territory';
 
 
 class BoardSquare extends Component {
@@ -79,6 +80,8 @@ class BoardSquare extends Component {
                       fillOpacity={0.0} />
                 {this.boardpart(size)}
                 {this.props.stone && Stone({size: 10, id: this.props.stone})}
+                {this.props.deadStone && Stone({size: 10, id: this.props.deadStone, opacity: 0.5})}
+                {this.props.territory && Territory({size: 10, id: this.props.territory})}
                 {this.state.showStone && Stone({size: 10, id: this.props.hover, opacity: 0.6})}
             </g>
         );

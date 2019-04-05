@@ -60,12 +60,9 @@ export class Game {
         newGame.rated = this.rated;
         newGame.me = this.me;
         newGame.gameState = { ...this.gameState };
-        // for (let i = 0; i < 19; i++ ) {
-        //     for (let j = 0; j < 19; j++ ) {
-        //         newGame.abstractBoard[i][j] = this.abstractBoard[i][j];
-        //     }
-        // }
         newGame.abstractBoard = this.abstractBoard;
+        newGame.mark_dead_stones_player = this.mark_dead_stones_player;
+        newGame.evaluate_stones_player = this.evaluate_stones_player;
         
         return newGame;
     };
@@ -102,7 +99,11 @@ export class Game {
                     return 1;
                 }
             }
-        }
+        } else if (this.isGo() && this.gameState.goState === GameState.GoState.MARK_STONES) {
+            return this.mark_dead_stones_player;
+        } else if (this.isGo() && this.gameState.goState === GameState.GoState.EVALUATE_STONES) {
+            return this.evaluate_stones_player;
+        } 
         return (1 + (this.moves.length % 2));
     };
     currentColor = () => {
@@ -205,8 +206,9 @@ export class Game {
     
     addMove = (move) => {
         let x = move % this.gridSize, y = Math.floor(move / this.gridSize);
+        this.moves.push(move);
         if (this.game < 3) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
             if (this.rated && this.moves.length === 1) {
                 this.#applyTournamentRule();
@@ -214,7 +216,7 @@ export class Game {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 5) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addKeryoPenteMove(x, y, player);
             if (this.rated && this.moves.length === 1) {
                 this.#applyTournamentRule();
@@ -222,13 +224,13 @@ export class Game {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 7) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addGomokuMove(x, y, player);
         } else if (this.game < 9) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
         } else if (this.game < 11) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
             if (this.rated && this.moves.length === 1) {
                 this.#applyGPenteRule();
@@ -236,7 +238,7 @@ export class Game {
                 this.#undoGPenteRule();
             }
         } else if (this.game < 13) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addPoofPenteMove(x, y, player);
             if (this.rated && this.moves.length === 1) {
                 this.#applyTournamentRule();
@@ -244,10 +246,10 @@ export class Game {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 15) {
-            let player = (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
+            let player = (((this.moves.length % 4) === 1) || ((this.moves.length % 4) === 0)) ? 1 : 2;
             this.#addGomokuMove(x, y, player);
         } else if (this.game < 17) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
             if (this.rated && this.moves.length === 1) {
                 this.#applyTournamentRule();
@@ -255,13 +257,12 @@ export class Game {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 19) {
-            let player = 1 + (this.moves.length%2);
+            let player = 2 - (this.moves.length%2);
             this.#addKeryoPenteMove(x, y, player);
         } else if (this.game < 25) {
-            let player = 1 + (this.moves.length%2);
-            this.#addGoMove(x, y, player);
+            let player = 2 - (this.moves.length%2);
+            this.#addGoMove(move, player);
         }
-        this.moves.push(move);
     };
 
     #applyTournamentRule = () => {
@@ -396,13 +397,15 @@ export class Game {
 
     #replayGoGame = (until) => {
         this.#resetAbstractBoard();
-        const passMove = this.gridSize*this.gridSize;
+        // const passMove = this.gridSize*this.gridSize;
         this.goGroupsByPlayerAndID = {1: {}, 2: {}};
         this.goStoneGroupIDsByPlayer = {1: {}, 2: {}};
         this.goDeadStonesByPlayer = {1: [], 2: []};
-        let p1DeadStones = this.goDeadStonesByPlayer[1], p2DeadStones = this.goDeadStonesByPlayer[2];
+        // let p1DeadStones = this.goDeadStonesByPlayer[1], p2DeadStones = this.goDeadStonesByPlayer[2];
         this.koMove = -1;
         this.hasPass = false; this.doublePass = false;
+        this.gameState.goState = GameState.GoState.PLAY;
+        this.captures = [undefined, 0, 0];
         for (let i = 0; i < Math.min(this.moves.length, until); i++) {
             let move = this.moves[i];
             // if (move === passMove) {
@@ -417,7 +420,7 @@ export class Game {
             let player = 1 + (i%2);
             // this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
             
-            this.#addGoMove(move % this.gridSize, Math.floor(move / this.gridSize), player);
+            this.#addGoMove(move, player);
             // if (move !== passMove && !this.doublePass) {
             //     let player = 1 + (i%2);
             //     this.abstractBoard[move % this.gridSize][Math.floor(move / this.gridSize)] = player;
@@ -434,16 +437,36 @@ export class Game {
         }
     };
 
+    #find_dead_stones_player = () => {
+        let pass = false;
+        const pass_move = this.gridSize*this.gridSize;
+        // console.log('moves = ', JSON.stringify(this.moves))
+        for (let i = 0; i < this.moves.length; i++) {
+            if (this.moves[i] === pass_move) {
+                if (pass) {
+                    this.mark_dead_stones_player = 1 + (i+1)%2;
+                    break;
+                } else {
+                    pass = true;
+                }
+            } else {
+                pass = false;
+            }
+        }    
+    };
 
-    #addGoMove = (x, y, currentPlayer) => {
-        const move = this.gridSize * y + x;
+    #addGoMove = (move, currentPlayer) => {
         if (move === this.gridSize*this.gridSize) {
             if (this.gameState.goState === GameState.GoState.MARK_STONES) {
                 this.gameState.goState = GameState.GoState.EVALUATE_STONES;
+                this.evaluate_stones_player = 3 - this.mark_dead_stones_player;
             } else if (this.gameState.goState === GameState.GoState.PLAY) {
                 if (this.hasPass) {
                     this.doublePass = true;
                     this.gameState.goState = GameState.GoState.MARK_STONES;
+                    this.#getTerritories();
+                    this.#find_dead_stones_player();
+                    // console.log('dead player = ', this.mark_dead_stones_player)
                 } else {
                     this.hasPass = true;
                 }
@@ -460,6 +483,7 @@ export class Game {
             let pos = this.getPosition(move);
             this.goDeadStonesByPlayer[pos].push(move);
             this.#setPosition(move, 0);
+            this.#getTerritories();
             return;
         }
         this.#setPosition(move, currentPlayer);
@@ -743,7 +767,7 @@ export class Game {
     };
     #floodPlayer = (player) => {
         for (let move = 0; move < this.gridSize*this.gridSize; move++) {
-            if (this.getPosition(move) === 3-player) {
+            if (this.getPosition(move) === player) {
                 let neighbourStone = this.#getEmptyNeighbour(move);
                 while (neighbourStone > -1) {
                     this.#floodFillWorker(neighbourStone, player + 2);
@@ -790,7 +814,48 @@ export class Game {
         this.goTerritoryByPlayer[2] = p2Territory;
     };
     
+    goScores = () => {
+        this.#getTerritories();
+        let score = {1: 0, 2: 0};
+        for (let i = 0; i < this.gridSize; i++) {
+            for (let j = 0; j < this.gridSize; j++) {
+                const pos = this.abstractBoard[i][j];
+                if (pos > 0) {
+                    score[pos] += 1;
+                }
+            }
+        }
+        for (let i = 1; i < 3; i++) {
+            score[i] += this.goTerritoryByPlayer[i].length;
+        }
+        return score;
+    };
 
+    evaluateScore = () => {
+        return this.isGo() && this.gameState.state === GameState.State.STARTED 
+            && this.gameState.goState === GameState.GoState.EVALUATE_STONES;
+    };
+
+    rejectGoState = () => {
+        let pass = false;
+        const pass_move = this.gridSize*this.gridSize;
+        // console.log('moves = ', JSON.stringify(this.moves))
+        for (let i = 0; i < this.moves.length; i++) {
+            if (this.moves[i] === pass_move) {
+                if (pass) {
+                    const newMoves = this.moves.slice(0, i-1);
+                    this.moves = newMoves;
+                    this.replayGame();
+                    break;
+                } else {
+                    pass = true;
+                }
+            } else {
+                pass = false;
+            }
+        }
+
+    };
 
     #detectPenteCapture = (i, j, myColor) => {
         let opponentColor = 1 + (myColor % 2);

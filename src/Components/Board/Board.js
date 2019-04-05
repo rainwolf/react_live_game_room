@@ -9,11 +9,14 @@ const Board = (props) => {
     const table = props.table;
     
     const makeBoard = (gridsize) => {
-        if (game === undefined || table === undefined) { return [] };
+        if (game === undefined || table === undefined) { return []; }
         let board = [];
         let player_colors = [undefined, 'white-stone-gradient', 'black-stone-gradient'];
         if (game.isGo()) { player_colors = [undefined, 'black-stone-gradient', 'white-stone-gradient']; }
         let hover = player_colors[game.currentColor()];
+        if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
+            hover = 'red-stone-gradient';
+        }
         const myTurn = table.isMyTurn(game) && game.gameState.state === GameState.State.STARTED;
         // console.log('my turn: ', myTurn);
         // console.log('my turn: ', table.isMyTurn(game));
@@ -52,7 +55,7 @@ const Board = (props) => {
                     if (game.abstractBoard[i][j] === 0) {
                         clickHandler = props.clickHandler;
                     } 
-                    if (game.isGo() && game.doublePass) {
+                    if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
                         if (clickHandler === undefined) {
                             clickHandler = props.clickHandler;
                         } else {
@@ -64,6 +67,19 @@ const Board = (props) => {
                             part: squaretype, stone: stone,
                             clickHandler: clickHandler,
                             hover: hover});
+            }
+        }
+        if (game.isGo() && game.gameState.goState > GameState.GoState.PLAY) {
+            for (let i = 1; i < 3; i++) {
+                game.goDeadStonesByPlayer[i].forEach(s => {
+                    board[s].deadStone = player_colors[i];
+                });
+            }
+            for (let i = 1; i < 3; i++) {
+                // console.log(JSON.stringify(game.goTerritoryByPlayer[i]))
+                game.goTerritoryByPlayer[i].forEach(s => {
+                    board[s].territory = i;
+                });
             }
         }
         if (props.game < 19) {
