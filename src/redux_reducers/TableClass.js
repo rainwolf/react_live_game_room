@@ -28,6 +28,7 @@ class Table {
         newTable.rated = this.rated;
         newTable.game = this.game;
         newTable.tableType = this.tableType;
+        newTable.owner = this.owner;
         
         return newTable;
     };

@@ -13,8 +13,7 @@ import Select from '@material-ui/core/Select';
 import Switch from '@material-ui/core/Switch';
 
 import { connect } from 'react-redux';
-import {send_message} from "../../redux_actions/actionTypes";
-import {toggleSettings} from "../../redux_actions/actionTypes";
+import { send_message, TOGGLE_SETTINGS } from "../../redux_actions/actionTypes";
 
 function getModalStyle() {
     const top = 50;
@@ -56,7 +55,7 @@ const mapDispatchToProps = dispatch => {
         send_message: message => {
             dispatch(send_message(message));
         },
-        toggle_settings: () => dispatch(toggleSettings())
+        toggle_settings: () => dispatch({ type: TOGGLE_SETTINGS})
     }
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import {send_message, toggleSettings} from "../../redux_actions/actionTypes";
+import { send_message, TOGGLE_SETTINGS, PRESSED_PLAY } from "../../redux_actions/actionTypes";
 import Grid from '@material-ui/core/Grid';
 import Seat from './Seat';
 import Timer from './Timer';
@@ -26,7 +26,6 @@ const mapStateToProps = state => {
     return {
         users: state.users,
         game: state.game,
-        messages: state.table_messages,
         table: state.tables[state.table]
     }
 };
@@ -35,6 +34,9 @@ const mapDispatchToProps = dispatch => {
     return {
         send_message: message => {
             dispatch(send_message(message));
+        },
+        toggle_settings: () => {
+            dispatch({ type: TOGGLE_SETTINGS })
         },
     }
 };
@@ -160,7 +162,8 @@ const UnconnectedGameInfoPanel = (props) => {
                             {table.owner &&
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" onClick={props.toggle_settings}>
+                                    <Button variant="contained" color="primary" 
+                                            onClick={props.toggle_settings}>
                                         settings
                                     </Button>
                                 </div>
@@ -170,7 +173,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" onClick={leave}>
-                                        exit table
+                                        exit
                                     </Button>
                                 </div>
                             </Grid>

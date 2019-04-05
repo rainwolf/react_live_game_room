@@ -30,9 +30,6 @@ const mapDispatchToProps = dispatch => {
         send_message: message => {
             dispatch(send_message(message));
         },
-        toggle_settings: () => {
-            dispatch(toggleSettings());
-        }
     }
 };
 
@@ -44,7 +41,9 @@ const UnconnectedTable = (props) => {
     const ref = useRef(null);
 
     useEffect(() => {
-        setHeight(ref.current.clientHeight)
+        if (ref.current !== null) {
+            setHeight(ref.current.clientHeight)
+        } 
     });
 
     const sendTableText = (event) => {
@@ -83,16 +82,16 @@ const UnconnectedTable = (props) => {
     return (
         <div style={{width: '100%', height: '100%'}}>
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
-                <Grid item style={{height: '100%'}}>
+                <Grid item style={{height:'100%'}}>
                     <div ref={ref} style={{height: '100%', width: height}}>
                         <Board game={table.game} gameObj={game} table={table}
                                clickHandler={sendMove}/>
                     </div>
                 </Grid>
-                <Grid item style={{height:'100%', flex: '1', minWidth: '0px'}}>
+                <Grid item style={{height:'100%', width: 640}}>
                     <Grid container direction={'column'} alignItems={'stretch'}  wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
-                        <Grid item style={{maxWidth: '100%', flex: '1 1 auto', overflow: 'auto', minHeight: '0px', borderWidth: '1px', borderStyle: 'solid'}}>
+                        <Grid item style={{maxWidth: '100%', flex: '1 1 auto', minHeight: '0px', borderWidth: '1px', borderStyle: 'solid'}}>
                             <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
                                 <div>
                                     <GameInfoPanel/>

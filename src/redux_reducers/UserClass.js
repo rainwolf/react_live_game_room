@@ -54,7 +54,7 @@ class User {
     };
     #userhtml = () => {
         return (
-            <span className="name">
+            <span className="name" style={{whiteSpace: 'nowrap'}}>
             <a href={server + "/gameServer/profile?viewName=" + this.name} target="_blank" rel="noopener noreferrer">
                 { this.subscriber?(
                     <span style={{fontWeight:'bold', color:'#'+this.#rgb2hex(this.name_color)}}>

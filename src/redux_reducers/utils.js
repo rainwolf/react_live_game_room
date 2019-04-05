@@ -101,8 +101,9 @@ export function standTable(data, state) {
 
 export function tableOwner(ownerEvent, state) {
     const tables = { ...state.tables };
-    const table = tables[ownerEvent.table];
+    const table = tables[ownerEvent.table].newInstance();
     table.owner = ownerEvent.player === state.me;
+    tables[ownerEvent.table] = table;
     state.tables = tables;
 }
 

@@ -31,12 +31,13 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedSeat = (props) => {
     const { seat, users, game, table } = props;
+    const width = 318;
     
     if (table.seats[seat] === "" && table.seats[3-seat] !== table.me) {
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{width: '100%', height: '100%'}}>
-                <Grid item xs>
+                  style={{width: '100%', height: '100%', width: width}}>
+                <Grid item xs style={{marginLeft: 10}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
                 <Grid item xs>
@@ -51,9 +52,14 @@ const UnconnectedSeat = (props) => {
     } else if (table.seats[seat] !== "" && users[table.seats[seat]]) {
         const player = users[table.seats[seat]];
         return (
-            <div>
-                <ListItem key={seat} >
+            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                  style={{width: '100%', height: '100%', width: width}}>
+                <Grid item xs={1} style={{marginLeft:10, marginTop: 8}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
+                </Grid>
+                    <Grid item xs={8}>
+                <ListItem key={seat} >
+                    {/*<SimpleStone size={40} id={table.player_color(seat)}/>*/}
                     <ListItemAvatar style={{marginLeft:10}}>
                         <Avatar alt={table.seats[seat]} src={player.avatar} />
                     </ListItemAvatar>
@@ -61,19 +67,22 @@ const UnconnectedSeat = (props) => {
                         primary={player.userhtml}
                         secondary={player.rating(table.game)}
                     />
+                </ListItem>
+                </Grid>
                     {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
+                    <Grid item xs style={{marginTop: 10}}>
                     <Button variant="contained" color="primary"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }
-                            style={{marginLeft:10, marginBottom:10}}>
-                        Leave seat
+                            >
+                        Stand
                     </Button>
+                    </Grid>
                     }
-                </ListItem>
-            </div>
+            </Grid>
         );
     } else {
         return (
-            <div>
+            <div style={{marginLeft: 10, marginTop: 8, width: width}}>
                 <SimpleStone size={40} id={table.player_color(seat)}/>
             </div>
         )

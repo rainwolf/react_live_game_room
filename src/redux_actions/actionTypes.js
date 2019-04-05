@@ -4,6 +4,7 @@ export const CONNECT_SERVER = 'CONNECT_SERVER';
 // export const SERVER_CONNECTED = 'SERVER_CONNECTED';
 export const SET_TIMER = 'SET_TIMER';
 export const TOGGLE_SETTINGS = 'TOGGLE_SETTINGS';
+export const PRESSED_PLAY = 'PRESSED_PLAY';
 
 export function connectServer(server) {
     return {
@@ -29,17 +30,10 @@ export function send_message(payload) {
     }
 }
 
-export function set_timer(payload) {
-    return {
-        type: SET_TIMER,
-        payload: payload
-    }
-}
-
-export function toggleSettings() {
-    // console.log('send '+ JSON.stringify(payload));
-    return {
-        type: TOGGLE_SETTINGS,
-        payload: undefined
-    }
-}
+// export function set_timer(payload) {
+//     return {
+//         type: SET_TIMER,
+//         payload: payload
+//     }
+// }
+//

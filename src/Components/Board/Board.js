@@ -107,7 +107,7 @@ const Board = (props) => {
     } else if (props.game < 5) {
         style = 'keryo-pente'
     } else if (props.game < 7) {
-        style = 'gomoku-pente'
+        style = 'gomoku'
     } else if (props.game < 9) {
         style = 'd-pente'
     } else if (props.game < 11) {
