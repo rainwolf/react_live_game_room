@@ -24,6 +24,7 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
     return {
+        pressed_play: state.pressed_play,
         users: state.users,
         game: state.game,
         table: state.tables[state.table]
@@ -38,6 +39,9 @@ const mapDispatchToProps = dispatch => {
         toggle_settings: () => {
             dispatch({ type: TOGGLE_SETTINGS })
         },
+        play_pressed: () => {
+            dispatch({ type: PRESSED_PLAY })
+        },
     }
 };
 
@@ -46,7 +50,7 @@ const mapDispatchToProps = dispatch => {
 
 
 const UnconnectedGameInfoPanel = (props) => {
-    const { table, game } = props;
+    const { table, game, pressed_play } = props;
     const requestCancel = () => {
         props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
     };
@@ -62,6 +66,10 @@ const UnconnectedGameInfoPanel = (props) => {
     const pass = () => {
         const pass_move = game.gridSize*game.gridSize;
         props.send_message({dsgMoveTableEvent: {move: pass_move, moves: [pass_move], player: table.me, table: table.table, time: 0}});
+    };
+    const play = () => {
+        props.send_message({dsgPlayTableEvent: {table: table.table, time: 0}});
+        props.play_pressed();    
     };
 
     return (
@@ -116,11 +124,24 @@ const UnconnectedGameInfoPanel = (props) => {
                     </Grid>
                 </Grid>
                 }
-                {(table.iAmPlaying() && game.gameState.state === GameState.State.STARTED) &&
+                {(table.iAmPlaying() && (game.gameState.state === GameState.State.STARTED 
+                    || game.gameState.state === GameState.State.NOT_STARTED
+                    || game.gameState.state === GameState.State.HALFSET)) &&
                     <Grid item xs>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
-                            {(table.isMyTurn(game) && game.isGo()) &&
+                            {(pressed_play === undefined && (game.gameState.state === GameState.State.NOT_STARTED
+                                || game.gameState.state === GameState.State.HALFSET)  &&
+                                table.iAmPlaying() && table.fullSeats()) &&
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary" onClick={play} className={'button-glow'}>
+                                        play
+                                    </Button>
+                                </div>
+                            </Grid>
+                            }
+                            {(table.isMyTurn(game) && game.isGo() && game.gameState.state === GameState.State.STARTED) &&
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" onClick={pass}>
@@ -129,6 +150,7 @@ const UnconnectedGameInfoPanel = (props) => {
                                 </div>
                             </Grid>
                             }
+                            {game.gameState.state === GameState.State.STARTED &&
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" onClick={resign}>
@@ -136,14 +158,18 @@ const UnconnectedGameInfoPanel = (props) => {
                                     </Button>
                                 </div>
                             </Grid>
+                            }
+                            {game.gameState.state === GameState.State.STARTED &&
                             <Grid item xs>
-                                <div style={{width:'0%', margin: '0 auto'}}>
+                                <div style={{width: '0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" onClick={requestCancel}>
                                         Cancel
                                     </Button>
                                 </div>
                             </Grid>
-                            {!table.isMyTurn(game) &&
+                            }
+                            {(game.gameState.state === GameState.State.STARTED
+                                 && !table.isMyTurn(game)) &&
                                 <Grid item xs>
                                     <div style={{width:'0%', margin: '0 auto'}}>
                                         <Button variant="contained" color="primary" onClick={requestUndo}>

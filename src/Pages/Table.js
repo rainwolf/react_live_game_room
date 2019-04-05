@@ -14,6 +14,7 @@ import CancelModal from '../Components/Table/CancelModal';
 import DPenteChoiceModal from '../Components/Table/DPenteChoiceModal';
 import SettingsModal from '../Components/Table/SettingsModal';
 import GameInfoPanel from '../Components/Table/GameInfoPanel';
+import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
 
 
 const mapStateToProps = state => {
@@ -59,9 +60,6 @@ const UnconnectedTable = (props) => {
     const forceCancelResign = (resign) => {
         props.send_message({dsgForceCancelResignTableEvent: {action:(resign?2:1), player: table.me, table: table.table, time: 0}});
     };
-    const play = () => {
-        props.send_message({dsgPlayTableEvent: {table: table.table, time: 0}});
-    };
     const rejectGoAssessment = () => {
         props.send_message({dsgRejectGoStateEvent: {player: table.me, table: table.table, time: 0}});
     };
@@ -95,14 +93,6 @@ const UnconnectedTable = (props) => {
                             <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
                                 <div>
                                     <GameInfoPanel/>
-                                    {((game.gameState.state === GameState.State.NOT_STARTED ||
-                                        game.gameState.state === GameState.State.HALFSET) && 
-                                        table.iAmPlaying() && table.fullSeats()) &&
-                                        <Button variant="contained" color="primary"
-                                                onClick={play} className={'button-glow'}>
-                                            Play
-                                        </Button>
-                                    }
                                 </div>
                             </div>
                         </Grid>
@@ -117,6 +107,7 @@ const UnconnectedTable = (props) => {
             <CancelModal/>
             <DPenteChoiceModal/>
             <SettingsModal/>
+            <EvaluateGoModal/>
         </div>
     );
 };

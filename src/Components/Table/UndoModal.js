@@ -33,7 +33,8 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
     return {
-        table: state.tables[state.table]
+        table: state.tables[state.table],
+        undo_requested: state.undo_requested
     }
 };
 
@@ -49,7 +50,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedUndoModal = (props) => {
 
-    const { classes, table } = props;
+    const { classes, table, undo_requested } = props;
 
     const reply_undo = (reply) => {
         props.send_message({dsgUndoReplyTableEvent:{accepted: reply, player: table.me, table: table.table, time:0}});
@@ -60,7 +61,7 @@ const UnconnectedUndoModal = (props) => {
             <Modal
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
-                open={table.undo_requested !== undefined}
+                open={undo_requested !== undefined}
                 // onClose={this.handleClose}
             >
                 <div style={getModalStyle()} className={classes.paper}>
@@ -68,7 +69,7 @@ const UnconnectedUndoModal = (props) => {
                         Undo requested
                     </Typography>
                     <Typography variant="subtitle1" id="simple-modal-description">
-                        {table.undo_requested} requests to undo their last move.
+                        {undo_requested} requests to undo their last move.
                     </Typography>
                     <Button onClick={() => reply_undo(true)}>Accept</Button>
                     <Button onClick={() => reply_undo(false)}>Deny</Button>
