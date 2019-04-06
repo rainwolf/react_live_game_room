@@ -53,6 +53,7 @@ function liveGameApp (state = initialState, action) {
                 return initialState;
             } else if (json.dsgLoginEvent) {
                 newState.me = json.dsgLoginEvent.player;
+                newState.admin = json.dsgLoginEvent.me.admin;
                 newState.logged_in = true;
             } else if (json.dsgPingEvent) {
                 console.log('ping: ' + action.payload.data)

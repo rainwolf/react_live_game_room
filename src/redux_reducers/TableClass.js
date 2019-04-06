@@ -1,4 +1,4 @@
-import {Game} from "./GameClass";
+import {Game, GameState} from "./GameClass";
 
 const PRIVATE_TABLE = 2;
 
@@ -31,6 +31,14 @@ class Table {
         newTable.owner = this.owner;
         
         return newTable;
+    };
+    
+    canUndo = (game) => {
+        if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
+            return this.isMyTurn(game);
+        } else {
+            return this.me === this.seats[3 - game.currentPlayer()];
+        }  
     };
     
     player_color = (p) => {

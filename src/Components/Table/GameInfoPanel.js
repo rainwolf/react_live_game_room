@@ -27,7 +27,8 @@ const mapStateToProps = state => {
         pressed_play: state.pressed_play,
         users: state.users,
         game: state.game,
-        table: state.tables[state.table]
+        table: state.tables[state.table],
+        admin: state.admin
     }
 };
 
@@ -50,7 +51,8 @@ const mapDispatchToProps = dispatch => {
 
 
 const UnconnectedGameInfoPanel = (props) => {
-    const { table, game, pressed_play } = props;
+    const { table, game, pressed_play, admin } = props;
+    
     const requestCancel = () => {
         props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
     };
@@ -168,8 +170,7 @@ const UnconnectedGameInfoPanel = (props) => {
                                 </div>
                             </Grid>
                             }
-                            {(game.gameState.state === GameState.State.STARTED
-                                 && !table.isMyTurn(game)) &&
+                            {table.canUndo(game) &&
                                 <Grid item xs>
                                     <div style={{width:'0%', margin: '0 auto'}}>
                                         <Button variant="contained" color="primary" onClick={requestUndo}>
@@ -181,11 +182,11 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Grid>
                     </Grid>
                 }
-                {(table.owner || table.canExit(game)) &&
+                {(table.owner || admin || table.canExit(game)) &&
                     <Grid item xs>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
-                            {table.owner &&
+                            {(table.owner || admin) &&
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" 

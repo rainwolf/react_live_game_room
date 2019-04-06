@@ -194,7 +194,7 @@ export function undoRequested(data, state) {
             || (table.iAmPlaying() 
                 && !table.isMyTurn(state.game)
                 && state.game.gameState.goState === GameState.GoState.MARK_STONES)) {
-            state.undo_requested = true;
+            state.undo_requested = data.player;
         }
         addTableMessage({player: 'game server', text: 'undo requested'}, state);
     }
