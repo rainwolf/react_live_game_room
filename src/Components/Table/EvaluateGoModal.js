@@ -63,7 +63,10 @@ const UnconnectedEvaluateGoModal = (props) => {
         }
     };
     
-    const scores = game.goScores();
+    let scores = [0,0,0];
+    if (game.isGo()) {
+        scores = game.goScores();
+    } 
 
     return (
         <div>
