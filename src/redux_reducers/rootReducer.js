@@ -7,7 +7,7 @@ import User from './UserClass';
 import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
-    serverTableMessage, adjustTimer, undoRequested, undoReply,
+    serverTableMessage, undoRequested, undoReply,
     cancelRequested, swapSeats, setPlayingPlayerTable,
     rejectGoState, resignOrCancel} from "./utils";
 
@@ -28,9 +28,6 @@ const initialState = {
 function liveGameApp (state = initialState, action) {
     let newState = { ...state };
     switch(action.type) {
-        case SET_TIMER:
-            adjustTimer(action.payload, newState);
-            break;
         case CONNECT_SERVER:
             newState.server = action.payload;
             break;

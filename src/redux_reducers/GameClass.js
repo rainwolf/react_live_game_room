@@ -60,6 +60,11 @@ export class Game {
         newGame.rated = this.rated;
         newGame.me = this.me;
         newGame.gameState = { ...this.gameState };
+        // for (let i = 0; i < 19; i++) {
+        //     for (let j = 0; j < 19; j++) {
+        //         newGame.abstractBoard[i][j] = this.abstractBoard[i][j];
+        //     }
+        // }
         newGame.abstractBoard = this.abstractBoard;
         newGame.mark_dead_stones_player = this.mark_dead_stones_player;
         newGame.evaluate_stones_player = this.evaluate_stones_player;

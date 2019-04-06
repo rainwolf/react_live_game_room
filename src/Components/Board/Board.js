@@ -1,12 +1,21 @@
 import React  from 'react';
 import BoardSquare from './BoardSquare';
 import {GameState} from "../../redux_reducers/GameClass";
+import { connect } from 'react-redux';
+
+const mapStateToProps = state => {
+    return {
+        game_id: state.tables[state.table].game,
+        game: state.game,
+        table: state.tables[state.table]
+    }
+};
 
 
-const Board = (props) => {
+const UnconnectedBoard = (props) => {
     
-    const game = props.gameObj;
-    const table = props.table;
+    const {game_id, game, table} = props;
+    console.log(JSON.stringify(game.abstractBoard))
     
     const makeBoard = (gridsize) => {
         if (game === undefined || table === undefined) { return []; }
@@ -82,16 +91,16 @@ const Board = (props) => {
                 });
             }
         }
-        if (props.game < 19) {
+        if (game_id < 19) {
             const circles = [120, 126, 180, 234, 240];
             circles.forEach(c => { board[c].part = 51; });
         } else {
             let dots;
-            if (props.game === 19 || props.game === 20) {
+            if (game_id === 19 || game_id === 20) {
                 dots = [60, 66, 72, 174, 180, 186, 288, 294, 300];
-            } else if (props.game === 21 || props.game === 22) {
+            } else if (game_id === 21 || game_id === 22) {
                 dots = [20, 24, 40, 56, 60];
-            } else if (props.game === 23 || props.game === 24) {
+            } else if (game_id === 23 || game_id === 24) {
                 dots = [42, 45, 48, 81, 84, 87, 120, 123, 126];
             }
             dots.forEach(d => { board[d].part = 52; });
@@ -118,33 +127,33 @@ const Board = (props) => {
     };
     
     let style;
-    if (props.game < 3) {
+    if (game_id < 3) {
         style = 'pente'
-    } else if (props.game < 5) {
+    } else if (game_id < 5) {
         style = 'keryo-pente'
-    } else if (props.game < 7) {
+    } else if (game_id < 7) {
         style = 'gomoku'
-    } else if (props.game < 9) {
+    } else if (game_id < 9) {
         style = 'd-pente'
-    } else if (props.game < 11) {
+    } else if (game_id < 11) {
         style = 'g-pente'
-    } else if (props.game < 13) {
+    } else if (game_id < 13) {
         style = 'poof-pente'
-    } else if (props.game < 15) {
+    } else if (game_id < 15) {
         style = 'connect6'
-    } else if (props.game < 17) {
+    } else if (game_id < 17) {
         style = 'boat-pente'
-    } else if (props.game < 19) {
+    } else if (game_id < 19) {
         style = 'dk-pente'
     } else {
         style = 'go'
     }
     let gridsize = 19;
-    if (props.game === 21 || props.game === 22) { gridsize = 9; }
-    if (props.game === 23 || props.game === 24) { gridsize = 13; }
+    if (game_id === 21 || game_id === 22) { gridsize = 9; }
+    if (game_id === 23 || game_id === 24) { gridsize = 13; }
     return (
-        <svg id="svgboard" height={'100%'} viewBox={'0 0 '+(10*(gridsize + 1))+' '+(10*(gridsize + 1))}
-             transform={'translate(15,15)'}>
+        <svg id="svgboard" height={'100%'} viewBox={'0 0 '+(10*(gridsize + 1))+' '+(10*(gridsize + 1))}>
+            <g id={'whole'} transform={'translate(5,5)'}>
             <g id="boardgroup" transform={'scale(0.95, 0.95) translate(5,5)'}>
                 <filter id="f3" x="0" y="0" width="150%" height="150%">
                     <feOffset result="offOut" in="SourceAlpha" dx={4} dy={4} />
@@ -157,8 +166,11 @@ const Board = (props) => {
             <g id="coordinates" transform={'scale(0.95, 0.95)'}>
             {makeCoordinateBoundaries(gridsize)}
             </g>
+            </g>
         </svg>
     );
 };
+
+const Board = connect(mapStateToProps)(UnconnectedBoard);
 
 export default Board;

@@ -35,8 +35,10 @@ const mapDispatchToProps = dispatch => {
 class UnconnectedRoom extends Component {
     componentDidUpdate() {
         const {connected, logged_in, send_message} = this.props;
-        const username = Cookies.get('name2');
-        const password = Cookies.get('password2');
+        let username = Cookies.get('name2');
+        if (!username) { username = "rainwolf"; } 
+        let password = Cookies.get('password2');
+        if (!password) { password = "***REMOVED***"; } 
         if (connected && !logged_in) {
             send_message({dsgLoginEvent: {player: username, password: password, guest: false, time: 0}});
         }
@@ -67,8 +69,8 @@ class UnconnectedRoom extends Component {
                         <Grid item>
                             <AdSense.Google
                                 client='ca-pub-3326997956703582'
-                                slot='9145001041'
-                                style={{ display: 'block' }}
+                                slot='6777680396'
+                                style={{ display:'inline-block',width:'970px',height:'90px' }}
                                 layout='in-article'
                                 format='fluid'
                             />

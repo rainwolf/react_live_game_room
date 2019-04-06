@@ -61,12 +61,6 @@ const UnconnectedTable = (props) => {
     const sendMove = (move) => {
         props.send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
     };
-    const forceCancelResign = (resign) => {
-        props.send_message({dsgForceCancelResignTableEvent: {action:(resign?2:1), player: table.me, table: table.table, time: 0}});
-    };
-    const rejectGoAssessment = () => {
-        props.send_message({dsgRejectGoStateEvent: {player: table.me, table: table.table, time: 0}});
-    };
     const bootPlayer = (player) => {
         props.send_message({dsgBootTableEvent: {toBoot: player, player: table.me, table: table.table, time: 0}});
     };
@@ -87,10 +81,17 @@ const UnconnectedTable = (props) => {
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 {freeloader &&
                 <Grid item>
+                    {/*<AdSense.Google*/}
+                        {/*client='ca-pub-3326997956703582'*/}
+                        {/*slot='9145001041'*/}
+                        {/*style={{ display: 'block' }}*/}
+                        {/*layout='in-article'*/}
+                        {/*format='fluid'*/}
+                    {/*/>*/}
                     <AdSense.Google
                         client='ca-pub-3326997956703582'
-                        slot='9145001041'
-                        style={{ display: 'block' }}
+                        slot='6777680396'
+                        style={{ display:'inline-block',width:'970px',height:'90px' }}
                         layout='in-article'
                         format='fluid'
                     />
@@ -111,8 +112,7 @@ const UnconnectedTable = (props) => {
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 <Grid item style={{height:'100%'}}>
                     <div ref={ref} style={{height: '100%', width: height}}>
-                        <Board game={table.game} gameObj={game} table={table}
-                               clickHandler={sendMove}/>
+                        <Board clickHandler={sendMove}/>
                     </div>
                 </Grid>
                 <Grid item style={{height:'100%', width: 640}}>

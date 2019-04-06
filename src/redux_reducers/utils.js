@@ -103,6 +103,7 @@ export function standTable(data, state) {
 }
 
 export function tableOwner(ownerEvent, state) {
+    return;
     const tables = { ...state.tables };
     const table = tables[ownerEvent.table].newInstance();
     table.owner = ownerEvent.player === state.me;
@@ -133,7 +134,8 @@ export function addMove(data, state) {
         }
         if (data.player !== state.me) {
             move_sound.play();
-        } 
+        }
+
     }
     state.game = game;
 }
@@ -170,6 +172,8 @@ export function changeGameState(data, state) {
 
 export function changeTimer(data, state) {
     if (data.table === state.table) {
+        console.log('timer 1', JSON.stringify(state.game.abstractBoard))
+        
         const tables = { ...state.tables };
         const table = tables[data.table].newInstance();
         const idx = table.seats.indexOf(data.player);
@@ -186,13 +190,13 @@ export function serverTableMessage(data, state) {
     }
 }
 
-export function adjustTimer(data, state) {
-    const tables = { ...state.tables };
-    const table = tables[state.table].newInstance();
-    table.adjustTimer(data);
-    tables[state.table] = table;
-    state.tables = tables;
-}
+// export function adjustTimer(data, state) {
+//     const tables = { ...state.tables };
+//     const table = tables[state.table].newInstance();
+//     table.adjustTimer(data);
+//     tables[state.table] = table;
+//     state.tables = tables;
+// }
 
 export function undoRequested(data, state) {
     if (data.table === state.table) {
