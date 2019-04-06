@@ -92,8 +92,6 @@ const UnconnectedTable = (props) => {
                         client='ca-pub-3326997956703582'
                         slot='6777680396'
                         style={{ display:'inline-block',width:'970px',height:'90px' }}
-                        layout='in-article'
-                        format='fluid'
                     />
                     {/*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>*/}
                     {/*<ins className="adsbygoogle"*/}
