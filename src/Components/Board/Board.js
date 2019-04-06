@@ -15,7 +15,7 @@ const mapStateToProps = state => {
 const UnconnectedBoard = (props) => {
     
     const {game_id, game, table} = props;
-    console.log(JSON.stringify(game.abstractBoard))
+    // console.log(JSON.stringify(game.abstractBoard))
     
     const makeBoard = (gridsize) => {
         if (game === undefined || table === undefined) { return []; }
