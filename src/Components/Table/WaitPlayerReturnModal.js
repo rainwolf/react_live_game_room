@@ -100,7 +100,6 @@ class UnconnectedWaitPlayerReturnModal extends Component {
     }
 
     componentWillUnmount() {
-        console.log('unmount timer');
         clearInterval(this.state.timer);
     }
 

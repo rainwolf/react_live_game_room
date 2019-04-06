@@ -145,7 +145,7 @@ export function changeGameState(data, state) {
         if (data.state !== game.gameState.state) {
             delete state.pressed_play;
         }
-        if (data.state === GameState.State.STARTED) {
+        if (data.state !== GameState.State.PAUSED) {
             delete state.waiting_modal;
             delete state.time_up_resign_cancel;
         } 

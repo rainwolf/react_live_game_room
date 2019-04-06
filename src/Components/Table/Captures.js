@@ -28,7 +28,7 @@ const UnconnectedCaptures = (props) => {
                 </Grid>
                 <Grid item xs>
                     <Typography variant="h4">
-                        x {game.captures[seat]}
+                        x {game.captures[3 - seat]}
                     </Typography>
                 </Grid>
             </Grid>

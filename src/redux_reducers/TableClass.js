@@ -37,7 +37,7 @@ class Table {
         if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
             return this.isMyTurn(game);
         } else {
-            return this.me === this.seats[3 - game.currentPlayer()];
+            return game.gameState.state === GameState.State.STARTED && this.me === this.seats[3 - game.currentPlayer()];
         }  
     };
     
@@ -52,7 +52,7 @@ class Table {
     };
     
     isMyTurn = (game) => {
-        return this.me === this.seats[game.currentPlayer()];
+        return game.gameState.state === GameState.State.STARTED && this.me === this.seats[game.currentPlayer()];
     };
     
     canExit = (game) => {

@@ -17,6 +17,7 @@ import GameInfoPanel from '../Components/Table/GameInfoPanel';
 import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
 import WaitPlayerReturnModal from "../Components/Table/WaitPlayerReturnModal";
 import ResignCancelLostPlayerModal from "../Components/Table/ResignCancelLostPlayerModal";
+import AdSense from 'react-adsense';
 
 
 const mapStateToProps = state => {
@@ -24,7 +25,8 @@ const mapStateToProps = state => {
         users: state.users,
         game: state.game,
         messages: state.table_messages,
-        table: state.tables[state.table]
+        table: state.tables[state.table],
+        freeloader: state.freeloader
     }
 };
 
@@ -39,7 +41,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedTable = (props) => {
 
-    const { users, game, messages, table } = props;
+    const { users, game, messages, table, freeloader } = props;
     const [height, setHeight] = useState(0);
     const ref = useRef(null);
 
@@ -80,6 +82,31 @@ const UnconnectedTable = (props) => {
     });
     
     return (
+        <div style={{height: '100vh', width: '100vw'}}>
+
+            <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
+                {freeloader &&
+                <Grid item>
+                    <AdSense.Google
+                        client='ca-pub-3326997956703582'
+                        slot='9145001041'
+                        style={{ display: 'block' }}
+                        layout='in-article'
+                        format='fluid'
+                    />
+                    {/*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>*/}
+                    {/*<ins className="adsbygoogle"*/}
+                    {/*style={{display:'block'}}*/}
+                    {/*data-ad-client="ca-pub-3326997956703582"*/}
+                    {/*data-ad-slot="9145001041"*/}
+                    {/*data-ad-format="auto"*/}
+                    {/*data-full-width-responsive="true"></ins>*/}
+                    {/*<script>*/}
+                    {/*(adsbygoogle = window.adsbygoogle || []).push({});*/}
+                    {/*</script>*/}
+                </Grid>
+                }
+                <Grid item style={{width:'100%', flex: '1', minHeight: '0px'}}>
         <div style={{width: '100%', height: '100%'}}>
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 <Grid item style={{height:'100%'}}>
@@ -112,6 +139,9 @@ const UnconnectedTable = (props) => {
             <EvaluateGoModal/>
             <WaitPlayerReturnModal/>
             <ResignCancelLostPlayerModal/>
+        </div>
+                </Grid>
+            </Grid>
         </div>
     );
 };

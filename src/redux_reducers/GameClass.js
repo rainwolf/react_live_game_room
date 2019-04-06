@@ -210,17 +210,17 @@ export class Game {
         if (this.game < 3) {
             let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
-            if (this.rated && this.moves.length === 1) {
+            if (this.rated && this.moves.length === 2) {
                 this.#applyTournamentRule();
-            } else if (this.rated && this.moves.length === 2) {
+            } else if (this.rated && this.moves.length === 3) {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 5) {
             let player = 2 - (this.moves.length%2);
             this.#addKeryoPenteMove(x, y, player);
-            if (this.rated && this.moves.length === 1) {
+            if (this.rated && this.moves.length === 2) {
                 this.#applyTournamentRule();
-            } else if (this.rated && this.moves.length === 2) {
+            } else if (this.rated && this.moves.length === 3) {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 7) {
@@ -232,17 +232,17 @@ export class Game {
         } else if (this.game < 11) {
             let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
-            if (this.rated && this.moves.length === 1) {
+            if (this.rated && this.moves.length === 2) {
                 this.#applyGPenteRule();
-            } else if (this.rated && this.moves.length === 2) {
+            } else if (this.rated && this.moves.length === 3) {
                 this.#undoGPenteRule();
             }
         } else if (this.game < 13) {
             let player = 2 - (this.moves.length%2);
             this.#addPoofPenteMove(x, y, player);
-            if (this.rated && this.moves.length === 1) {
+            if (this.rated && this.moves.length === 2) {
                 this.#applyTournamentRule();
-            } else if (this.rated && this.moves.length === 2) {
+            } else if (this.rated && this.moves.length === 3) {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 15) {
@@ -251,9 +251,9 @@ export class Game {
         } else if (this.game < 17) {
             let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
-            if (this.rated && this.moves.length === 1) {
+            if (this.rated && this.moves.length === 2) {
                 this.#applyTournamentRule();
-            } else if (this.rated && this.moves.length === 2) {
+            } else if (this.rated && this.moves.length === 3) {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 19) {

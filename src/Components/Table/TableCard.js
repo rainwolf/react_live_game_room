@@ -49,12 +49,12 @@ const TableCard = (props) => {
                 {/*</Typography>*/}
                 {seated &&
                     <Typography component="p">
-                        {table.seats[1] !== "" &&
+                        {(table.seats[1] !== "" && users[table.seats[1]]) &&
                         <span key={1}>
                                 {users[table.seats[1]].userhtml} <SimpleStone size={15} id={table.player_color(1)}/>
                             </span>
                         } &nbsp; - &nbsp; 
-                        {table.seats[2] !== "" &&
+                        {(table.seats[2] !== "" && users[table.seats[2]]) &&
                         <span key={2}>
                                 {users[table.seats[2]].userhtml} <SimpleStone size={15} id={table.player_color(2)}/>
                             </span>
@@ -67,7 +67,7 @@ const TableCard = (props) => {
                 
                 {table.watching().length > 0 && 
                     <Typography component="p">
-                        watching: {table.watching().map((player, i) => <span key={i}>{users[player].userhtml}, </span>)}
+                        watching: {table.watching().map((player, i) => users[player]?(<span key={i}>{users[player].userhtml}, </span>):"")}
                     </Typography>
                 }
             </CardContent>
