@@ -16,6 +16,7 @@ import SettingsModal from '../Components/Table/SettingsModal';
 import GameInfoPanel from '../Components/Table/GameInfoPanel';
 import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
 import WaitPlayerReturnModal from "../Components/Table/WaitPlayerReturnModal";
+import ResignCancelLostPlayerModal from "../Components/Table/ResignCancelLostPlayerModal";
 
 
 const mapStateToProps = state => {
@@ -110,6 +111,7 @@ const UnconnectedTable = (props) => {
             <SettingsModal/>
             <EvaluateGoModal/>
             <WaitPlayerReturnModal/>
+            <ResignCancelLostPlayerModal/>
         </div>
     );
 };

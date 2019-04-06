@@ -1,7 +1,9 @@
 import Table from './TableClass';
 import User from './UserClass';
 import { Game, GameState } from './GameClass';
-import move_sound from '../resources/sounds/move_sound.mp3';
+import move_sound_file from '../resources/sounds/move_sound.mp3';
+
+const move_sound = new Audio(move_sound_file);
 
 export function processUser(userdata, state) {
     let user;
@@ -128,9 +130,10 @@ export function addMove(data, state) {
             for(let i = 0; i < data.moves.length; i++) {
                 game.addMove(data.moves[i]);
             }
+        }
+        if (data.player !== state.me) {
+            move_sound.play();
         } 
-        const sound = new Audio(move_sound);
-        sound.play();
     }
     state.game = game;
 }
@@ -142,6 +145,10 @@ export function changeGameState(data, state) {
         if (data.state !== game.gameState.state) {
             delete state.pressed_play;
         }
+        if (data.state === GameState.State.STARTED) {
+            delete state.waiting_modal;
+            delete state.time_up_resign_cancel;
+        } 
 
         if ((game.gameState.state === GameState.State.NOT_STARTED || game.gameState.state === GameState.State.HALFSET) 
             && data.state === GameState.State.STARTED) {
@@ -151,7 +158,7 @@ export function changeGameState(data, state) {
             table.resetClocks();
             tables[data.table] = table;
             state.tables = tables;
-        } 
+        }
         game.gameState = Object.assign(game.gameState, { state: data.state });
         state.game = game;
         // console.log(JSON.stringify(state.game))
@@ -264,4 +271,11 @@ export function rejectGoState(data, state) {
         state.game = game;
         addTableMessage({player: 'game server', text: data.player+' rejected the assessment, play continues.'}, state);
     }    
+}
+
+export function resignOrCancel(data, state) {
+    if (data.table === state.table) {
+        state.waiting_modal = true;
+        state.time_up_resign_cancel = true;
+    }
 }

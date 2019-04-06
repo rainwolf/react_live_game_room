@@ -1,5 +1,6 @@
 import '../redux_actions/actionTypes';
-import { CONNECT_SERVER, SET_TIMER, TOGGLE_SETTINGS, PRESSED_PLAY } from "../redux_actions/actionTypes";
+import { CONNECT_SERVER, SET_TIMER, TOGGLE_SETTINGS, 
+    PRESSED_PLAY, DISMISS_WAITING_MODAL } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -8,7 +9,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, adjustTimer, undoRequested, undoReply,
     cancelRequested, swapSeats, setPlayingPlayerTable,
-    rejectGoState} from "./utils";
+    rejectGoState, resignOrCancel} from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -45,6 +46,9 @@ function liveGameApp (state = initialState, action) {
             break;
         case PRESSED_PLAY:
             newState.pressed_play = true;
+            break;
+        case DISMISS_WAITING_MODAL:
+            newState.waiting_modal = true;
             break;
         case WEBSOCKET_MESSAGE:
             console.log(action.payload.data);
@@ -99,8 +103,12 @@ function liveGameApp (state = initialState, action) {
                 setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
             } else if (json.dsgRejectGoStateEvent) {
                 rejectGoState(json.dsgRejectGoStateEvent, newState);
+            } else if (json.dsgWaitingPlayerReturnTimeUpTableEvent) {
+                resignOrCancel(json.dsgWaitingPlayerReturnTimeUpTableEvent, newState);
             }
             
+        // {"dsgWaitingPlayerReturnTimeUpTableEvent":{"waitingForPlayerToReturnSeqNbr":0,"set":false,"player":"rainwolf","table":1,"time":1554539579997}}
+        // {"dsgGameStateTableEvent":{"state":3,"changeText":"player iostest has been disconnected, game is paused. ","gameInSet":0,"table":1,"time":1554539519996}}
         //    {"dsgSetPlayingPlayerTableEvent":{"seat":1,"player":"iostest","table":1,"time":1554124915697}}
         // {"dsgSwapSeatsTableEvent":{"swap":true,"silent":false,"player":"iostest","table":1,"time":1554122803745}}
         // {"dsgSetPlayingPlayerTableEvent":{"seat":2,"player":"iostest","table":1,"time":1553629064097}} rootReducer.js:35
