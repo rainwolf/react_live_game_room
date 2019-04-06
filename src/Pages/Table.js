@@ -15,6 +15,7 @@ import DPenteChoiceModal from '../Components/Table/DPenteChoiceModal';
 import SettingsModal from '../Components/Table/SettingsModal';
 import GameInfoPanel from '../Components/Table/GameInfoPanel';
 import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
+import WaitPlayerReturnModal from "../Components/Table/WaitPlayerReturnModal";
 
 
 const mapStateToProps = state => {
@@ -108,6 +109,7 @@ const UnconnectedTable = (props) => {
             <DPenteChoiceModal/>
             <SettingsModal/>
             <EvaluateGoModal/>
+            <WaitPlayerReturnModal/>
         </div>
     );
 };

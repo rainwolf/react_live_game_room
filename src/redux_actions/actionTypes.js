@@ -5,6 +5,7 @@ export const CONNECT_SERVER = 'CONNECT_SERVER';
 export const SET_TIMER = 'SET_TIMER';
 export const TOGGLE_SETTINGS = 'TOGGLE_SETTINGS';
 export const PRESSED_PLAY = 'PRESSED_PLAY';
+export const DISMISS_WAITING_MODAL = 'DISMISS_WAITING_MODAL';
 
 export function connectServer(server) {
     return {

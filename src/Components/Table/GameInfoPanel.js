@@ -186,7 +186,7 @@ const UnconnectedGameInfoPanel = (props) => {
                     <Grid item xs>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
-                            {(table.owner || admin) &&
+                            {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
                                     <Button variant="contained" color="primary" 
