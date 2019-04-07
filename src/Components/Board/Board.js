@@ -105,6 +105,10 @@ const UnconnectedBoard = (props) => {
             }
             dots.forEach(d => { board[d].part = 52; });
         } 
+        const lastMove = game.last_move();
+        if (lastMove) {
+            board[lastMove].last_move = true;
+        } 
         
         return board.map(p => <BoardSquare {...p}/>);
     };

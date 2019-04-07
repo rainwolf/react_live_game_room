@@ -64,6 +64,8 @@ export function joinTable(joinEvent, state) {
         table = new Table({table: joinEvent.table});
         table.me = state.me;
         tables[joinEvent.table] = table;
+    } else {
+        table = tables[joinEvent.table].newInstance();
     }
     if (joinEvent.player === state.me) {
         state.table = joinEvent.table;
@@ -75,15 +77,17 @@ export function joinTable(joinEvent, state) {
         new_player_sound.play();
     }
     table.addPlayer(joinEvent.player);
+    tables[joinEvent.table] = table;
     state.tables = tables;
 }
 
 export function exitTable(exitEvent, state) {
     const tables = { ...state.tables };
-    const table = tables[exitEvent.table];
+    let table = tables[exitEvent.table];
     if (table) {
+        table = tables[exitEvent.table].newInstance();
         table.removePlayer(exitEvent.player);
-        if (table.players.length === 0) { delete tables[exitEvent.table]} 
+        if (table.players.length === 0) { delete tables[exitEvent.table]} else { tables[exitEvent.table] = table; }
     }
     if (exitEvent.player === state.me) {
         state.table = undefined;
@@ -99,6 +103,9 @@ export function sitTable(data, state) {
     table.sit(data.player, data.seat);
     tables[data.table] = table;
     state.tables = tables;
+    if (table.table === state.table) {
+        delete state.pressed_play;
+    } 
 }
 
 export function standTable(data, state) {
@@ -107,6 +114,9 @@ export function standTable(data, state) {
     table.stand(data.player);
     tables[data.table] = table;
     state.tables = tables;
+    if (table.table === state.table) {
+        delete state.pressed_play;
+    }
 }
 
 export function tableOwner(ownerEvent, state) {

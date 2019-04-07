@@ -36,9 +36,9 @@ class UnconnectedRoom extends Component {
     componentDidUpdate() {
         const {connected, logged_in, send_message} = this.props;
         let username = Cookies.get('name2');
-        // if (!username) { username = "rainwolf"; } 
+        if (!username) { username = process.env.REACT_APP_USERNAME; }
         let password = Cookies.get('password2');
-        // if (!password) { password = "***REMOVED***"; } 
+        if (!password) { password = process.env.REACT_APP_PASSWORD; }
         if (connected && !logged_in) {
             send_message({dsgLoginEvent: {player: username, password: password, guest: false, time: 0}});
         }

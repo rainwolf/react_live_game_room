@@ -86,6 +86,19 @@ export class Game {
             this.gridSize = 13;
         }
     };
+    
+    last_move = () => {
+        const l = this.moves.length - 1;
+        if (this.isGo() && this.gameState.goState === GameState.GoState.PLAY) {
+            const move = this.moves[l];
+            if (move !== this.gridSize*this.gridSize) {
+                return move;
+            } 
+        } else if (l > 0) {
+            return this.moves[l];
+        }
+        return undefined;
+    };
 
     canNotLeave = () => {
         return this.gameState.state === GameState.State.STARTED || this.gameState.state === GameState.State.HALFSET;    

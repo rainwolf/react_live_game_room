@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Stone from './Stone';
 import Territory from './Territory';
-
+import LastMove from './LastMove';
 
 class BoardSquare extends Component {
     
@@ -83,6 +83,7 @@ class BoardSquare extends Component {
                 {this.props.deadStone && Stone({size: 10, id: this.props.deadStone, opacity: 0.5})}
                 {this.props.territory && Territory({size: 10, id: this.props.territory})}
                 {this.state.showStone && Stone({size: 10, id: this.props.hover, opacity: 0.6})}
+                {this.props.last_move && LastMove({size: 10})}
             </g>
         );
     }
