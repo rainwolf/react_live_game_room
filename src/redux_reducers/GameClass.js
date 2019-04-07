@@ -89,12 +89,12 @@ export class Game {
     
     last_move = () => {
         const l = this.moves.length - 1;
-        if (this.isGo() && this.gameState.goState === GameState.GoState.PLAY) {
+        if (this.isGo() && this.gameState.goState === GameState.GoState.PLAY && l>-1) {
             const move = this.moves[l];
             if (move !== this.gridSize*this.gridSize) {
                 return move;
             } 
-        } else if (l > 0) {
+        } else if (l >= 0) {
             return this.moves[l];
         }
         return undefined;
@@ -193,7 +193,7 @@ export class Game {
             until = this.moves.length;
         }
         let moves = this.moves;
-        this.reset();
+        this.resetBoard();
         this.moves = moves;
         if (this.game < 3) {
             this.#replayPenteGame(until);
