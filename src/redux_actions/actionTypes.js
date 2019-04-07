@@ -18,7 +18,7 @@ export function connectSocket(server) {
     return {
         type: WEBSOCKET_CONNECT,
         payload: {
-            url: 'wss://development.pente.org/websocketServer/'+server
+            url: 'wss://pente.org/websocketServer/'+server
         }
     }
 }

@@ -97,8 +97,8 @@ function liveGameApp (state = initialState, action) {
                 cancelRequested(json.dsgCancelRequestTableEvent, newState);
             } else if (json.dsgSwapSeatsTableEvent) {
                 swapSeats(json.dsgSwapSeatsTableEvent, newState);
-            } else if (json.dsgSetPlayingPlayerTableEvent) {
-                setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
+            // } else if (json.dsgSetPlayingPlayerTableEvent) {
+            //     setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
             } else if (json.dsgRejectGoStateEvent) {
                 rejectGoState(json.dsgRejectGoStateEvent, newState);
             } else if (json.dsgWaitingPlayerReturnTimeUpTableEvent) {

@@ -2,8 +2,10 @@ import Table from './TableClass';
 import User from './UserClass';
 import { Game, GameState } from './GameClass';
 import move_sound_file from '../resources/sounds/move_sound.mp3';
+import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
 
 const move_sound = new Audio(move_sound_file);
+const new_player_sound = new Audio(new_player_sound_file);
 
 export function processUser(userdata, state) {
     let user;
@@ -12,6 +14,9 @@ export function processUser(userdata, state) {
         user.updateUser(userdata);
     } else {
         user = new User(userdata);
+        if (state.table === undefined) {
+            new_player_sound.play();
+        } 
     }
     state.users = { ...state.users, [user.name]: user };
 }
@@ -66,6 +71,8 @@ export function joinTable(joinEvent, state) {
         if (state.game === undefined) {
             state.game = new Game();
         } 
+    } else if (state.table === joinEvent.table) {
+        new_player_sound.play();
     }
     table.addPlayer(joinEvent.player);
     state.tables = tables;
@@ -103,7 +110,6 @@ export function standTable(data, state) {
 }
 
 export function tableOwner(ownerEvent, state) {
-    return;
     const tables = { ...state.tables };
     const table = tables[ownerEvent.table].newInstance();
     table.owner = ownerEvent.player === state.me;

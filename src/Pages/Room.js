@@ -36,9 +36,9 @@ class UnconnectedRoom extends Component {
     componentDidUpdate() {
         const {connected, logged_in, send_message} = this.props;
         let username = Cookies.get('name2');
-        if (!username) { username = "rainwolf"; } 
+        // if (!username) { username = "rainwolf"; } 
         let password = Cookies.get('password2');
-        if (!password) { password = "***REMOVED***"; } 
+        // if (!password) { password = "***REMOVED***"; } 
         if (connected && !logged_in) {
             send_message({dsgLoginEvent: {player: username, password: password, guest: false, time: 0}});
         }
@@ -62,7 +62,7 @@ class UnconnectedRoom extends Component {
         const { users, connected, logged_in, messages, tables, freeloader } = this.props;
         if (logged_in) {
             return (
-                <div style={{height: '100vh', width: '100vw'}}>
+                <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
 
                     <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                         {freeloader &&

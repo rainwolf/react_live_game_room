@@ -76,9 +76,9 @@ const UnconnectedTable = (props) => {
     });
     
     return (
-        <div style={{height: '100vh', width: '100vw'}}>
+        <div style={{height: '100vh', width: '90%', margin: 'auto'}}>
 
-            <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
+            <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{height: '100%'}}>
                 {freeloader &&
                 <Grid item>
                     {/*<AdSense.Google*/}
