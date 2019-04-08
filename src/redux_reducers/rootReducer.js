@@ -1,5 +1,5 @@
 import '../redux_actions/actionTypes';
-import { CONNECT_SERVER, SET_TIMER, TOGGLE_SETTINGS, 
+import { CONNECT_SERVER, TOGGLE_SETTINGS, 
     PRESSED_PLAY, DISMISS_WAITING_MODAL } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
@@ -8,7 +8,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, undoRequested, undoReply,
-    cancelRequested, swapSeats, setPlayingPlayerTable,
+    cancelRequested, swapSeats, // setPlayingPlayerTable,
     rejectGoState, resignOrCancel} from "./utils";
 
 

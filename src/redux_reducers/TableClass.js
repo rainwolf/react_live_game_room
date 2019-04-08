@@ -1,4 +1,4 @@
-import {Game, GameState} from "./GameClass";
+import { GameState } from "./GameClass";
 
 const PRIVATE_TABLE = 2;
 

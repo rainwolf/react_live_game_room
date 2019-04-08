@@ -1,7 +1,9 @@
 import React  from 'react';
 import BoardSquare from './BoardSquare';
-import {GameState} from "../../redux_reducers/GameClass";
+import { GameState, Game } from "../../redux_reducers/GameClass";
+import Table from "../../redux_reducers/TableClass";
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 const mapStateToProps = state => {
     return {
@@ -173,6 +175,11 @@ const UnconnectedBoard = (props) => {
             </g>
         </svg>
     );
+};
+
+UnconnectedBoard.propTypes = {
+    table: PropTypes.instanceOf(Table).isRequired,
+    game: PropTypes.instanceOf(Game).isRequired
 };
 
 const Board = connect(mapStateToProps)(UnconnectedBoard);

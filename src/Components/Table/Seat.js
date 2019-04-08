@@ -36,7 +36,7 @@ const UnconnectedSeat = (props) => {
     if (table.seats[seat] === "" && table.seats[3-seat] !== table.me) {
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{width: '100%', height: '100%', width: width}}>
+                  style={{height: '100%', width: width}}>
                 <Grid item xs style={{marginLeft: 10}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
@@ -53,7 +53,7 @@ const UnconnectedSeat = (props) => {
         const player = users[table.seats[seat]];
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{width: '100%', height: '100%', width: width}}>
+                  style={{height: '100%', width: width}}>
                 <Grid item xs={1} style={{marginLeft:10, marginTop: 8}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { connect } from 'react-redux';
-import { send_message, toggleSettings } from "../redux_actions/actionTypes";
+import { send_message } from "../redux_actions/actionTypes";
 import PropTypes from 'prop-types';
 import User from "../redux_reducers/UserClass";
-import {Game, GameState} from '../redux_reducers/GameClass';
 import Table from '../redux_reducers/TableClass';
 import Board from '../Components/Board/Board';
 import Grid from '@material-ui/core/Grid';
 import ChatComponent from '../Components/Chat/ChatComponent';
-import Button from '@material-ui/core/Button';
 import UndoModal from '../Components/Table/UndoModal';
 import CancelModal from '../Components/Table/CancelModal';
 import DPenteChoiceModal from '../Components/Table/DPenteChoiceModal';
@@ -23,7 +21,6 @@ import AdSense from 'react-adsense';
 const mapStateToProps = state => {
     return {
         users: state.users,
-        game: state.game,
         messages: state.table_messages,
         table: state.tables[state.table],
         freeloader: state.freeloader
@@ -41,7 +38,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedTable = (props) => {
 
-    const { users, game, messages, table, freeloader } = props;
+    const { users, messages, table, freeloader } = props;
     const [height, setHeight] = useState(0);
     const ref = useRef(null);
 
@@ -155,8 +152,7 @@ UnconnectedTable.propTypes = {
         }).isRequired
     ).isRequired,
     table: PropTypes.instanceOf(Table).isRequired,
-    game: PropTypes.instanceOf(Game).isRequired
-    // game: PropTypes.instanceOf(Game)
+    // game: PropTypes.instanceOf(Game).isRequired
 };
 
 

@@ -6,6 +6,7 @@ export const SET_TIMER = 'SET_TIMER';
 export const TOGGLE_SETTINGS = 'TOGGLE_SETTINGS';
 export const PRESSED_PLAY = 'PRESSED_PLAY';
 export const DISMISS_WAITING_MODAL = 'DISMISS_WAITING_MODAL';
+export const MOVE_FORWARD = 'MOVE_FORWARD';
 
 export function connectServer(server) {
     return {

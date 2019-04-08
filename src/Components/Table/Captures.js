@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import {Game, GameState} from "../../redux_reducers/GameClass";
+import { Game } from "../../redux_reducers/GameClass";
 import Table from "../../redux_reducers/TableClass";
 import SimpleStone from '../Board/SimpleStone';
 import Grid from '@material-ui/core/Grid';

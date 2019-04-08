@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import {Game, GameState} from "../../redux_reducers/GameClass";
+import { GameState } from "../../redux_reducers/GameClass";
+import Table from '../../redux_reducers/TableClass';
 import {send_message} from "../../redux_actions/actionTypes";
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
@@ -124,7 +125,7 @@ class UnconnectedWaitPlayerReturnModal extends Component {
                             Your opponent appears to be disconnected for some reason. For now you have the option of resigning the game.
                         </Typography>
                         <Typography variant="h6" id="modal-title">
-                            If they do not return in {this.state.seconds} seconds, you will have the option of either 
+                            If they do not return in {seconds} seconds, you will have the option of either 
                             canceling the game, or force your opponent to resign and claim victory. 
                         </Typography>
                         <Button onClick={this.resign}>resign myself</Button>
@@ -140,6 +141,7 @@ class UnconnectedWaitPlayerReturnModal extends Component {
 
 UnconnectedWaitPlayerReturnModal.propTypes = {
     show: PropTypes.bool.isRequired,
+    table: PropTypes.instanceOf(Table).isRequired
 };
 
 

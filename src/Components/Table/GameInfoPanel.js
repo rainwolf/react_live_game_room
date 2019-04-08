@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { send_message, TOGGLE_SETTINGS, PRESSED_PLAY } from "../../redux_actions/actionTypes";
 import Grid from '@material-ui/core/Grid';
