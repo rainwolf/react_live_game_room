@@ -162,11 +162,15 @@ export function changeGameState(data, state) {
 
         if (data.state !== game.gameState.state) {
             delete state.pressed_play;
-        }
-        if (data.state !== GameState.State.PAUSED) {
+            delete state.cancel_requested;
+            delete state.undo_requested;
             delete state.waiting_modal;
             delete state.time_up_resign_cancel;
-        } 
+        }
+        // if (data.state !== GameState.State.PAUSED) {
+        //     delete state.waiting_modal;
+        //     delete state.time_up_resign_cancel;
+        // } 
 
         if ((game.gameState.state === GameState.State.NOT_STARTED || game.gameState.state === GameState.State.HALFSET) 
             && data.state === GameState.State.STARTED) {
@@ -188,7 +192,7 @@ export function changeGameState(data, state) {
 
 export function changeTimer(data, state) {
     if (data.table === state.table) {
-        console.log('timer 1', JSON.stringify(state.game.abstractBoard))
+        // console.log('timer 1', JSON.stringify(state.game.abstractBoard))
         
         const tables = { ...state.tables };
         const table = tables[data.table].newInstance();
