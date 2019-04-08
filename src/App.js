@@ -4,7 +4,7 @@ import Servers from './Pages/Servers';
 import Room from "./Pages/Room";
 import { connect } from 'react-redux';
 import TableView from "./Pages/Table";
-import Test from "./test/Test";
+// import Test from "./test/Test";
 
 const mapStateToProps = state => {
     return {
@@ -13,8 +13,9 @@ const mapStateToProps = state => {
     }
 };
 
-const UnconnectedApp = ({table, room}) => {
-    // return <Test/>;
+const UnconnectedApp = (props) => {
+    const {table, room} = props;
+
     if (table) {
         return (
             <div style={{width: '100vw', height: '100vh'}}>

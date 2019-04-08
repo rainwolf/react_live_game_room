@@ -31,10 +31,17 @@ const mapDispatchToProps = dispatch => {
     }
 };
 
-
 class UnconnectedRoom extends Component {
     componentDidUpdate() {
         const {connected, logged_in, send_message} = this.props;
+
+        if (window.location.search && window.location.search.indexOf('?guest') > -1) {
+            if (connected && !logged_in) {
+                send_message({dsgLoginEvent: {guest: true, time: 0}});
+            }
+            return;
+        }
+        
         let username = Cookies.get('name2');
         if (!username) { username = process.env.REACT_APP_USERNAME; }
         let password = Cookies.get('password2');
