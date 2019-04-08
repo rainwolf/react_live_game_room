@@ -36,6 +36,14 @@ class UnconnectedServers extends Component {
                 const name = str.substr(str.indexOf(' ') + 1);
                 servers.push({port: port, name: name});
             }
+            if (window.location.search && window.location.search.indexOf('?guest') > -1) {
+                for (let i = 0; i < servers.length; i++) {
+                    if (servers[i].name.indexOf('Beginners') === 0) {
+                        this.props.onServerClick(servers[i]);
+                        return;
+                    } 
+                } 
+            }
             this.setState( {servers: servers} );
         });
     }
