@@ -7,6 +7,11 @@ import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import liveGameApp from './redux_reducers/rootReducer';
 import websocket, { WEBSOCKET_MESSAGE, WEBSOCKET_SEND } from '@giantmachines/redux-websocket';
+import { disableReactDevTools } from '@fvilers/disable-react-devtools';
+
+if (process.env.NODE_ENV === 'production') {
+    disableReactDevTools();
+}
 
 // ping middleware to respond to pings
 const pinger = store => next => action => {
