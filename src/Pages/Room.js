@@ -94,7 +94,7 @@ class UnconnectedRoom extends Component {
                         <Grid item style={{width:'100%', flex: '1', minHeight: '0px'}}>
                             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                                 <Grid item style={{height:'100%', flex: '1', minWidth: '0px'}}>
-                                    <ChatComponent messages={messages} users={users} sendText={this.sendRoomText}/>
+                                    <ChatComponent messages={messages} players={Object.keys(users)} sendText={this.sendRoomText}/>
                                 </Grid>
                                 <Grid item style={{height: '100%', overflow: 'auto', alignCenter: true}}>
                                     <Fab color="primary"  variant="extended" aria-label="Delete"

@@ -1,7 +1,8 @@
 import '../redux_actions/actionTypes';
 import { CONNECT_SERVER, TOGGLE_SETTINGS, 
     PRESSED_PLAY, DISMISS_WAITING_MODAL,
-    MOVE_BACK, MOVE_FORWARD, MOVE_GOTO } from "../redux_actions/actionTypes";
+    MOVE_BACK, MOVE_FORWARD, MOVE_GOTO,
+    MUTE, UNMUTE } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -10,7 +11,8 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, undoRequested, undoReply,
     cancelRequested, swapSeats, // setPlayingPlayerTable,
-    rejectGoState, resignOrCancel, moveForwardBack, moveGoTo} from "./utils";
+    rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
+    mute, unmute } from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -18,7 +20,7 @@ const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], 
 const initialState = {
     users: { 'game server': server },
     tables: {},
-    room_messages: [],
+    room_messages: [{player: server, message: 'Click on a user\'s avatar to ignore their messages and invitations, this mute will only last while you\'re connected'}],
     connected: false,
     logged_in: false,
     table: undefined,
@@ -56,6 +58,12 @@ function liveGameApp (state = initialState, action) {
             break;
         case MOVE_GOTO:
             moveGoTo(action.payload, newState);
+            break;
+        case MUTE:
+            mute(action.payload, newState);
+            break;
+        case UNMUTE:
+            unmute(action.payload, newState);
             break;
         case WEBSOCKET_MESSAGE:
             if (process.env.NODE_ENV === 'development') {

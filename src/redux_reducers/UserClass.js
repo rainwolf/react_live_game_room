@@ -56,8 +56,22 @@ class User {
         this.subscriber = userdata.subscriberLevel > 0;
         this.name_color= 0;
         this.crown = 0;
-        this.updateUser(userdata);
+        if (userdata) {
+            this.updateUser(userdata);
+        } 
     }
+    
+    newInstance = () => {
+        const newUser = new User();
+        newUser.name = this.name;
+        newUser.game_ratings = this.game_ratings;
+        newUser.subscriber = this.subscriber;
+        newUser.name_color = this.name_color;
+        newUser.crown = this.crown;
+        newUser.muted = this.muted;
+        newUser.userhtml = newUser.userhtml();
+        newUser.avatar = newUser.avatar();
+    };
     
     updateUser = (userdata) => {
         if (this.subscriber) {
@@ -79,8 +93,8 @@ class User {
             }
         }
         this.crown = crown;
-        this.userhtml = this.#userhtml();
-        this.avatar = this.#avatar();
+        this.userhtml = this.userhtml();
+        this.avatar = this.avatar();
     };
     #rgb2hex = (n) => {
         const b = n & 255, g = (n >> 8) & 255, r = (n >> 16) & 255;
@@ -135,7 +149,7 @@ class User {
             default: return "";
         }
     };
-    #userhtml = () => {
+    userhtml = () => {
         return (
             <span className="name" style={{whiteSpace: 'nowrap'}}>
             <a href={server + "/gameServer/profile?viewName=" + this.name} target="_blank" rel="noopener noreferrer">
@@ -170,7 +184,7 @@ class User {
             <span><img alt="rating" src={gif}/> &nbsp; {r}</span>
         );
     };
-    #avatar = () => {
+    avatar = () => {
         if (this.subscriber) {
             return server+"/gameServer/avatar?name="+this.name;
         }

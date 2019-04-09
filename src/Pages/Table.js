@@ -38,7 +38,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedTable = (props) => {
 
-    const { users, messages, table, freeloader } = props;
+    const { messages, table, freeloader } = props;
     const [height, setHeight] = useState(0);
     const ref = useRef(null);
 
@@ -65,12 +65,12 @@ const UnconnectedTable = (props) => {
         props.send_message({dsgBootTableEvent: {toInvite: player, inviteText: message, player: table.me, table: table.table, time: 0}});
     };
     
-    let table_users = {};
-    table.players.forEach(player => {
-        if (users[player]) {
-            table_users[player] = users[player];
-        }
-    });
+    // let table_users = {};
+    // table.players.forEach(player => {
+    //     if (users[player]) {
+    //         table_users[player] = users[player];
+    //     }
+    // });
     
     return (
         <div style={{height: '100vh', width: '90%', margin: 'auto'}}>
@@ -121,7 +121,7 @@ const UnconnectedTable = (props) => {
                             </div>
                         </Grid>
                         <Grid item style={{height: '40%', borderWidth: '1px', borderStyle: 'solid'}}>
-                            <ChatComponent messages={messages} game={table.game} users={table_users} sendText={sendTableText}/>
+                            <ChatComponent messages={messages} game={table.game} players={table.players} sendText={sendTableText}/>
                         </Grid>
                     </Grid>
                 </Grid>

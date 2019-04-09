@@ -10,7 +10,7 @@ const new_player_sound = new Audio(new_player_sound_file);
 export function processUser(userdata, state) {
     let user;
     if (state.users[userdata.name]) {
-        user = state.users[userdata.name];
+        user = state.users[userdata.name].newInstance();
         user.updateUser(userdata);
     } else {
         user = new User(userdata);
@@ -25,11 +25,13 @@ export function addRoomMessage(data, state) {
     // const messages = state.room_messages.slice();
     const messages = [...state.room_messages];
     const user = state.users[data.player];
-    messages.push( {
-        message: data.text,
-        player: user
-    });
-    state.room_messages = messages;
+    if (!user.muted) {
+        messages.push( {
+            message: data.text,
+            player: user
+        });
+        state.room_messages = messages;
+    } 
 }
 
 export function exitUser(name, state) {
@@ -130,11 +132,13 @@ export function tableOwner(ownerEvent, state) {
 export function addTableMessage(data, state) {
     const messages = [...state.table_messages];
     const user = state.users[data.player];
-    messages.push( {
-        message: data.text,
-        player: user
-    });
-    state.table_messages = messages;
+    if (!user.muted) {
+        messages.push( {
+            message: data.text,
+            player: user
+        });
+        state.table_messages = messages;
+    } 
 }
 
 export function addMove(data, state) {
@@ -314,4 +318,15 @@ export function moveGoTo(i, state) {
     const game = state.game.newInstance();
     game.goto_move(i);
     state.game = game;
+}
+
+export function mute(player, state) {
+    const user = state.users[player];
+    user.muted = true;
+    state.users = { ...state.users, [player]: user };
+}
+export function unmute(player, state) {
+    const user = state.users[player];
+    delete user.muted;
+    state.users = { ...state.users, [player]: user };
 }

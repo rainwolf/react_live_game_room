@@ -15,13 +15,13 @@ function ChatComponent(props) {
             element.scrollTop = element.scrollHeight;
         });
         
-        const { users, sendText, messages } = props;
+        const { players, sendText, messages } = props;
 
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 <Grid item style={{height: '100%'}}>
                      <div style={{overflow: 'auto', maxHeight:'100%', borderWidth: '1px', borderStyle: 'solid'}}>
-                         <PlayersList players={users} game={props.game}/>
+                         <PlayersList players={players} game={props.game}/>
                      </div>
                 </Grid>
                 <Grid item style={{height:'100%', flex: '1', minWidth: '0px'}}>
@@ -41,9 +41,9 @@ function ChatComponent(props) {
 }
 
 ChatComponent.propTypes = {
-    users: PropTypes.objectOf(
-        PropTypes.instanceOf(User).isRequired
-    ).isRequired,
+    // users: PropTypes.objectOf(
+    //     PropTypes.instanceOf(User).isRequired
+    // ).isRequired,
     messages: PropTypes.arrayOf(
         PropTypes.shape({
             message: PropTypes.string.isRequired,

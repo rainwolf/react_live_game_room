@@ -9,6 +9,9 @@ export const DISMISS_WAITING_MODAL = 'DISMISS_WAITING_MODAL';
 export const MOVE_FORWARD = 'MOVE_FORWARD';
 export const MOVE_BACK = 'MOVE_BACK';
 export const MOVE_GOTO = 'MOVE_GOTO';
+export const MUTE = 'MUTE';
+export const UNMUTE = 'UNMUTE';
+
 
 export function connectServer(server) {
     return {

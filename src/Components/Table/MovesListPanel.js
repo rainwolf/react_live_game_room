@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { MOVE_FORWARD, MOVE_BACK, MOVE_GOTO } from "../../redux_actions/actionTypes";
 import { connect } from 'react-redux';
-import {Game, GameState} from "../../redux_reducers/GameClass";
+import { Game } from "../../redux_reducers/GameClass";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';

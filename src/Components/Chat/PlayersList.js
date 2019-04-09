@@ -8,32 +8,61 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 // import Typography from '@material-ui/core/Typography';
 import User from '../../redux_reducers/UserClass';
+import { connect } from 'react-redux';
+import { MUTE, UNMUTE } from "../../redux_actions/actionTypes";
+import WifiOffIcon from '@material-ui/icons/WifiOff';
+
 
 const styles = theme => ({
     root: {
         width: '100%',
         maxWidth: 360,
         backgroundColor: theme.palette.background.paper,
+    },
+    icon: {
+        fontSize: 30,
     }
 });
 
-function PlayersList(props) {
-    const { classes, players, game } = props;
+const mapStateToProps = state => {
+    return {
+        users: state.users,
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        mute: (player) => {
+            dispatch({ type: MUTE, payload: player});
+        },
+        unmute: (player) => {
+            dispatch({ type: UNMUTE, payload: player});
+        }
+
+    }
+};
+
+
+function UnconnectedPlayersList(props) {
+    const { classes, users, game, players } = props;
     
     return (
         <List className={classes.root}>
-            {Object.keys(players).map((name, i) => {
-                    const player = players[name];
+            {players.map((name, i) => {
+                    const player = users[name];
                     if ('game server' === name) { return undefined; }
                     return (
                         <ListItem key={i} >
-                            <ListItemAvatar>
+                            <ListItemAvatar onClick={() => props.mute(name)}>
                                 <Avatar alt={name} src={player.avatar} />
                             </ListItemAvatar>
                             <ListItemText
                                 primary={player.userhtml}
                                 secondary={player.rating(game)}
                             />
+                            {player.muted &&
+                                <WifiOffIcon className={classes.icon} onClick={() => props.unmute(name)}/>
+                            }
                         </ListItem>
     
                     )
@@ -43,11 +72,14 @@ function PlayersList(props) {
     );
 }
 
-PlayersList.propTypes = {
+UnconnectedPlayersList.propTypes = {
     classes: PropTypes.object.isRequired,
-    players: PropTypes.objectOf(
+    users: PropTypes.objectOf(
         PropTypes.instanceOf(User).isRequired
-    ).isRequired
+    ).isRequired,
+    players: PropTypes.arrayOf(PropTypes.string)
 };
 
-export default withStyles(styles)(PlayersList);
+const PlayersList = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedPlayersList)); 
+
+export default PlayersList;
