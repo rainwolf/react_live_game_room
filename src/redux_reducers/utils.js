@@ -303,3 +303,15 @@ export function resignOrCancel(data, state) {
         state.time_up_resign_cancel = true;
     }
 }
+
+export function moveForwardBack(forward, state) {
+    const game = state.game.newInstance();
+    game.goForwardBack(forward);
+    state.game = game;
+}
+
+export function moveGoTo(i, state) {
+    const game = state.game.newInstance();
+    game.goto_move(i);
+    state.game = game;
+}

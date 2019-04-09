@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import {GameState} from "../../redux_reducers/GameClass";
+import MovesListPanel from './MovesListPanel';
 
 const styles = theme => ({
     root: {
@@ -75,10 +76,10 @@ const UnconnectedGameInfoPanel = (props) => {
     };
 
     return (
-        <div style={{width: '100%', height: '100%', marginTop: 20}}>
+        <div style={{width: '100%', height: '100%'}}>
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} 
                   style={{width: '100%', height: '100%'}} spacing={8}>
-                <Grid item xs>
+                <Grid item>
                     <Paper style={{textAlign: 'center'}}>
                         <Typography variant="h4">
                             {table.game_name()}
@@ -91,7 +92,7 @@ const UnconnectedGameInfoPanel = (props) => {
                     </Paper>                    
                 </Grid>
                 {table.timed &&
-                <Grid item xs>
+                <Grid item>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
                         <Grid item xs>
@@ -103,7 +104,7 @@ const UnconnectedGameInfoPanel = (props) => {
                     </Grid>
                 </Grid>
                 }
-                <Grid item xs>
+                <Grid item>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                         <Grid item xs>
                             <Seat seat={1}/>
@@ -114,7 +115,7 @@ const UnconnectedGameInfoPanel = (props) => {
                     </Grid>
                 </Grid>
                 {table.gameHasCaptures() &&
-                <Grid item xs>
+                <Grid item>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
                         <Grid item xs>
@@ -129,7 +130,7 @@ const UnconnectedGameInfoPanel = (props) => {
                 {(table.iAmPlaying() && (game.gameState.state === GameState.State.STARTED 
                     || game.gameState.state === GameState.State.NOT_STARTED
                     || game.gameState.state === GameState.State.HALFSET)) &&
-                    <Grid item xs>
+                    <Grid item>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
                             {(pressed_play === undefined && (game.gameState.state === GameState.State.NOT_STARTED
@@ -182,7 +183,8 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Grid>
                     </Grid>
                 }
-                {(table.owner || admin || table.canExit(game)) &&
+                {(((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) 
+                    || table.canExit(game)) &&
                     <Grid item xs>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
@@ -208,7 +210,9 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Grid>
                     </Grid>
                 }
-                
+                <Grid item style={{flex: '1 1 auto', minHeight: '0px', maxHeight: '50%'}}>
+                    <MovesListPanel />
+                </Grid>    
             </Grid>
         </div>
     );

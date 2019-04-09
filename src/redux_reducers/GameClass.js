@@ -17,6 +17,8 @@ export const GameState = {
     }
 };
 
+const coordinateLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+
 export class Game {
     constructor(gameState) {
         this.updateGameState(gameState);
@@ -68,6 +70,7 @@ export class Game {
         newGame.abstractBoard = this.abstractBoard;
         newGame.mark_dead_stones_player = this.mark_dead_stones_player;
         newGame.evaluate_stones_player = this.evaluate_stones_player;
+        newGame.until = this.until;
         
         return newGame;
     };
@@ -88,16 +91,92 @@ export class Game {
     };
     
     last_move = () => {
-        const l = this.moves.length - 1;
-        if (this.isGo() && this.gameState.goState === GameState.GoState.PLAY && l>-1) {
+        let l; 
+        l = this.until - 1;
+        if (this.until === undefined) {
+            l = this.moves.length - 1;
+        }
+        if (this.isConnect6()) {
+            if (l === 0 || l%4 === 1 || l%4 === 3) {
+                return [this.moves[l]];
+            } else {
+                return [this.moves[l-1], this.moves[l]];
+            }
+        } else if (this.isGo() && l>-1) {
             const move = this.moves[l];
             if (move !== this.gridSize*this.gridSize) {
-                return move;
-            } 
-        } else if (l >= 0) {
-            return this.moves[l];
+                return [move];
+            }
+        } else if (l > -1) {
+            return [this.moves[l]];
         }
-        return undefined;
+        return [];
+    };
+    
+    goForwardBack = (forward) => {
+        if (this.until === undefined) {
+            this.until = this.moves.length;
+        } 
+        if (forward) {
+            if (this.isConnect6()) {
+                
+            } else {
+                if (this.until < this.moves.length) {
+                    this.until += 1;
+                    this.addMoveFromList(this.until - 1);
+                } 
+            }
+        } else {
+            if (this.isConnect6()) {
+                if (this.until > 1) {
+                    if (this.until % 4 === 0 || this.until % 4 === 2) {
+                        this.until -= 1;
+                    }
+                    this.until -= 1;
+                    this.replayGame(this.until);
+                }
+            } else {
+                if (this.until > 1) {
+                    this.until -= 1;
+                    this.replayGame(this.until);
+                } 
+            }
+        }
+    };
+    
+    goto_move = (i) => {
+        if (!this.until || this.until > i) {
+            this.until = i;
+            this.replayGame(this.until);
+        } else if (this.until < i) {
+            while (this.until < i) {
+                this.until += 1;
+                this.addMoveFromList(this.until - 1);
+            }
+        }
+    };
+    
+    moves_strings = () => {
+        if (this.isConnect6()) {
+            const movestrs = [];
+            if (this.moves.length > 0) {
+                movestrs.push(this.getMoveCoord(this.moves[0]));
+            }
+            for (let i = 1; i < this.moves.length; i++) {
+                let str = this.getMoveCoord(this.moves[i]) + ' - ';
+                if (i < this.moves.length - 1) {
+                    i++;
+                    str += this.getMoveCoord(this.moves[i]);
+                }
+                movestrs.push(str);
+            }
+            return movestrs;
+        } else if (this.isGo()) {
+            const passMove = this.gridSize*this.gridSize;
+            return this.moves.map(move => move === passMove?'PASS':this.getMoveCoord(move));
+        } else {
+            return this.moves.map(move => this.getMoveCoord(move));
+        }
     };
 
     canNotLeave = () => {
@@ -105,7 +184,7 @@ export class Game {
     };
     
     currentPlayer = () => {
-        if (this.#isConnect6()) {
+        if (this.isConnect6()) {
             return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
         } else if (this.#isDPente()) {
             if (this.moves.length < 4) {
@@ -125,7 +204,7 @@ export class Game {
         return (1 + (this.moves.length % 2));
     };
     currentColor = () => {
-        if (this.#isConnect6()) {
+        if (this.isConnect6()) {
             return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
         } 
         const currentColor = 1 + (this.moves.length % 2);
@@ -140,7 +219,7 @@ export class Game {
     #isDPente = () => {
         return this.game === 7 || this.game === 8 || this.game === 17 || this.game === 18;
     };
-    #isConnect6 = () => {
+    isConnect6 = () => {
         return this.game === 13 || this.game === 14;
     };
     isGo = () => {
@@ -222,9 +301,77 @@ export class Game {
         }
     };
     
+    addMoveFromList = (i) => {
+        const move = this.moves[i];
+        const x = move % this.gridSize, y = Math.floor(move / this.gridSize);
+        if (this.game < 3) {
+            let player = 1 + (i%2);
+            this.#addPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyTournamentRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoTournamentRule();
+            }
+        } else if (this.game < 5) {
+            let player = 1 + (i%2);
+            this.#addKeryoPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyTournamentRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoTournamentRule();
+            }
+        } else if (this.game < 7) {
+            let player = 1 + (i%2);
+            this.#addGomokuMove(x, y, player);
+        } else if (this.game < 9) {
+            let player = 1 + (i%2);
+            this.#addPenteMove(x, y, player);
+        } else if (this.game < 11) {
+            let player = 1 + (i%2);
+            this.#addPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyGPenteRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoGPenteRule();
+            }
+        } else if (this.game < 13) {
+            let player = 1 + (i%2);
+            this.#addPoofPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyTournamentRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoTournamentRule();
+            }
+        } else if (this.game < 15) {
+            let player = (((i % 4) === 0) || ((this.moves.length % 3) === 0)) ? 1 : 2;
+            this.#addGomokuMove(x, y, player);
+        } else if (this.game < 17) {
+            let player = 1 + (i%2);
+            this.#addPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyTournamentRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoTournamentRule();
+            }
+        } else if (this.game < 19) {
+            let player = 1 + (i%2);
+            this.#addKeryoPenteMove(x, y, player);
+        } else if (this.game < 25) {
+            let player = 1 + (i%2);
+            this.#addGoMove(move, player);
+        }
+    };
+
     addMove = (move) => {
-        let x = move % this.gridSize, y = Math.floor(move / this.gridSize);
+        if (this.until && this.until < this.moves.length) {
+            while (this.until < this.moves.length) {
+                this.until += 1;
+                this.addMoveFromList(this.until - 1);
+            }
+        } 
+        const x = move % this.gridSize, y = Math.floor(move / this.gridSize);
         this.moves.push(move);
+        this.until = this.moves.length;
         if (this.game < 3) {
             let player = 2 - (this.moves.length%2);
             this.#addPenteMove(x, y, player);
@@ -669,11 +816,11 @@ export class Game {
         return false;
     };
 
-    // function getMoveCoord(move) {
-    //     let letter = coordinateLetters[move%this.gridSize];
-    //     let number = this.gridSize-Math.floor(move/this.gridSize);
-    //     return letter + number;
-    // }
+    getMoveCoord = (move) => {
+        let letter = coordinateLetters[move%this.gridSize];
+        let number = this.gridSize-Math.floor(move/this.gridSize);
+        return letter + number;
+    };
     getPosition = (move) => {
         return this.abstractBoard[move%this.gridSize][Math.floor(move/this.gridSize)];
     };

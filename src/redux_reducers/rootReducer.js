@@ -1,6 +1,7 @@
 import '../redux_actions/actionTypes';
 import { CONNECT_SERVER, TOGGLE_SETTINGS, 
-    PRESSED_PLAY, DISMISS_WAITING_MODAL } from "../redux_actions/actionTypes";
+    PRESSED_PLAY, DISMISS_WAITING_MODAL,
+    MOVE_BACK, MOVE_FORWARD, MOVE_GOTO } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -9,7 +10,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, undoRequested, undoReply,
     cancelRequested, swapSeats, // setPlayingPlayerTable,
-    rejectGoState, resignOrCancel} from "./utils";
+    rejectGoState, resignOrCancel, moveForwardBack, moveGoTo} from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -46,6 +47,15 @@ function liveGameApp (state = initialState, action) {
             break;
         case DISMISS_WAITING_MODAL:
             newState.waiting_modal = true;
+            break;
+        case MOVE_BACK:
+            moveForwardBack(false, newState);
+            break;
+        case MOVE_FORWARD:
+            moveForwardBack(true, newState);
+            break;
+        case MOVE_GOTO:
+            moveGoTo(action.payload, newState);
             break;
         case WEBSOCKET_MESSAGE:
             if (process.env.NODE_ENV === 'development') {

@@ -7,6 +7,8 @@ export const TOGGLE_SETTINGS = 'TOGGLE_SETTINGS';
 export const PRESSED_PLAY = 'PRESSED_PLAY';
 export const DISMISS_WAITING_MODAL = 'DISMISS_WAITING_MODAL';
 export const MOVE_FORWARD = 'MOVE_FORWARD';
+export const MOVE_BACK = 'MOVE_BACK';
+export const MOVE_GOTO = 'MOVE_GOTO';
 
 export function connectServer(server) {
     return {

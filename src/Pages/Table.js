@@ -113,9 +113,9 @@ const UnconnectedTable = (props) => {
                 <Grid item style={{height:'100%', width: 640}}>
                     <Grid container direction={'column'} alignItems={'stretch'}  wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
-                        <Grid item style={{maxWidth: '100%', flex: '1 1 auto', minHeight: '0px', borderWidth: '1px', borderStyle: 'solid'}}>
+                        <Grid item style={{maxWidth: '100%',maxHeight: '60%', flex: '1 1 auto', minHeight: '0px', borderWidth: '1px', borderStyle: 'solid'}}>
                             <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
-                                <div>
+                                <div style={{height: '100%'}}>
                                     <GameInfoPanel/>
                                 </div>
                             </div>
