@@ -48,7 +48,9 @@ function liveGameApp (state = initialState, action) {
             newState.waiting_modal = true;
             break;
         case WEBSOCKET_MESSAGE:
-            console.log(action.payload.data);
+            if (process.env.NODE_ENV === 'development') {
+                console.log(action.payload.data);
+            }
             const json = JSON.parse(action.payload.data);
             if (json.dsgLoginErrorEvent) {
                 return initialState;
