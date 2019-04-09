@@ -49,8 +49,9 @@ function UnconnectedPlayersList(props) {
     return (
         <List className={classes.root}>
             {players.map((name, i) => {
-                    const player = users[name];
                     if ('game server' === name) { return undefined; }
+                    const player = users[name];
+                    if (!player) { return undefined; }
                     return (
                         <ListItem key={i} >
                             <ListItemAvatar onClick={() => props.mute(name)}>

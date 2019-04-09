@@ -51,9 +51,9 @@ const server = "https://www.pente.org";
 
 class User {
     constructor(userdata) {
-        this.name = userdata.name;
+        this.name = '';
         this.game_ratings = {};
-        this.subscriber = userdata.subscriberLevel > 0;
+        this.subscriber = 0;
         this.name_color= 0;
         this.crown = 0;
         if (userdata) {
@@ -69,14 +69,17 @@ class User {
         newUser.name_color = this.name_color;
         newUser.crown = this.crown;
         newUser.muted = this.muted;
-        newUser.userhtml = newUser.userhtml();
-        newUser.avatar = newUser.avatar();
+        newUser.userhtml = newUser.user_html();
+        newUser.avatar = newUser.avatar_f();
+        return newUser;
     };
     
     updateUser = (userdata) => {
         if (this.subscriber) {
             this.name_color = userdata.nameColor.value;
         }
+        this.name = userdata.name;
+        this.subscriber = userdata.subscriberLevel > 0;
         let crown = 0;
         for(let i = 0; i<userdata.gameData.length; i++) {
             let gameData = userdata.gameData[i];
@@ -93,8 +96,8 @@ class User {
             }
         }
         this.crown = crown;
-        this.userhtml = this.userhtml();
-        this.avatar = this.avatar();
+        this.userhtml = this.user_html();
+        this.avatar = this.avatar_f();
     };
     #rgb2hex = (n) => {
         const b = n & 255, g = (n >> 8) & 255, r = (n >> 16) & 255;
@@ -149,7 +152,7 @@ class User {
             default: return "";
         }
     };
-    userhtml = () => {
+    user_html = () => {
         return (
             <span className="name" style={{whiteSpace: 'nowrap'}}>
             <a href={server + "/gameServer/profile?viewName=" + this.name} target="_blank" rel="noopener noreferrer">
@@ -184,7 +187,7 @@ class User {
             <span><img alt="rating" src={gif}/> &nbsp; {r}</span>
         );
     };
-    avatar = () => {
+    avatar_f = () => {
         if (this.subscriber) {
             return server+"/gameServer/avatar?name="+this.name;
         }

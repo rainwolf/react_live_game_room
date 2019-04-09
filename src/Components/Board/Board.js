@@ -109,7 +109,9 @@ const UnconnectedBoard = (props) => {
         } 
         const lastMoves = game.last_move();
         lastMoves.forEach(move => {
-            board[move].last_move = true;
+            if (move !== undefined) {
+                board[move].last_move = true;
+            } 
         });
         
         return board.map(p => <BoardSquare {...p}/>);
