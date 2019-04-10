@@ -16,7 +16,7 @@ import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
 import WaitPlayerReturnModal from "../Components/Table/WaitPlayerReturnModal";
 import ResignCancelLostPlayerModal from "../Components/Table/ResignCancelLostPlayerModal";
 import AdSense from 'react-adsense';
-
+import Snack from '../Components/Table/Snack';
 
 const mapStateToProps = state => {
     return {
@@ -134,6 +134,7 @@ const UnconnectedTable = (props) => {
             <EvaluateGoModal/>
             <WaitPlayerReturnModal/>
             <ResignCancelLostPlayerModal/>
+            <Snack/>
         </div>
                 </Grid>
             </Grid>

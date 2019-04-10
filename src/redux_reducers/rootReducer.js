@@ -2,7 +2,7 @@ import '../redux_actions/actionTypes';
 import { CONNECT_SERVER, TOGGLE_SETTINGS, 
     PRESSED_PLAY, DISMISS_WAITING_MODAL,
     MOVE_BACK, MOVE_FORWARD, MOVE_GOTO,
-    MUTE, UNMUTE } from "../redux_actions/actionTypes";
+    MUTE, UNMUTE, REMOVE_SNACK } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -25,7 +25,8 @@ const initialState = {
     logged_in: false,
     table: undefined,
     game: undefined,
-    table_messages: []
+    table_messages: [],
+    // snack: 'test snack rainwolf'
 };
 
 function liveGameApp (state = initialState, action) {
@@ -65,6 +66,9 @@ function liveGameApp (state = initialState, action) {
         case UNMUTE:
             unmute(action.payload, newState);
             break;
+        case REMOVE_SNACK:
+            delete newState.snack;
+            break;
         case WEBSOCKET_MESSAGE:
             if (process.env.NODE_ENV === 'development') {
                 console.log(action.payload.data);
@@ -77,8 +81,8 @@ function liveGameApp (state = initialState, action) {
                 newState.admin = json.dsgLoginEvent.me.admin;
                 newState.freeloader = json.dsgLoginEvent.me.subscriberLevel === 0;
                 newState.logged_in = true;
-            } else if (json.dsgPingEvent) {
-                console.log('ping: ' + action.payload.data)
+            // } else if (json.dsgPingEvent) {
+            //     console.log('ping: ' + action.payload.data)
             } else if (json.dsgJoinMainRoomEvent) {
                 processUser(json.dsgJoinMainRoomEvent.dsgPlayerData, newState);
             } else if (json.dsgUpdatePlayerDataEvent) {
