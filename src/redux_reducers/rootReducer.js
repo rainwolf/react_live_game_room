@@ -26,7 +26,7 @@ const initialState = {
     table: undefined,
     game: undefined,
     table_messages: [],
-    // snack: 'test snack rainwolf'
+    // snack: 'rainwolf'
 };
 
 function liveGameApp (state = initialState, action) {

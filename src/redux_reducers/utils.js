@@ -188,7 +188,9 @@ export function changeGameState(data, state) {
         game.gameState = Object.assign(game.gameState, { state: data.state });
         state.game = game;
         // console.log(JSON.stringify(state.game))
-        if (data.winner) {
+        if (data.winner && data.winner !== '') {
+            // console.log(JSON.stringify(state.game))
+            // console.log('winner ', data.winner)
             state.snack = data.winner;
         } 
         if (data.changeText) {

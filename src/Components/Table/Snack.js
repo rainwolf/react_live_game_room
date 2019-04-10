@@ -12,6 +12,8 @@ import { withStyles } from '@material-ui/core/styles';
 import classNames from 'classnames';
 import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
+import red from '@material-ui/core/colors/red';
+import blue from '@material-ui/core/colors/blue';
 import User from "../../redux_reducers/UserClass";
 
 const mapStateToProps = state => {
@@ -35,10 +37,10 @@ const styles = theme => ({
         backgroundColor: green[600],
     },
     error: {
-        backgroundColor: theme.palette.error.dark,
+        backgroundColor: red[500],
     },
     info: {
-        backgroundColor: theme.palette.primary.dark,
+        backgroundColor: blue[500],
     },
     warning: {
         backgroundColor: amber[700],
@@ -60,12 +62,19 @@ const styles = theme => ({
 const UnConnectedSnack = (props) => {
     const { users, snack, table, close_snack, classes } = props;
     
-    const [open, toggle] = useState(snack !== undefined);
+    let [open, toggle] = useState(snack !== undefined);
+
+    if (!open) {
+        open = snack !== undefined && snack !== '';
+    } 
     
     const close = () => {
         toggle(false);
         close_snack();
     };
+
+    // console.log(snack)
+    // console.log(open)
     
     let variant, message, Icon;
     variant = 'error';
@@ -77,7 +86,7 @@ const UnConnectedSnack = (props) => {
             variant = 'info';
             message = (<span>{user.userhtml} wins the game.</span>);
             Icon = InfoIcon;
-        } else if (snack.indexOf(table.me) > 0) { // i win
+        } else if (snack === table.me) { // i win
             variant = 'success';
             message = 'Game over, you win.';
             Icon = CheckCircleIcon;
@@ -99,7 +108,7 @@ const UnConnectedSnack = (props) => {
             onClose={close}
         >
             <SnackbarContent
-                className={variant}
+                className={classes[variant]}
                 aria-describedby="client-snackbar"
                 message={
                     <span id="client-snackbar" className={classes.message}>
