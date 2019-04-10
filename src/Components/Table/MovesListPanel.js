@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MOVE_FORWARD, MOVE_BACK, MOVE_GOTO } from "../../redux_actions/actionTypes";
 import { connect } from 'react-redux';
 import { Game } from "../../redux_reducers/GameClass";
@@ -49,7 +49,12 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedMovesListPanel = (props) => {
     const { classes, game } = props;
-    
+
+    useEffect(() => {
+        let element = document.getElementById('moveslist');
+        element.scrollTop = element.scrollHeight;
+    });
+
     const move_strs = game.moves_strings();
     let move_cells;
     if (game.isConnect6()) {
@@ -98,7 +103,7 @@ const UnconnectedMovesListPanel = (props) => {
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'}
                   style={{width: '100%', height: '100%'}}>
                 <Grid item style={{flex: '1 1 auto', minHeight: '0px'}}>
-                    <Paper className={classes.root}>
+                    <Paper id='moveslist' className={classes.root}>
                         <Table className={classes.table}>
                             <TableBody>
                                 {move_rows}

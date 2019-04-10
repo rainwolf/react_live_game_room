@@ -75,11 +75,11 @@ class User {
     };
     
     updateUser = (userdata) => {
+        this.subscriber = userdata.subscriberLevel > 0;
         if (this.subscriber) {
             this.name_color = userdata.nameColor.value;
         }
         this.name = userdata.name;
-        this.subscriber = userdata.subscriberLevel > 0;
         let crown = 0;
         for(let i = 0; i<userdata.gameData.length; i++) {
             let gameData = userdata.gameData[i];

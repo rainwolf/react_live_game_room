@@ -119,7 +119,16 @@ export class Game {
         } 
         if (forward) {
             if (this.isConnect6()) {
-                
+                if (this.until%4 === 1 || this.until%4 === 3) {
+                    if (this.until < this.moves.length - 1) {
+                        this.until += 1;
+                        this.addMoveFromList(this.until - 1);
+                    }
+                }
+                if (this.until < this.moves.length) {
+                    this.until += 1;
+                    this.addMoveFromList(this.until - 1);
+                }
             } else {
                 if (this.until < this.moves.length) {
                     this.until += 1;
