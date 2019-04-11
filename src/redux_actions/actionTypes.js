@@ -12,6 +12,8 @@ export const MOVE_GOTO = 'MOVE_GOTO';
 export const MUTE = 'MUTE';
 export const UNMUTE = 'UNMUTE';
 export const REMOVE_SNACK = 'REMOVE_SNACK';
+export const SHOW_BOOT_DIALOG = 'SHOW_BOOT_DIALOG';
+
 
 export function connectServer(server) {
     return {

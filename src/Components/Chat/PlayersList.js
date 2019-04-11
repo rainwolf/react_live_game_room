@@ -8,9 +8,11 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 // import Typography from '@material-ui/core/Typography';
 import User from '../../redux_reducers/UserClass';
+import Table from '../../redux_reducers/TableClass';
 import { connect } from 'react-redux';
-import { MUTE, UNMUTE } from "../../redux_actions/actionTypes";
+import { MUTE, UNMUTE, SHOW_BOOT_DIALOG } from "../../redux_actions/actionTypes";
 import WifiOffIcon from '@material-ui/icons/WifiOff';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 
 const styles = theme => ({
@@ -27,16 +29,22 @@ const styles = theme => ({
 const mapStateToProps = state => {
     return {
         users: state.users,
+        table: state.tables[state.table],
+        me: state.me,
+        admin: state.admin
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
         mute: (player) => {
-            dispatch({ type: MUTE, payload: player});
+            dispatch({ type: MUTE, payload: player });
         },
         unmute: (player) => {
-            dispatch({ type: UNMUTE, payload: player});
+            dispatch({ type: UNMUTE, payload: player });
+        },
+        show_boot_dialog: (player) => {
+            dispatch({ type: SHOW_BOOT_DIALOG, payload: player });
         }
 
     }
@@ -44,7 +52,7 @@ const mapDispatchToProps = dispatch => {
 
 
 function UnconnectedPlayersList(props) {
-    const { classes, users, game, players } = props;
+    const { classes, users, game, players, table, mute, unmute, me, show_boot_dialog, admin } = props;
     
     return (
         <List className={classes.root}>
@@ -54,7 +62,7 @@ function UnconnectedPlayersList(props) {
                     if (!player) { return undefined; }
                     return (
                         <ListItem key={i} >
-                            <ListItemAvatar onClick={() => props.mute(name)}>
+                            <ListItemAvatar onClick={() => { if (name !== me) { mute(name); } } }>
                                 <Avatar alt={name} src={player.avatar} />
                             </ListItemAvatar>
                             <ListItemText
@@ -62,7 +70,10 @@ function UnconnectedPlayersList(props) {
                                 secondary={player.rating(game)}
                             />
                             {player.muted &&
-                                <WifiOffIcon className={classes.icon} onClick={() => props.unmute(name)}/>
+                                <WifiOffIcon className={classes.icon} onClick={() => unmute(name)}/>
+                            }
+                            {(game && table && (table.owner || admin) && name !== me) &&
+                                <ExitToAppIcon className={classes.icon} onClick={() => show_boot_dialog(name)}/>
                             }
                         </ListItem>
     
@@ -78,7 +89,10 @@ UnconnectedPlayersList.propTypes = {
     users: PropTypes.objectOf(
         PropTypes.instanceOf(User).isRequired
     ).isRequired,
-    players: PropTypes.arrayOf(PropTypes.string)
+    table: PropTypes.instanceOf(Table),
+    players: PropTypes.arrayOf(PropTypes.string),
+    me: PropTypes.string,
+    admin: PropTypes.string,
 };
 
 const PlayersList = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedPlayersList)); 

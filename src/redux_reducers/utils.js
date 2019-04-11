@@ -335,3 +335,12 @@ export function unmute(player, state) {
     delete user.muted;
     state.users = { ...state.users, [player]: user };
 }
+
+export function bootEvent(data, state) {
+    if (data.table === state.table && data.toBoot !== state.me) {
+        addTableMessage({player: 'game server', text: data.toBoot+' was booted from this table by '+data.player+' and won\'t be able to return for 5 minutes.' }, state);
+    } else {
+        // TODO: make this an error snackbar
+        addRoomMessage({player: 'game server', text: 'You were booted by '+data.player+' from their table and won\'t be able to return for 5 minutes.' }, state);
+    }
+}

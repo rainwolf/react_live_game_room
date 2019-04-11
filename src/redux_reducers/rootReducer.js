@@ -2,7 +2,7 @@ import '../redux_actions/actionTypes';
 import { CONNECT_SERVER, TOGGLE_SETTINGS, 
     PRESSED_PLAY, DISMISS_WAITING_MODAL,
     MOVE_BACK, MOVE_FORWARD, MOVE_GOTO,
-    MUTE, UNMUTE, REMOVE_SNACK } from "../redux_actions/actionTypes";
+    MUTE, UNMUTE, REMOVE_SNACK, SHOW_BOOT_DIALOG } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -12,7 +12,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     serverTableMessage, undoRequested, undoReply,
     cancelRequested, swapSeats, // setPlayingPlayerTable,
     rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
-    mute, unmute } from "./utils";
+    mute, unmute, bootEvent } from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -68,6 +68,13 @@ function liveGameApp (state = initialState, action) {
             break;
         case REMOVE_SNACK:
             delete newState.snack;
+            break;
+        case SHOW_BOOT_DIALOG:
+            if (action.payload) {
+                newState.showBootDialog = action.payload;
+            } else {
+                delete newState.showBootDialog;
+            }
             break;
         case WEBSOCKET_MESSAGE:
             if (process.env.NODE_ENV === 'development') {
@@ -127,13 +134,10 @@ function liveGameApp (state = initialState, action) {
                 rejectGoState(json.dsgRejectGoStateEvent, newState);
             } else if (json.dsgWaitingPlayerReturnTimeUpTableEvent) {
                 resignOrCancel(json.dsgWaitingPlayerReturnTimeUpTableEvent, newState);
+            } else if (json.dsgBootTableEvent) {
+                bootEvent(json.dsgBootTableEvent, newState);
             }
-            
-        // {"dsgWaitingPlayerReturnTimeUpTableEvent":{"waitingForPlayerToReturnSeqNbr":0,"set":false,"player":"rainwolf","table":1,"time":1554539579997}}
-        // {"dsgGameStateTableEvent":{"state":3,"changeText":"player iostest has been disconnected, game is paused. ","gameInSet":0,"table":1,"time":1554539519996}}
-        //    {"dsgSetPlayingPlayerTableEvent":{"seat":1,"player":"iostest","table":1,"time":1554124915697}}
-        // {"dsgSwapSeatsTableEvent":{"swap":true,"silent":false,"player":"iostest","table":1,"time":1554122803745}}
-        // {"dsgSetPlayingPlayerTableEvent":{"seat":2,"player":"iostest","table":1,"time":1553629064097}} rootReducer.js:35
+        // {"dsgBootTableEvent":{"toBoot":"rainwolf","player":"iostest","table":1,"time":1554968452267}}            
             break;
         default: break;
     }
