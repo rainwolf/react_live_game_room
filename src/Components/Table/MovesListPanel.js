@@ -58,9 +58,12 @@ const UnconnectedMovesListPanel = (props) => {
     const move_strs = game.moves_strings();
     let move_cells;
     if (game.isConnect6()) {
+        move_cells = [];
         if (move_strs.length > 0) {
             move_cells.push(<TableCell key={0} align='center' onClick={() => props.goto_move(1)}>
+                <Typography variant='h6'>
                 {move_strs[0]}
+                </Typography>
             </TableCell>)
         }
         for (let i = 1; i < move_strs.length; i++) {
@@ -73,7 +76,9 @@ const UnconnectedMovesListPanel = (props) => {
         }
     } else {
         move_cells = move_strs.map((m,i) => (<TableCell key={i} align='center' onClick={() => props.goto_move(i+1)}>
+            <Typography variant='h6'>
             {m}
+            </Typography>
         </TableCell>));
     }
     let move_rows = [];

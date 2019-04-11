@@ -2,8 +2,8 @@
   "name": "react_live_games",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://development.pente.org",
-  "homepage": "http://development.pente.org/gameServer/live",
+  "proxy": "https://pente.org",
+  "homepage": "http://pente.org/gameServer/live",
   "dependencies": {
     "@fvilers/disable-react-devtools": "^1.1.0",
     "@giantmachines/redux-websocket": "^0.3.0",
@@ -22,7 +22,7 @@
     "redux": "^4.0.1"
   },
   "scripts": {
-    "start": "PORT=8000 react-scripts start",
+    "start": "PORT=8000 react-scripts start --watch --watch-poll",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
