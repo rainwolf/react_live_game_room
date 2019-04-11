@@ -350,3 +350,17 @@ export function invitationReceived(data, state) {
         state.received_invitation = { by: data.player, message: data.inviteText, table: data.table };
     }
 }
+
+export function invitationReply(data, state) {
+    if (data.toPlayer === state.me) {
+        let message = data.player + ' ' + (data.accept?'accepted':'declined') + ' your invitation.';
+        if (data.responseText && data.responseText !== '') {
+            message += '\nTheir message: "' + data.responseText + '"';
+        } 
+        if (state.table) {
+            addTableMessage({player: 'game server', text: message }, state);
+        } else {
+            addRoomMessage({player: 'game server', text: message }, state);
+        }
+    } 
+}

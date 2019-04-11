@@ -13,7 +13,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     serverTableMessage, undoRequested, undoReply,
     cancelRequested, swapSeats, // setPlayingPlayerTable,
     rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
-    mute, unmute, bootEvent, invitationReceived } from "./utils";
+    mute, unmute, bootEvent, invitationReceived, invitationReply } from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -142,9 +142,10 @@ function liveGameApp (state = initialState, action) {
                 bootEvent(json.dsgBootTableEvent, newState);
             } else if (json.dsgInviteTableEvent) {
                 invitationReceived(json.dsgInviteTableEvent, newState);
+            } else if (json.dsgInviteResponseTableEvent) {
+                invitationReply(json.dsgInviteResponseTableEvent, newState);
             }
-        // {"dsgInviteTableEvent":{"toInvite":"rainwolf","inviteText":"bleep","player":"iostest","table":2,"time":1554994754640}}
-        // {"dsgBootTableEvent":{"toBoot":"rainwolf","player":"iostest","table":1,"time":1554968452267}}            
+        // {"dsgInviteResponseTableEvent":{"toPlayer":"rainwolf","responseText":"sure","accept":true,"ignore":false,"player":"iostest","table":1,"time":1554998965841}}
             break;
         default: break;
     }
