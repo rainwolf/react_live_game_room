@@ -48,6 +48,7 @@ const UnconnectedTable = (props) => {
             setHeight(ref.current.clientHeight)
         } 
     });
+    
 
     const sendTableText = (event) => {
         const str = event.target.value;
@@ -55,9 +56,6 @@ const UnconnectedTable = (props) => {
             props.send_message({dsgTextTableEvent: {text: str, table: table.table, time: 0}});
             event.target.value = "";
         }
-    };
-    const invitePlayer = (player, message) => {
-        props.send_message({dsgBootTableEvent: {toInvite: player, inviteText: message, player: table.me, table: table.table, time: 0}});
     };
     
     // let table_users = {};
@@ -73,28 +71,11 @@ const UnconnectedTable = (props) => {
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{height: '100%'}}>
                 {freeloader &&
                 <Grid item>
-                    {/*<AdSense.Google*/}
-                        {/*client='ca-pub-3326997956703582'*/}
-                        {/*slot='9145001041'*/}
-                        {/*style={{ display: 'block' }}*/}
-                        {/*layout='in-article'*/}
-                        {/*format='fluid'*/}
-                    {/*/>*/}
                     <AdSense.Google
                         client='ca-pub-3326997956703582'
                         slot='6777680396'
                         style={{ display:'inline-block',width:'970px',height:'90px' }}
                     />
-                    {/*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>*/}
-                    {/*<ins className="adsbygoogle"*/}
-                    {/*style={{display:'block'}}*/}
-                    {/*data-ad-client="ca-pub-3326997956703582"*/}
-                    {/*data-ad-slot="9145001041"*/}
-                    {/*data-ad-format="auto"*/}
-                    {/*data-full-width-responsive="true"></ins>*/}
-                    {/*<script>*/}
-                    {/*(adsbygoogle = window.adsbygoogle || []).push({});*/}
-                    {/*</script>*/}
                 </Grid>
                 }
                 <Grid item style={{width:'100%', flex: '1', minHeight: '0px'}}>

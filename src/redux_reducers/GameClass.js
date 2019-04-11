@@ -272,6 +272,9 @@ export class Game {
     
     undoMove = () => {
         const new_moves = this.moves.slice(0, this.moves.length - 1);
+        if (this.until === this.moves.length) {
+            this.until -= 1;
+        } 
         this.moves = new_moves;
         this.replayGame();
     };

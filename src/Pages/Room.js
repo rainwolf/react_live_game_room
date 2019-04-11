@@ -79,16 +79,6 @@ class UnconnectedRoom extends Component {
                                 slot='6777680396'
                                 style={{ display:'inline-block',width:'970px',height:'90px' }}
                             />
-                            {/*<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>*/}
-                            {/*<ins className="adsbygoogle"*/}
-                            {/*style={{display:'block'}}*/}
-                            {/*data-ad-client="ca-pub-3326997956703582"*/}
-                            {/*data-ad-slot="9145001041"*/}
-                            {/*data-ad-format="auto"*/}
-                            {/*data-full-width-responsive="true"></ins>*/}
-                            {/*<script>*/}
-                            {/*(adsbygoogle = window.adsbygoogle || []).push({});*/}
-                            {/*</script>*/}
                         </Grid>
                         }
                         <Grid item style={{width:'100%', flex: '1', minHeight: '0px'}}>

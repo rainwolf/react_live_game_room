@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { send_message, TOGGLE_SETTINGS, PRESSED_PLAY } from "../../redux_actions/actionTypes";
 import Grid from '@material-ui/core/Grid';
@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import {GameState} from "../../redux_reducers/GameClass";
 import MovesListPanel from './MovesListPanel';
+import InviteModal from './InviteModal';
 
 const styles = theme => ({
     root: {
@@ -75,6 +76,8 @@ const UnconnectedGameInfoPanel = (props) => {
         props.play_pressed();    
     };
 
+    const [invite, toggleInvite] = useState(false);
+    
     return (
         <div style={{width: '100%', height: '100%'}}>
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} 
@@ -191,9 +194,19 @@ const UnconnectedGameInfoPanel = (props) => {
                             {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&
                             <Grid item xs>
                                 <div style={{width:'0%', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" 
+                                    <Button variant="contained" color="primary"
                                             onClick={props.toggle_settings}>
                                         settings
+                                    </Button>
+                                </div>
+                            </Grid>
+                            }
+                            {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&
+                            <Grid item xs>
+                                <div style={{width:'0%', margin: '0 auto'}}>
+                                    <Button variant="contained" color="primary"
+                                            onClick={() => toggleInvite(true)}>
+                                        invite
                                     </Button>
                                 </div>
                             </Grid>
@@ -214,6 +227,7 @@ const UnconnectedGameInfoPanel = (props) => {
                     <MovesListPanel />
                 </Grid>    
             </Grid>
+            <InviteModal open={invite} dismiss={() => toggleInvite(false)}/>
         </div>
     );
 };
