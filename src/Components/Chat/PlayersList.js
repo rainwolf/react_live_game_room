@@ -92,7 +92,7 @@ UnconnectedPlayersList.propTypes = {
     table: PropTypes.instanceOf(Table),
     players: PropTypes.arrayOf(PropTypes.string),
     me: PropTypes.string,
-    admin: PropTypes.string,
+    admin: PropTypes.bool,
 };
 
 const PlayersList = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedPlayersList)); 

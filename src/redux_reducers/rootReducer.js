@@ -2,7 +2,8 @@ import '../redux_actions/actionTypes';
 import { CONNECT_SERVER, TOGGLE_SETTINGS, 
     PRESSED_PLAY, DISMISS_WAITING_MODAL,
     MOVE_BACK, MOVE_FORWARD, MOVE_GOTO,
-    MUTE, UNMUTE, REMOVE_SNACK, SHOW_BOOT_DIALOG } from "../redux_actions/actionTypes";
+    MUTE, UNMUTE, REMOVE_SNACK, SHOW_BOOT_DIALOG,
+    REPLIED_INVITATION } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from './UserClass';
@@ -12,7 +13,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     serverTableMessage, undoRequested, undoReply,
     cancelRequested, swapSeats, // setPlayingPlayerTable,
     rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
-    mute, unmute, bootEvent } from "./utils";
+    mute, unmute, bootEvent, invitationReceived } from "./utils";
 
 
 const server = new User({name: 'game server', subscriberLevel: 0, gameData: [], name_color: 0});
@@ -76,6 +77,9 @@ function liveGameApp (state = initialState, action) {
                 delete newState.showBootDialog;
             }
             break;
+        case REPLIED_INVITATION:
+            delete newState.received_invitation;
+            break;
         case WEBSOCKET_MESSAGE:
             if (process.env.NODE_ENV === 'development') {
                 console.log(action.payload.data);
@@ -136,7 +140,10 @@ function liveGameApp (state = initialState, action) {
                 resignOrCancel(json.dsgWaitingPlayerReturnTimeUpTableEvent, newState);
             } else if (json.dsgBootTableEvent) {
                 bootEvent(json.dsgBootTableEvent, newState);
+            } else if (json.dsgInviteTableEvent) {
+                invitationReceived(json.dsgInviteTableEvent, newState);
             }
+        // {"dsgInviteTableEvent":{"toInvite":"rainwolf","inviteText":"bleep","player":"iostest","table":2,"time":1554994754640}}
         // {"dsgBootTableEvent":{"toBoot":"rainwolf","player":"iostest","table":1,"time":1554968452267}}            
             break;
         default: break;

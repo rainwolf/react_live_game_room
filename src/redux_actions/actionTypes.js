@@ -13,6 +13,7 @@ export const MUTE = 'MUTE';
 export const UNMUTE = 'UNMUTE';
 export const REMOVE_SNACK = 'REMOVE_SNACK';
 export const SHOW_BOOT_DIALOG = 'SHOW_BOOT_DIALOG';
+export const REPLIED_INVITATION = 'REPLIED_INVITATION';
 
 
 export function connectServer(server) {

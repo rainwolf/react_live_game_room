@@ -121,6 +121,11 @@ const UnconnectedGameInfoPanel = (props) => {
                 <Grid item>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
+                        <Grid item xs style={{paddingLeft: 10}}>
+                            <Typography variant='h4'>
+                                Captures:
+                            </Typography>
+                        </Grid>
                         <Grid item xs>
                             <Captures seat={1}/>
                         </Grid>

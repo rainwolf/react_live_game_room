@@ -11,6 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Fab from '@material-ui/core/Fab';
 import AdSense from 'react-adsense';
 import Cookies from 'js-cookie';
+import InvitationResponseModal from "../Components/Room/InvitationResponseModal";
 
 const mapStateToProps = state => {
         return {
@@ -102,6 +103,7 @@ class UnconnectedRoom extends Component {
                             </Grid>
                         </Grid>
                     </Grid>
+                    <InvitationResponseModal/>
                 </div>
             )
         } else if (connected) {

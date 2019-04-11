@@ -344,3 +344,9 @@ export function bootEvent(data, state) {
         addRoomMessage({player: 'game server', text: 'You were booted by '+data.player+' from their table and won\'t be able to return for 5 minutes.' }, state);
     }
 }
+
+export function invitationReceived(data, state) {
+    if (data.toInvite === state.me) {
+        state.received_invitation = { by: data.player, message: data.inviteText, table: data.table };
+    }
+}
