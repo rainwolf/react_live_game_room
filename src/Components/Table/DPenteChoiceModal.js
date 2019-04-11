@@ -9,8 +9,8 @@ import { connect } from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 
 function getModalStyle() {
-    const top = 50;
-    const left = 50;
+    const top = 70;
+    const left = 70;
 
     return {
         top: `${top}%`,

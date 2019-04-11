@@ -4,6 +4,7 @@ import { GameState, Game } from "../../redux_reducers/GameClass";
 import Table from "../../redux_reducers/TableClass";
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import {send_message} from "../../redux_actions/actionTypes";
 
 const mapStateToProps = state => {
     return {
@@ -13,10 +14,23 @@ const mapStateToProps = state => {
     }
 };
 
+const mapDispatchToProps = dispatch => {
+    return {
+        send_message: message => {
+            dispatch(send_message(message));
+        },
+    }
+};
+
 
 const UnconnectedBoard = (props) => {
     
-    const {game_id, game, table} = props;
+    const {game_id, game, table, send_message} = props;
+
+    const sendMove = (move) => {
+        send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
+    };
+
     // console.log(JSON.stringify(game.abstractBoard))
     
     const makeBoard = (gridsize) => {
@@ -64,11 +78,11 @@ const UnconnectedBoard = (props) => {
                 let clickHandler = undefined;
                 if (myTurn) {
                     if (game.abstractBoard[i][j] === 0) {
-                        clickHandler = props.clickHandler;
+                        clickHandler = sendMove;
                     } 
                     if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
                         if (clickHandler === undefined) {
-                            clickHandler = props.clickHandler;
+                            clickHandler = sendMove;
                         } else {
                             clickHandler = undefined;
                         } 
@@ -184,6 +198,6 @@ UnconnectedBoard.propTypes = {
     game: PropTypes.instanceOf(Game).isRequired
 };
 
-const Board = connect(mapStateToProps)(UnconnectedBoard);
+const Board = connect(mapStateToProps, mapDispatchToProps)(UnconnectedBoard);
 
 export default Board;

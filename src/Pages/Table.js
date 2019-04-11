@@ -56,12 +56,6 @@ const UnconnectedTable = (props) => {
             event.target.value = "";
         }
     };
-    const sendMove = (move) => {
-        props.send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
-    };
-    const bootPlayer = (player) => {
-        props.send_message({dsgBootTableEvent: {toBoot: player, player: table.me, table: table.table, time: 0}});
-    };
     const invitePlayer = (player, message) => {
         props.send_message({dsgBootTableEvent: {toInvite: player, inviteText: message, player: table.me, table: table.table, time: 0}});
     };
@@ -108,7 +102,7 @@ const UnconnectedTable = (props) => {
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                 <Grid item style={{height:'100%'}}>
                     <div ref={ref} style={{height: '100%', width: height}}>
-                        <Board clickHandler={sendMove}/>
+                        <Board />
                     </div>
                 </Grid>
                 <Grid item style={{height:'100%', width: 640}}>
