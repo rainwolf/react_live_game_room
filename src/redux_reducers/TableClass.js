@@ -36,6 +36,14 @@ class Table {
     canUndo = (game) => {
         if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
             return this.isMyTurn(game);
+        } else if (game.isConnect6()) {
+            if (game.gameState.state === GameState.State.STARTED) {
+                if (game.moves.length % 4 === 1 || game.moves.length % 4 === 3) {
+                    return this.me === this.seats[3 - game.currentPlayer()];
+                } else {
+                    return this.me === this.seats[game.currentPlayer()];
+                }
+            }
         } else {
             return game.gameState.state === GameState.State.STARTED && this.me === this.seats[3 - game.currentPlayer()];
         }  
