@@ -24,11 +24,15 @@ export function connectServer(server) {
 }
 
 export function connectSocket(server) {
+    let host = window.location.hostname;
+    if (host === 'localhost') {
+        // host = 'development.pente.org';
+        host = 'pente.org';
+    } 
     return {
         type: WEBSOCKET_CONNECT,
         payload: {
-            // url: 'wss://development.pente.org/websocketServer/'+server
-            url: 'wss://pente.org/websocketServer/'+server
+            url: 'wss://' + host + '/websocketServer/' + server
         }
     }
 }
