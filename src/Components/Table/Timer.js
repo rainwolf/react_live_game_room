@@ -74,23 +74,13 @@ class UnconnectedTimer extends Component {
     
     render () {
         const { minutes, seconds } = this.state;
-        if (minutes === 0 && seconds < 12) {
-            return (
-                <Paper style={{textAlign: 'center', padding: 5}}>
-                    <Typography variant="h3" color='error'>
-                        {this.props.table.timed ? minutes+':'+(seconds<10?'0':'')+seconds : '-:-'}
-                    </Typography>
-                </Paper>
-            );
-        } else {
-            return (
-                <Paper style={{textAlign: 'center', padding: 5}}>
-                    <Typography variant="h3" color='default'>
-                        {this.props.table.timed ? minutes+':'+(seconds<10?'0':'')+seconds : '-:-'}
-                    </Typography>
-                </Paper>
-            );
-        } 
+        return (
+            <Paper style={{textAlign: 'center', padding: 5}}>
+                <Typography variant="h3" color={(minutes === 0 && seconds < 12)?'error':'default'}>
+                    {this.props.table.timed ? minutes+':'+(seconds<10?'0':'')+seconds : '-:-'}
+                </Typography>
+            </Paper>
+        );
     };
 };
 

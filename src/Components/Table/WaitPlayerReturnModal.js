@@ -126,7 +126,7 @@ class UnconnectedWaitPlayerReturnModal extends Component {
                         </Typography>
                         <Typography variant="h6" id="modal-title">
                             If they do not return in {seconds} seconds, you will have the option of either 
-                            canceling the game, or force your opponent to resign and claim victory. 
+                            cancelling the game, or force your opponent to resign and claim victory. 
                         </Typography>
                         <Button onClick={this.resign}>resign myself</Button>
                         <Button onClick={this.props.close_modal}>dismiss</Button>

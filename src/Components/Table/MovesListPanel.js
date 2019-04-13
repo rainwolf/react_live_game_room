@@ -60,23 +60,25 @@ const UnconnectedMovesListPanel = (props) => {
     if (game.isConnect6()) {
         move_cells = [];
         if (move_strs.length > 0) {
-            move_cells.push(<TableCell key={0} align='center' onClick={() => props.goto_move(1)}>
-                <Typography variant='h6'>
-                {move_strs[0]}
-                </Typography>
-            </TableCell>)
+            move_cells.push(
+                <TableCell key={0} align='center' onClick={() => props.goto_move(1)}>
+                    <Typography variant='h6' color={(game.until === 1)?'error':'default'}>
+                    {move_strs[0]}
+                    </Typography>
+                </TableCell>)
         }
         for (let i = 1; i < move_strs.length; i++) {
-            move_cells.push(<TableCell key={i} align='center' 
+            move_cells.push(
+                <TableCell key={i} align='center' 
                                        onClick={() => props.goto_move(1 + 2*i)}>
-                <Typography variant='h6'>
-                    {move_strs[i]}
-                </Typography>
+                    <Typography variant='h6' color={(game.until === 1 + 2*i || game.until === 2*i)?'error':'default'}>
+                        {move_strs[i]}
+                    </Typography>
             </TableCell>)
         }
     } else {
         move_cells = move_strs.map((m,i) => (<TableCell key={i} align='center' onClick={() => props.goto_move(i+1)}>
-            <Typography variant='h6'>
+            <Typography variant='h6' color={(game.until === 1 + i)?'error':'default'}>
             {m}
             </Typography>
         </TableCell>));
