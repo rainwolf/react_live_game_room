@@ -138,7 +138,7 @@ export class Game {
         } else {
             if (this.isConnect6()) {
                 if (this.until > 1) {
-                    if (this.until % 4 === 0 || this.until % 4 === 2) {
+                    if (this.until % 4 === 1 || this.until % 4 === 3) {
                         this.until -= 1;
                     }
                     this.until -= 1;
@@ -157,8 +157,8 @@ export class Game {
         if (!this.until || this.until > i) {
             this.until = i;
             this.replayGame(this.until);
-        } else if (this.until < i) {
-            while (this.until < i) {
+        } else {
+            while (this.until < i && this.until < this.moves.length) {
                 this.until += 1;
                 this.addMoveFromList(this.until - 1);
             }
@@ -355,7 +355,7 @@ export class Game {
                 this.#undoTournamentRule();
             }
         } else if (this.game < 15) {
-            let player = (((i % 4) === 0) || ((this.moves.length % 3) === 0)) ? 1 : 2;
+            let player = (((i % 4) === 0) || ((i % 4) === 3)) ? 1 : 2;
             this.#addGomokuMove(x, y, player);
         } else if (this.game < 17) {
             let player = 1 + (i%2);
