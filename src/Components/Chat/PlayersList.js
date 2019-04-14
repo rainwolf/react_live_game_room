@@ -12,7 +12,7 @@ import Table from '../../Classes/TableClass';
 import { connect } from 'react-redux';
 import { MUTE, UNMUTE, SHOW_BOOT_DIALOG } from "../../redux_actions/actionTypes";
 import WifiOffIcon from '@material-ui/icons/WifiOff';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import LaunchIcon from '@material-ui/icons/Launch';
 
 
 const styles = theme => ({
@@ -73,7 +73,7 @@ function UnconnectedPlayersList(props) {
                                 <WifiOffIcon className={classes.icon} onClick={() => unmute(name)}/>
                             }
                             {(game && table && (table.owner || admin) && name !== me) &&
-                                <ExitToAppIcon className={classes.icon} onClick={() => show_boot_dialog(name)}/>
+                                <LaunchIcon className={classes.icon} onClick={() => show_boot_dialog(name)}/>
                             }
                         </ListItem>
     

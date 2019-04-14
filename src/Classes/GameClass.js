@@ -90,6 +90,16 @@ export class Game {
         }
     };
     
+    critical_captures = (color) => {
+        let threshold = 7;
+        if (this.game === 3 || this.game === 4 || this.game === 17 || this.game === 18) {
+            threshold = 11;
+        } else if (this.isGo()) {
+            return false;
+        } 
+        return this.captures[color] > threshold;
+    };
+    
     last_move = () => {
         let l; 
         l = this.until - 1;
