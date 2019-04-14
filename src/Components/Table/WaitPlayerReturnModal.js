@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { GameState } from "../../redux_reducers/GameClass";
-import Table from '../../redux_reducers/TableClass';
+import { GameState } from "../../Classes/GameClass";
+import Table from '../../Classes/TableClass';
 import {send_message} from "../../redux_actions/actionTypes";
 import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';

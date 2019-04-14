@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import {Game, GameState} from "../../redux_reducers/GameClass";
-import Table from "../../redux_reducers/TableClass";
-import User from "../../redux_reducers/UserClass";
+import {Game, GameState} from "../../Classes/GameClass";
+import Table from "../../Classes/TableClass";
+import User from "../../Classes/UserClass";
 import {send_message} from "../../redux_actions/actionTypes";
 import Button from '@material-ui/core/Button';
 import ListItem from '@material-ui/core/ListItem';

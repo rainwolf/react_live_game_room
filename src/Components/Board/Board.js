@@ -1,7 +1,7 @@
 import React  from 'react';
 import BoardSquare from './BoardSquare';
-import { GameState, Game } from "../../redux_reducers/GameClass";
-import Table from "../../redux_reducers/TableClass";
+import { GameState, Game } from "../../Classes/GameClass";
+import Table from "../../Classes/TableClass";
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import {send_message} from "../../redux_actions/actionTypes";

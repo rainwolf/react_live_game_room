@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import {GameState} from "../../redux_reducers/GameClass";
+import {GameState} from "../../Classes/GameClass";
 import MovesListPanel from './MovesListPanel';
 import InviteModal from './InviteModal';
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { REMOVE_SNACK } from "../../redux_actions/actionTypes";
-import Table from '../../redux_reducers/TableClass';
+import Table from '../../Classes/TableClass';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ErrorIcon from '@material-ui/icons/Error';
 import InfoIcon from '@material-ui/icons/Info';
@@ -14,7 +14,7 @@ import green from '@material-ui/core/colors/green';
 import amber from '@material-ui/core/colors/amber';
 import red from '@material-ui/core/colors/red';
 import blue from '@material-ui/core/colors/blue';
-import User from "../../redux_reducers/UserClass";
+import User from "../../Classes/UserClass";
 
 const mapStateToProps = state => {
     return {

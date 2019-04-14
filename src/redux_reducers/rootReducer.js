@@ -6,7 +6,7 @@ import { CONNECT_SERVER, TOGGLE_SETTINGS,
     REPLIED_INVITATION } from "../redux_actions/actionTypes";
 import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
-import User from './UserClass';
+import User from '../Classes/UserClass';
 import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,

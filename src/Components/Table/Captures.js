@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Game } from "../../redux_reducers/GameClass";
-import Table from "../../redux_reducers/TableClass";
+import { Game } from "../../Classes/GameClass";
+import Table from "../../Classes/TableClass";
 import SimpleStone from '../Board/SimpleStone';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';

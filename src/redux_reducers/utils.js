@@ -1,6 +1,6 @@
-import Table from './TableClass';
-import User from './UserClass';
-import { Game, GameState } from './GameClass';
+import Table from '../Classes/TableClass';
+import User from '../Classes/UserClass';
+import { Game, GameState } from '../Classes/GameClass';
 import move_sound_file from '../resources/sounds/move_sound.mp3';
 import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
 

@@ -6,8 +6,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
-import User from '../../redux_reducers/UserClass';
-import Table from '../../redux_reducers/TableClass';
+import User from '../../Classes/UserClass';
+import Table from '../../Classes/TableClass';
 import { connect } from 'react-redux';
 import Radio from '@material-ui/core/Radio';
 

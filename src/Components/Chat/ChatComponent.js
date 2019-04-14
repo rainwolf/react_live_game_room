@@ -6,7 +6,7 @@ import PlayersList from './PlayersList';
 import ChatInput from './ChatInput';
 import ChatPanel from './ChatPanel';
 // import Table from "../../redux_reducers/TableClass";
-import User from "../../redux_reducers/UserClass";
+import User from "../../Classes/UserClass";
 
 function ChatComponent(props) {
 
