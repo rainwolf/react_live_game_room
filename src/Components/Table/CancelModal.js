@@ -33,7 +33,9 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
     return {
-        table: state.tables[state.table]
+        me: state.me,
+        table: state.table,
+        cancelRequested: state.cancel_requested
     }
 };
 
@@ -49,10 +51,10 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedCancelModal = (props) => {
 
-    const { classes, table } = props;
+    const { classes, cancelRequested, table, me } = props;
 
     const cancel_reply = (accept) => {
-        props.send_message({dsgCancelReplyTableEvent: {accepted: accept, player: table.me, table: table.table, time: 0}});
+        props.send_message({dsgCancelReplyTableEvent: {accepted: accept, player: me, table: table, time: 0}});
     };
 
     return (
@@ -60,7 +62,7 @@ const UnconnectedCancelModal = (props) => {
             <Modal
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
-                open={table.cancel_requested !== undefined}
+                open={cancelRequested !== undefined}
                 // onClose={this.handleClose}
             >
                 <div style={getModalStyle()} className={classes.paper}>
@@ -68,7 +70,7 @@ const UnconnectedCancelModal = (props) => {
                         Cancel requested
                     </Typography>
                     <Typography variant="subtitle1" id="simple-modal-description">
-                        {table.cancel_requested} requests to cancel this set.
+                        {cancelRequested} requests to cancel this set.
                     </Typography>
                     <Button onClick={() => cancel_reply(true)}>Accept</Button>
                     <Button onClick={() => cancel_reply(false)}>Deny</Button>

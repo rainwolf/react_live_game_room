@@ -170,13 +170,6 @@ export function changeGameState(data, state) {
             delete state.undo_requested;
             delete state.waiting_modal;
             delete state.time_up_resign_cancel;
-            if (state.tables[data.table].cancel_requested) {
-                const tables = { ...state.tables };
-                const table = tables[data.table].newInstance();
-                delete table.cancel_requested;
-                tables[data.table] = table;
-                state.tables = tables;
-            }             
         }
         // if (data.state !== GameState.State.PAUSED) {
         //     delete state.waiting_modal;
@@ -262,11 +255,7 @@ export function undoReply(data, state) {
 export function cancelRequested(data, state) {
     if (data.table === state.table) {
         if (state.tables[data.table].iAmPlaying() && state.me !== data.player) {
-            const tables = { ...state.tables };
-            const table = tables[state.table].newInstance();
-            table.cancel_requested = state.users[data.player].userhtml;
-            tables[data.table] = table;
-            state.tables = tables;
+            state.cancel_requested = state.users[data.player].userhtml;
         }
         addTableMessage({player: 'game server', text: 'set cancellation requested'}, state);
     }
