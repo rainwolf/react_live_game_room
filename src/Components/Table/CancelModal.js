@@ -65,7 +65,7 @@ const UnconnectedCancelModal = (props) => {
             >
                 <div style={getModalStyle()} className={classes.paper}>
                     <Typography variant="h6" id="modal-title">
-                        Undo requested
+                        Cancel requested
                     </Typography>
                     <Typography variant="subtitle1" id="simple-modal-description">
                         {table.cancel_requested} requests to cancel this set.

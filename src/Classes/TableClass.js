@@ -50,7 +50,7 @@ class Table {
     };
     
     player_color = (p) => {
-        if (this.game > 18) {
+        if (this.game > 18 && this.game < 25) {
             p = 3 - p;
         }
         if (p === 1) {
@@ -94,7 +94,7 @@ class Table {
         } else if (this.game < 25) {
             style = '#FAC832'
         } else {
-            style = '#FAC832'
+            style = '#52be80'
         }
         return style;
     };

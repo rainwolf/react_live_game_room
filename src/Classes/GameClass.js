@@ -87,12 +87,14 @@ export class Game {
             this.gridSize = 9;
         } else if (game < 25) {
             this.gridSize = 13;
+        } else {
+            this.gridSize = 19;
         }
     };
     
     critical_captures = (color) => {
         let threshold = 7;
-        if (this.game === 3 || this.game === 4 || this.game === 17 || this.game === 18) {
+        if (this.game === 3 || this.game === 4 || this.game === 17 || this.game === 18 || this.game === 25 || this.game === 26) {
             threshold = 11;
         } else if (this.isGo()) {
             return false;
@@ -225,12 +227,13 @@ export class Game {
     currentColor = () => {
         if (this.isConnect6()) {
             return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
-        } 
-        const currentColor = 1 + (this.moves.length % 2);
+        }
+        // const currentColor = 1 + (this.moves.length % 2);
+        return 1 + (this.moves.length % 2);
         // if (this.isGo()) {
         //     return 3 - currentColor;
         // }
-        return currentColor;
+        // return currentColor;
     };
     // #isPoofPente = () => {
     //     return this.game === 11 || this.game === 12;    
@@ -242,7 +245,7 @@ export class Game {
         return this.game === 13 || this.game === 14;
     };
     isGo = () => {
-        return this.game > 18;
+        return this.game > 18 && this.game < 25;
     };
     
     dPenteChoice = () => {
@@ -386,6 +389,11 @@ export class Game {
         } else if (this.game < 27) {
             let player = 1 + (i%2);
             this.#addOPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyTournamentRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoTournamentRule();
+            }
         }
     };
 
@@ -1056,8 +1064,9 @@ export class Game {
         for (let i = 0; i < this.moves.length; i++) {
             if (this.moves[i] === pass_move) {
                 if (pass) {
-                    const newMoves = this.moves.slice(0, i-1);
-                    this.moves = newMoves;
+                    this.moves = this.moves.slice(0, i-1);
+                    // const newMoves = this.moves.slice(0, i-1);
+                    // this.moves = newMoves;
                     this.replayGame();
                     break;
                 } else {

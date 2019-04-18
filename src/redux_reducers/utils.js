@@ -170,6 +170,13 @@ export function changeGameState(data, state) {
             delete state.undo_requested;
             delete state.waiting_modal;
             delete state.time_up_resign_cancel;
+            if (state.tables[data.table].cancel_requested) {
+                const tables = { ...state.tables };
+                const table = tables[data.table].newInstance();
+                delete table.cancel_requested;
+                tables[data.table] = table;
+                state.tables = tables;
+            }             
         }
         // if (data.state !== GameState.State.PAUSED) {
         //     delete state.waiting_modal;
