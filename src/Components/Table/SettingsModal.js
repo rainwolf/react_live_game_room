@@ -123,7 +123,7 @@ const UnconnectedSettingsModal = (props) => {
                                 {/*{[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>*/}
                                     {/*<MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>*/}
                                 {/*)}*/}
-                                {Array.from({length: 24}, (v, i) => i+1).map(game =>
+                                {Array.from({length: 26}, (v, i) => i+1).map(game =>
                                     <MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>
                                 )}
                             </Select>                        

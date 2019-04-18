@@ -320,6 +320,8 @@ export class Game {
             this.rated = r;
         } else if (this.game < 25) {
             this.#replayGoGame(until);
+        } else if (this.game < 27) {
+            this.#replayOPenteGame(until);
         }
     };
     
@@ -381,6 +383,9 @@ export class Game {
         } else if (this.game < 25) {
             let player = 1 + (i%2);
             this.#addGoMove(move, player);
+        } else if (this.game < 27) {
+            let player = 1 + (i%2);
+            this.#addOPenteMove(x, y, player);
         }
     };
 
@@ -449,6 +454,9 @@ export class Game {
         } else if (this.game < 25) {
             let player = 2 - (this.moves.length%2);
             this.#addGoMove(move, player);
+        } else if (this.game < 27) {
+            let player = 2 - (this.moves.length%2);
+            this.#addOPenteMove(x, y, player);
         }
     };
 
@@ -575,6 +583,24 @@ export class Game {
             let color = 1 + (i%2);
             let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
             this.#addPoofPenteMove(x, y, color);
+        }
+        if (this.rated && (this.moves.length === 2)) {
+            this.#applyTournamentRule();
+        }
+    };
+    #addOPenteMove = (x, y, player) => {
+        this.#addGomokuMove(x, y, player);
+        this.#detectPoof(x, y, player);
+        this.#detectKeryoPoof(x, y, player);
+        this.#detectPenteCapture(x, y, player);
+        this.#detectKeryoPenteCapture(x, y, player);
+    };
+    #replayOPenteGame = (until) => {
+        // this.#resetAbstractBoard();
+        for (let i = 0; i < Math.min(this.moves.length, until); i++) {
+            let color = 1 + (i%2);
+            let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
+            this.#addOPenteMove(x, y, color);
         }
         if (this.rated && (this.moves.length === 2)) {
             this.#applyTournamentRule();
@@ -1290,6 +1316,150 @@ export class Game {
         }
     };
 
+    #detectKeryoPoof = (i, j, myColor) => {
+        let opponentColor = 1 + (myColor % 2);
+        let poofed = false;
+        if (((i-3) > -1) && ((i+1) < 19)) { // left
+            if (this.abstractBoard[i-1][j] === myColor && this.abstractBoard[i-2][j] === myColor) {
+                if ((this.abstractBoard[i-3][j] === opponentColor) && (this.abstractBoard[i+1][j] === opponentColor)) {
+                    this.abstractBoard[i-2][j] = 0;
+                    this.abstractBoard[i-1][j] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i-3) > -1) && ((j-3) > -1) && ((i+1) < 19) && ((j+1) < 19)) { // up left
+            if (this.abstractBoard[i-1][j-1] === myColor && this.abstractBoard[i-2][j-2] === myColor) {
+                if ((this.abstractBoard[i-3][j-3] === opponentColor) && (this.abstractBoard[i+1][j+1] === opponentColor)) {
+                    this.abstractBoard[i-2][j-2] = 0;
+                    this.abstractBoard[i-1][j-1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((j-3) > -1) && ((j+1) < 19)) { // up
+            if (this.abstractBoard[i][j-1] === myColor && this.abstractBoard[i][j-2] === myColor) {
+                if ((this.abstractBoard[i][j-3] === opponentColor) && (this.abstractBoard[i][j+1] === opponentColor)) {
+                    this.abstractBoard[i][j-2] = 0;
+                    this.abstractBoard[i][j-1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i-1) > -1) && ((j-3) > -1) && ((i+3) < 19) && ((j+1) < 19)) { // up right
+            if (this.abstractBoard[i+1][j-1] === myColor && this.abstractBoard[i+2][j-2] === myColor) {
+                if ((this.abstractBoard[i-1][j+1] === opponentColor) && (this.abstractBoard[i+3][j-3] === opponentColor)) {
+                    this.abstractBoard[i+2][j-2] = 0;
+                    this.abstractBoard[i+1][j-1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i+3) < 19) && ((i-1) > -1)) { // right
+            if (this.abstractBoard[i+1][j] === myColor && this.abstractBoard[i+2][j] === myColor) {
+                if ((this.abstractBoard[i+3][j] === opponentColor) && (this.abstractBoard[i-1][j] === opponentColor)) {
+                    this.abstractBoard[i+2][j] = 0;
+                    this.abstractBoard[i+1][j] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i-1) > -1) && ((j-1) > -1) && ((i+3) < 19) && ((j+3) < 19)) { // down right
+            if (this.abstractBoard[i+1][j+1] === myColor && this.abstractBoard[i+2][j+2] === myColor) {
+                if ((this.abstractBoard[i-1][j-1] === opponentColor) && (this.abstractBoard[i+3][j+3] === opponentColor)) {
+                    this.abstractBoard[i+2][j+2] = 0;
+                    this.abstractBoard[i+1][j+1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((j+2) < 19) && ((j-1) > -1)) { // down
+            if (this.abstractBoard[i][j+1] === myColor && this.abstractBoard[i][j+2] === myColor) {
+                if ((this.abstractBoard[i][j-1] === opponentColor) && (this.abstractBoard[i][j+3] === opponentColor)) {
+                    this.abstractBoard[i][j+1] = 0;
+                    this.abstractBoard[i][j+2] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i-3) > -1) && ((j-1) > -1) && ((i+1) < 19) && ((j+3) < 19)) { // down left
+            if (this.abstractBoard[i-1][j+1] === myColor && this.abstractBoard[i-2][j+2] === myColor) {
+                if ((this.abstractBoard[i+1][j-1] === opponentColor) && (this.abstractBoard[i-3][j+3] === opponentColor)) {
+                    this.abstractBoard[i-2][j+2] = 0;
+                    this.abstractBoard[i-1][j+1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+
+        // 4 directions with center of 3 stones placed to poof
+        if (((i-2) > -1) && ((i+2) < 19)) { // horizontal
+            if (this.abstractBoard[i-1][j] === myColor && this.abstractBoard[i+1][j] === myColor) {
+                if ((this.abstractBoard[i-2][j] === opponentColor) && (this.abstractBoard[i+2][j] === opponentColor)) {
+                    this.abstractBoard[i+1][j] = 0;
+                    this.abstractBoard[i-1][j] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i-2) > -1) && ((j-2) > -1) && ((i+2) < 19) && ((j+2) < 19)) { // up left
+            if (this.abstractBoard[i-1][j-1] === myColor && this.abstractBoard[i+1][j+1] === myColor) {
+                if ((this.abstractBoard[i-2][j-2] === opponentColor) && (this.abstractBoard[i+2][j+2] === opponentColor)) {
+                    this.abstractBoard[i+1][j+1] = 0;
+                    this.abstractBoard[i-1][j-1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((j-2) > -1) && ((j+2) < 19)) { // vertical
+            if (this.abstractBoard[i][j-1] === myColor && this.abstractBoard[i][j+1] === myColor) {
+                if ((this.abstractBoard[i][j-2] === opponentColor) && (this.abstractBoard[i][j+2] === opponentColor)) {
+                    this.abstractBoard[i][j+1] = 0;
+                    this.abstractBoard[i][j-1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+        if (((i-2) > -1) && ((j-2) > -1) && ((i+2) < 19) && ((j+2) < 19)) { // up right
+            if (this.abstractBoard[i+1][j-1] === myColor && this.abstractBoard[i+1][j-1] === myColor) {
+                if ((this.abstractBoard[i-2][j+2] === opponentColor) && (this.abstractBoard[i+2][j-2] === opponentColor)) {
+                    this.abstractBoard[i+1][j-1] = 0;
+                    this.abstractBoard[i-1][j+1] = 0;
+                    this.abstractBoard[i][j] = 0;
+                    this.captures[myColor] += 2;
+                    poofed = true;
+                }
+            }
+        }
+
+        if (poofed) {
+            this.captures[myColor] += 1;
+        }
+
+    }
+    
 
 }
 

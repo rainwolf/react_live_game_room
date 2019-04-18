@@ -107,7 +107,7 @@ const UnconnectedBoard = (props) => {
                 });
             }
         }
-        if (game_id < 19) {
+        if (game_id < 19 || game_id > 24) {
             const circles = [120, 126, 180, 234, 240];
             circles.forEach(c => { board[c].part = 51; });
         } else {
@@ -167,8 +167,10 @@ const UnconnectedBoard = (props) => {
         style = 'boat-pente'
     } else if (game_id < 19) {
         style = 'dk-pente'
-    } else {
+    } else if (game_id < 25) {
         style = 'go'
+    } else {
+        style = 'o-pente'
     }
     let gridsize = 19;
     if (game_id === 21 || game_id === 22) { gridsize = 9; }

@@ -91,6 +91,8 @@ class Table {
             style = '#25BAFF'
         } else if (this.game < 19) {
             style = '#FFA500'
+        } else if (this.game < 25) {
+            style = '#FAC832'
         } else {
             style = '#FAC832'
         }
@@ -126,6 +128,8 @@ class Table {
             name = 'Go (9x9)';
         } else if (g < 25) {
             name = 'Go (13x13)';
+        } else if (g < 27) {
+            name = 'O-Pente';
         }
         if (g % 2 === 0) {
             return 'Speed '+name;
