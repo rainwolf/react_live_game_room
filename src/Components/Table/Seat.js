@@ -37,13 +37,13 @@ const UnconnectedSeat = (props) => {
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                   style={{height: '100%', width: width}}>
-                <Grid item xs style={{marginLeft: 10}}>
+                <Grid item xs style={{paddingLeft: 10}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
                 <Grid item xs>
                     <Button variant="contained" color="primary" className={'button-glow'}
                             onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }
-                    style={{marginLeft:10}}>
+                    style={{paddingLeft:10}}>
                         Take Seat
                     </Button>
                 </Grid>
@@ -54,7 +54,7 @@ const UnconnectedSeat = (props) => {
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                   style={{height: '100%', width: width}}>
-                <Grid item xs={1} style={{marginLeft:10, marginTop: 8}}>
+                <Grid item xs={1} style={{paddingLeft:10, marginTop: 10}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
                     <Grid item xs={8}>
