@@ -109,10 +109,10 @@ const UnconnectedGameInfoPanel = (props) => {
                 }
                 <Grid item>
                     <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
-                        <Grid item xs>
+                        <Grid item xs style={{maxWidth: '50%'}}>
                             <Seat seat={1}/>
                         </Grid>
-                        <Grid item xs>
+                        <Grid item xs style={{maxWidth: '50%'}}>
                             <Seat seat={2}/>
                         </Grid>
                     </Grid>
@@ -188,6 +188,15 @@ const UnconnectedGameInfoPanel = (props) => {
                                     </div>
                                 </Grid>
                             }
+                            {/*{(game.isGo() && game.gameState.state === GameState.State.STARTED) &&*/}
+                            {/*<Grid item xs>*/}
+                                {/*<div style={{width:'0%', margin: '0 auto'}}>*/}
+                                    {/*<Button variant="contained" color="primary" onClick={score}>*/}
+                                        {/*score*/}
+                                    {/*</Button>*/}
+                                {/*</div>*/}
+                            {/*</Grid>*/}
+                            {/*}*/}
                         </Grid>
                     </Grid>
                 }
