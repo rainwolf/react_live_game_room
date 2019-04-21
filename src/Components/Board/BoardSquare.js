@@ -76,7 +76,7 @@ class BoardSquare extends Component {
                onClick={this.clickHandler}
                transform={'translate('+x+','+y+')'}
             >
-                <rect id={this.props.id} width={size+1} height={size+1}
+                <rect id={this.props.id} width={size} height={size}
                       fillOpacity={0.0} />
                 {this.boardpart(size)}
                 {this.props.stone && Stone({size: 10, id: this.props.stone})}
