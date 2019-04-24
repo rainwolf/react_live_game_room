@@ -465,6 +465,11 @@ export class Game {
         } else if (this.game < 27) {
             let player = 2 - (this.moves.length%2);
             this.#addOPenteMove(x, y, player);
+            if (this.rated && this.moves.length === 2) {
+                this.#applyTournamentRule();
+            } else if (this.rated && this.moves.length === 3) {
+                this.#undoTournamentRule();
+            }
         }
     };
 
