@@ -7,7 +7,7 @@ import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
 const move_sound = new Audio(move_sound_file);
 const new_player_sound = new Audio(new_player_sound_file);
 
-export function processUser(userdata, state) {
+export async function processUser(userdata, state) {
     let user;
     if (state.users[userdata.name]) {
         user = state.users[userdata.name].newInstance();
@@ -15,7 +15,7 @@ export function processUser(userdata, state) {
     } else {
         user = new User(userdata);
         if (state.table === undefined) {
-            new_player_sound.play();
+            try { await new_player_sound.play(); } catch(err) {} 
         } 
     }
     state.users = { ...state.users, [user.name]: user };
@@ -59,7 +59,7 @@ export function changeTableState(tableState, state) {
     state.tables = tables;
 }
 
-export function joinTable(joinEvent, state) {
+export async function joinTable(joinEvent, state) {
     const tables = { ...state.tables };
     let table = tables[joinEvent.table];
     if (table === undefined) {  
@@ -76,7 +76,7 @@ export function joinTable(joinEvent, state) {
             state.game = new Game();
         } 
     } else if (state.table === joinEvent.table) {
-        new_player_sound.play();
+        try { await new_player_sound.play(); } catch(err) {}
     }
     table.addPlayer(joinEvent.player);
     tables[joinEvent.table] = table;
@@ -141,7 +141,7 @@ export function addTableMessage(data, state) {
     } 
 }
 
-export function addMove(data, state) {
+export async function addMove(data, state) {
     const game =  state.game.newInstance();
     if (data.table === state.table) {
         if (data.moves.length === 1 && data.move === data.moves[0]) {
@@ -153,7 +153,7 @@ export function addMove(data, state) {
             }
         }
         if (data.player !== state.me) {
-            move_sound.play();
+            try { await move_sound.play(); } catch(err) {}
         }
 
     }
@@ -205,7 +205,10 @@ export function changeTimer(data, state) {
         
         const tables = { ...state.tables };
         const table = tables[data.table].newInstance();
-        const idx = table.seats.indexOf(data.player);
+        let idx = table.seats.indexOf(data.player);
+        if (idx < 0) {
+            idx = table.seats.indexOf('');
+        } 
         table.clocks[idx].minutes = data.minutes;
         table.clocks[idx].seconds = data.seconds;
         tables[data.table] = table;
