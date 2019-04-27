@@ -5,7 +5,7 @@ function Stone(props) {
         <svg key={props.id} height={props.size*1.5} width={props.size*1.5}>
             <defs>
                 <filter id="shadow">
-                    <feDropShadow dx="0.7" dy="0.7" stdDeviation="0.35"/>
+                    <feDropShadow dx="0.7" dy="0.7" stdDeviation="0.35" floodColor={'#434A50'}/>
                 </filter>
                 <radialGradient id={props.id} cx="40%" cy="40%" r="50%">
                     <stop offset="0%" stopColor='var(--color1)' />

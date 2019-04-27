@@ -55,6 +55,7 @@ export function changeTableState(tableState, state) {
         game.setGame(tableState.game);
         game.rated = tableState.rated;
         state.game = game;
+        delete state.pressed_play;
     } 
     state.tables = tables;
 }
