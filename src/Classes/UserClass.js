@@ -184,7 +184,7 @@ class User {
             gif = ratings_green;
         }
         return (
-            <span><img alt="rating" src={gif}/> &nbsp; {r}</span>
+            <span style={{whiteSpace: 'nowrap'}}><img alt="rating" src={gif}/> &nbsp; {r}</span>
         );
     };
     avatar_f = () => {

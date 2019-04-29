@@ -237,7 +237,7 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Grid>
                     </Grid>
                 }
-                <Grid item style={{flex: '1 1 auto', minHeight: '0px', maxHeight: '50%'}}>
+                <Grid item style={{flex: '1 1 auto', minHeight: '0px'}}>
                     <MovesListPanel />
                 </Grid>    
             </Grid>

@@ -42,11 +42,14 @@ const UnconnectedTable = (props) => {
 
     const { messages, table, freeloader } = props;
     const [height, setHeight] = useState(0);
+    const [width, setWidth] = useState(0);
     const ref = useRef(null);
 
     useEffect(() => {
         if (ref.current !== null) {
-            setHeight(ref.current.clientHeight)
+            setHeight(ref.current.clientHeight - (freeloader?90:0));
+            // console.log(ref.current.clientHeight, ref.current.clientWidth)
+            setWidth(ref.current.clientWidth);
         } 
     });
     
@@ -67,9 +70,9 @@ const UnconnectedTable = (props) => {
     // });
     
     return (
-        <div style={{height: '100vh', width: '90%', margin: 'auto'}}>
+        <div ref={ref} style={{height: '100%', width: '100%'}}>
 
-            <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{height: '100%'}}>
+            <Grid container direction={'column'} alignItems={'center'} wrap={'nowrap'} style={{height: '100%', width: '100%'}}>
                 {freeloader &&
                 <Grid item>
                     <AdSense.Google
@@ -79,22 +82,20 @@ const UnconnectedTable = (props) => {
                     />
                 </Grid>
                 }
-                <Grid item style={{width:'100%', flex: '1', minHeight: '0px'}}>
-        <div style={{width: '100%', height: '100%'}}>
-            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
+                <Grid item style={{flex: '1', minHeight: '0px'}}>
+        <div style={{height: '100%', width: Math.min(width, height + 600)}}>
+            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{height: '100%'}}>
                 <Grid item style={{height:'100%'}}>
-                    <div ref={ref} style={{height: '100%', width: height}}>
+                    <div style={{height: '100%', width: height}}>
                         <Board />
                     </div>
                 </Grid>
-                <Grid item style={{height:'100%', width: 640}}>
+                <Grid item style={{height:'100%', width: Math.min(600, width - height)}}>
                     <Grid container direction={'column'} alignItems={'stretch'}  wrap={'nowrap'}
-                          style={{width: '100%', height: '100%'}}>
-                        <Grid item style={{maxWidth: '100%',maxHeight: '60%', flex: '1 1 auto', minHeight: '0px', borderWidth: '1px', borderStyle: 'solid'}}>
+                          style={{height:'100%', width: '100%'}}>
+                        <Grid item style={{height: '60%', borderWidth: '1px', borderStyle: 'solid'}}>
                             <div style={{width: '100%', height: '100%', backgroundColor: '#fffff'}}>
-                                <div style={{height: '100%'}}>
-                                    <GameInfoPanel/>
-                                </div>
+                                <GameInfoPanel/>
                             </div>
                         </Grid>
                         <Grid item style={{height: '40%', borderWidth: '1px', borderStyle: 'solid'}}>

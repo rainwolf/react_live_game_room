@@ -12,6 +12,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import SimpleStone from '../Board/SimpleStone';
 import Grid from '@material-ui/core/Grid';
+import CloseIcon from '@material-ui/icons/Close';
 
 const mapStateToProps = state => {
     return {
@@ -31,20 +32,20 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedSeat = (props) => {
     const { seat, users, game, table } = props;
-    const width = 318;
+    const width = 300;
     
     if (table.seats[seat] === "" && table.seats[3-seat] !== table.me) {
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{height: '100%', width: width}}>
+                  style={{height: '100%', maxWidth: width}}>
                 <Grid item xs style={{paddingLeft: 10}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
                 <Grid item xs>
-                    <Button variant="contained" color="primary" className={'button-glow'}
+                    <Button variant="contained" color="primary" className={'button-glow'} fullWidth
                             onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }
                     style={{paddingLeft:10}}>
-                        Take Seat
+                        <span style={{whiteSpace: 'nowrap'}}>Take Seat</span>
                     </Button>
                 </Grid>
             </Grid>
@@ -53,12 +54,12 @@ const UnconnectedSeat = (props) => {
         const player = users[table.seats[seat]];
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{height: '100%', width: width}}>
+                  style={{height: '100%', maxWidth: width}}>
                 <Grid item xs={1} style={{paddingLeft:10, marginTop: 10}}>
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
                     <Grid item xs={8}>
-                <ListItem key={seat} >
+                <ListItem key={seat} style={{paddingRight: 10}}>
                     {/*<SimpleStone size={40} id={table.player_color(seat)}/>*/}
                     <ListItemAvatar style={{marginLeft:10}}>
                         <Avatar alt={table.seats[seat]} src={player.avatar} />
@@ -71,10 +72,10 @@ const UnconnectedSeat = (props) => {
                 </Grid>
                     {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
                     <Grid item xs style={{marginTop: 10}}>
-                    <Button variant="contained" color="primary"
+                    <Button variant="outlined" color="primary"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }
                             >
-                        Stand
+                        <CloseIcon/>
                     </Button>
                     </Grid>
                     }
