@@ -42,7 +42,7 @@ const UnconnectedSeat = (props) => {
                     <SimpleStone size={40} id={table.player_color(seat)}/>
                 </Grid>
                 <Grid item xs>
-                    <Button variant="contained" color="primary" className={'button-glow'} fullWidth
+                    <Button variant="outlined" color="primary" className={'button-glow'} fullWidth
                             onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}}) }
                     style={{paddingLeft:10}}>
                         <span style={{whiteSpace: 'nowrap'}}>Take Seat</span>
