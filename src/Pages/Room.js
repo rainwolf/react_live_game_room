@@ -20,7 +20,8 @@ const mapStateToProps = state => {
             logged_in: state.logged_in,
             messages: state.room_messages,
             tables: state.tables,
-            freeloader: state.freeloader
+            freeloader: state.freeloader,
+            admin: state.admin
         }
 };
 
@@ -61,7 +62,7 @@ class UnconnectedRoom extends Component {
     };
     
     joinRoom = (table) => {
-        if (table === -1 || !this.props.tables[table].private()) {
+        if (table === -1 || !this.props.tables[table].private() || this.props.admin) {
             this.props.send_message({dsgJoinTableEvent: {table: table, time: 0}});
         } 
     };

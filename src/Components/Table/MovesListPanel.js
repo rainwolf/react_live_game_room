@@ -7,12 +7,13 @@ import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
-import TableFooter from '@material-ui/core/TableFooter';
 import TableRow from '@material-ui/core/TableRow';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
+import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 
 const styles = theme => ({
     root: {
@@ -106,37 +107,33 @@ const UnconnectedMovesListPanel = (props) => {
     }
     
     return (
-        <div style={{width: '100%', height: '100%'}}>
+        <div style={{margin: '0 auto', width: '70%', height: '100%'}}>
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{width: '100%', height: '100%'}}>
-                <Grid item style={{flex: '1 1 auto', minHeight: '0px'}}>
+                  style={{flex: '1 1 auto', minHeight: '0px', maxHeight: '100%', width: '100%', height: '100%'}}>
+                <Grid item style={{flex: '1 1 auto', minHeight: '0px', maxHeight: '100%'}}>
                     <Paper id='moveslist' className={classes.root}>
                         <Table className={classes.table}>
                             <TableBody>
                                 {move_rows}
                             </TableBody>
-                            <TableFooter>
-                                <TableRow>
-                                </TableRow>
-                            </TableFooter>
                         </Table>
                     </Paper>
                 </Grid>
                 <Grid item>
                     <Grid container direction={'row'} alignItems={'center'} wrap={'nowrap'}
-                          style={{width: '100%', height: '100%'}}>
+                          style={{width: '100%'}}>
                         <Grid item xs>
                             <div style={{display: 'table', margin: '0 auto'}}>
-                                <Button variant="contained" color="primary"
+                                <Button variant="outlined" color="primary"
                                         onClick={() => props.move(false)}>
-                                    back
+                                    <SkipPreviousIcon/>
                                 </Button>
                             </div>
                         </Grid>
                         <Grid item xs>
                             <div style={{display: 'table', margin: '0 auto'}}>
-                                <Button variant="contained" color="primary" onClick={() => props.move(true)}>
-                                    forward
+                                <Button variant="outlined" color="primary" onClick={() => props.move(true)}>
+                                    <SkipNextIcon/>
                                 </Button>
                             </div>
                         </Grid>

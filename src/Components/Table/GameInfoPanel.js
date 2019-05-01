@@ -146,7 +146,7 @@ const UnconnectedGameInfoPanel = (props) => {
                                 table.iAmPlaying() && table.fullSeats()) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" onClick={play} className={'button-glow'}>
+                                    <Button variant="outlined" color="primary" onClick={play} className={'button-glow'}>
                                         play
                                     </Button>
                                 </div>
@@ -155,7 +155,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {(table.isMyTurn(game) && game.isGo() && game.gameState.state === GameState.State.STARTED) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" onClick={pass}>
+                                    <Button variant="outlined" color="primary" onClick={pass}>
                                         PASS
                                     </Button>
                                 </div>
@@ -164,7 +164,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {game.gameState.state === GameState.State.STARTED &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" onClick={resign}>
+                                    <Button variant="outlined" color="primary" onClick={resign}>
                                         Resign
                                     </Button>
                                 </div>
@@ -173,7 +173,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {game.gameState.state === GameState.State.STARTED &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" onClick={requestCancel}>
+                                    <Button variant="outlined" color="primary" onClick={requestCancel}>
                                         Cancel
                                     </Button>
                                 </div>
@@ -182,7 +182,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {table.canUndo(game) &&
                                 <Grid item xs>
                                     <div style={{display: 'table', margin: '0 auto'}}>
-                                        <Button variant="contained" color="primary" onClick={requestUndo}>
+                                        <Button variant="outlined" color="primary" onClick={requestUndo}>
                                             Undo
                                         </Button>
                                     </div>
@@ -191,7 +191,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {/*{(game.isGo() && game.gameState.state === GameState.State.STARTED) &&*/}
                             {/*<Grid item xs>*/}
                                 {/*<div style={{width:'0%', margin: '0 auto'}}>*/}
-                                    {/*<Button variant="contained" color="primary" onClick={score}>*/}
+                                    {/*<Button variant="outlined" color="primary" onClick={score}>*/}
                                         {/*score*/}
                                     {/*</Button>*/}
                                 {/*</div>*/}
@@ -208,7 +208,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary"
+                                    <Button variant="outlined" color="primary"
                                             onClick={props.toggle_settings}>
                                         settings
                                     </Button>
@@ -218,7 +218,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary"
+                                    <Button variant="outlined" color="primary"
                                             onClick={() => toggleInvite(true)}>
                                         invite
                                     </Button>
@@ -228,7 +228,7 @@ const UnconnectedGameInfoPanel = (props) => {
                             {table.canExit(game) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
-                                    <Button variant="contained" color="primary" onClick={leave}>
+                                    <Button variant="outlined" color="primary" onClick={leave}>
                                         exit
                                     </Button>
                                 </div>
