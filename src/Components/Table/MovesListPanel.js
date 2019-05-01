@@ -123,10 +123,10 @@ const UnconnectedMovesListPanel = (props) => {
                     </Paper>
                 </Grid>
                 <Grid item>
-                    <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                    <Grid container direction={'row'} alignItems={'center'} wrap={'nowrap'}
                           style={{width: '100%', height: '100%'}}>
                         <Grid item xs>
-                            <div style={{width:'0%', margin: '0 auto'}}>
+                            <div style={{display: 'table', margin: '0 auto'}}>
                                 <Button variant="contained" color="primary"
                                         onClick={() => props.move(false)}>
                                     back
@@ -134,7 +134,7 @@ const UnconnectedMovesListPanel = (props) => {
                             </div>
                         </Grid>
                         <Grid item xs>
-                            <div style={{width:'0%', margin: '0 auto'}}>
+                            <div style={{display: 'table', margin: '0 auto'}}>
                                 <Button variant="contained" color="primary" onClick={() => props.move(true)}>
                                     forward
                                 </Button>
