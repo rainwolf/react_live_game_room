@@ -202,7 +202,7 @@ const UnconnectedGameInfoPanel = (props) => {
                 }
                 {(((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) 
                     || table.canExit(game)) &&
-                    <Grid item xs>
+                    <Grid item>
                         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                               style={{width: '100%', height: '100%'}}>
                             {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&

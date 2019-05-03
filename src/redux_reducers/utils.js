@@ -7,6 +7,16 @@ import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
 const move_sound = new Audio(move_sound_file);
 const new_player_sound = new Audio(new_player_sound_file);
 
+async function playSound(sound) {
+    try {
+        await sound.play();
+    } catch(err) {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('oops, no sound ', err);
+        }
+    }    
+}
+
 export function processUser(userdata, state) {
     let user;
     if (state.users[userdata.name]) {
@@ -15,7 +25,8 @@ export function processUser(userdata, state) {
     } else {
         user = new User(userdata);
         if (state.table === undefined) {
-            new_player_sound.play();
+            playSound(new_player_sound);
+            // new_player_sound.play();
         } 
     }
     state.users = { ...state.users, [user.name]: user };
@@ -77,7 +88,8 @@ export function joinTable(joinEvent, state) {
             state.game = new Game();
         } 
     } else if (state.table === joinEvent.table) {
-        new_player_sound.play();
+        playSound(new_player_sound);
+        // new_player_sound.play();
     }
     table.addPlayer(joinEvent.player);
     tables[joinEvent.table] = table;
@@ -154,7 +166,8 @@ export function addMove(data, state) {
             }
         }
         if (data.player !== state.me) {
-            move_sound.play();
+            playSound(move_sound);
+            // move_sound.play();
         }
     }
     state.game = game;
