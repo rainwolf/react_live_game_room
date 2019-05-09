@@ -35,7 +35,7 @@ class BoardSquare extends Component {
                                       cx={size/2} cy={size/2} r={size/5} fill='none'/>,
         this.up(size), this.left(size), this.right(size), this.down(size)] ) };
     crossdot = (size) => { return ( [this.up(size), this.left(size), this.right(size), this.down(size), 
-         <circle className='boarddot' key={this.props.id + 'dot'} cx={size/2} cy={size/2} r={size/8} />] ) };
+         <circle className='boarddot' key={this.props.id + 'dot'} cx={size/2} cy={size/2} r={size/20} />] ) };
     boardpart = (size) => {
          switch(this.props.part) {
             case 1: return this.upperleftcorner(size);
