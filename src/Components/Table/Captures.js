@@ -18,21 +18,21 @@ const mapStateToProps = state => {
 const UnconnectedCaptures = (props) => {
     const { seat, game, table } = props;
     
-        return (
-            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-                  style={{width: '100%', height: '100%'}}>
-                <Grid item xs>
-                    <div style={{float: 'right', marginRight: 10}}>
-                        <SimpleStone size={40} id={table.player_color(3-seat)}/>
-                    </div>
-                </Grid>
-                <Grid item xs>
-                    <Typography variant="h4" color={game.critical_captures(3 - seat)?'error':'default'}>
-                        x {game.captures[3 - seat]}
-                    </Typography>
-                </Grid>
+    return (
+        <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+              style={{width: '100%', height: '100%'}}>
+            <Grid item xs>
+                <div style={{float: 'right', marginRight: 10}}>
+                    <SimpleStone size={40} id={table.player_color(3-seat)}/>
+                </div>
             </Grid>
-        );
+            <Grid item xs>
+                <Typography variant="h4" color={game.critical_captures(3 - seat)?'error':'default'}>
+                    x {game.captures[3 - seat]}
+                </Typography>
+            </Grid>
+        </Grid>
+    );
 };
 
 UnconnectedCaptures.propTypes = {

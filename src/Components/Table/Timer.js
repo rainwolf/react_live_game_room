@@ -5,7 +5,7 @@ import {Game, GameState} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-
+import { playLowTimeCapturesSound } from '../../redux_reducers/utils'
 
 const mapStateToProps = state => {
     return {
@@ -49,6 +49,9 @@ class UnconnectedTimer extends Component {
             newState.seconds = 0;
             newState.minutes = 0;
         }
+        if (newState.minutes === 0 && newState.seconds < 12 && this.state.seconds >= 12 && this.props.table.isMySeat(this.props.seat)) {
+            playLowTimeCapturesSound();
+        } 
         this.setState(newState);
     };
 

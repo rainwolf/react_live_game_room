@@ -3,9 +3,11 @@ import User from '../Classes/UserClass';
 import { Game, GameState } from '../Classes/GameClass';
 import move_sound_file from '../resources/sounds/move_sound.mp3';
 import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
+import low_time_captures_file from '../resources/sounds/low_time_captures.mp3';
 
 const move_sound = new Audio(move_sound_file);
 const new_player_sound = new Audio(new_player_sound_file);
+const low_time_captures_sound = new Audio(low_time_captures_file);
 
 async function playSound(sound) {
     try {
@@ -15,6 +17,10 @@ async function playSound(sound) {
             console.log('oops, no sound ', err);
         }
     }    
+}
+
+export function playLowTimeCapturesSound() {
+    playSound(low_time_captures_sound);    
 }
 
 export function processUser(userdata, state) {

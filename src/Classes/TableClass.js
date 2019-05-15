@@ -63,6 +63,10 @@ class Table {
         return game.gameState.state === GameState.State.STARTED && this.me === this.seats[game.currentPlayer()];
     };
     
+    isMySeat = (seat) => {
+        return this.me === this.seats[seat];    
+    };
+    
     canExit = (game) => {
         return !(this.iAmPlaying() && game.canNotLeave());      
     };
