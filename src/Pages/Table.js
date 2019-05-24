@@ -45,6 +45,7 @@ const UnconnectedTable = (props) => {
     const [width, setWidth] = useState(0);
     const ref = useRef(null);
 
+    // eslint-disable-next-line
     useEffect(() => {
         if (ref.current !== null) {
             setHeight(ref.current.clientHeight - (freeloader?90:0));

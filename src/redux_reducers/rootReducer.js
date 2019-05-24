@@ -27,6 +27,7 @@ const initialState = {
     table: undefined,
     game: undefined,
     table_messages: [],
+    tournament: false,
     // snack: 'rainwolf'
 };
 
@@ -92,6 +93,7 @@ function liveGameApp (state = initialState, action) {
                 newState.admin = json.dsgLoginEvent.me.admin;
                 newState.freeloader = json.dsgLoginEvent.me.subscriberLevel === 0;
                 newState.logged_in = true;
+                newState.tournament = json.dsgLoginEvent.serverData.tournament;
             // } else if (json.dsgPingEvent) {
             //     console.log('ping: ' + action.payload.data)
             } else if (json.dsgJoinMainRoomEvent) {

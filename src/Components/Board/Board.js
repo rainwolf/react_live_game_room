@@ -111,7 +111,7 @@ const UnconnectedBoard = (props) => {
             const circles = [120, 126, 180, 234, 240];
             circles.forEach(c => { board[c].part = 51; });
         } else {
-            let dots;
+            let dots = [];
             if (game_id === 19 || game_id === 20) {
                 dots = [60, 66, 72, 174, 180, 186, 288, 294, 300];
             } else if (game_id === 21 || game_id === 22) {

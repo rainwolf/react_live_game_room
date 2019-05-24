@@ -30,7 +30,8 @@ const mapStateToProps = state => {
         users: state.users,
         game: state.game,
         table: state.tables[state.table],
-        admin: state.admin
+        admin: state.admin,
+        tournament: state.tournament
     }
 };
 
@@ -53,7 +54,7 @@ const mapDispatchToProps = dispatch => {
 
 
 const UnconnectedGameInfoPanel = (props) => {
-    const { table, game, pressed_play, admin } = props;
+    const { table, game, pressed_play, admin, tournament } = props;
     
     const requestCancel = () => {
         props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
@@ -170,7 +171,7 @@ const UnconnectedGameInfoPanel = (props) => {
                                 </div>
                             </Grid>
                             }
-                            {game.gameState.state === GameState.State.STARTED &&
+                            {(game.gameState.state === GameState.State.STARTED && !tournament) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
                                     <Button variant="outlined" color="primary" onClick={requestCancel}>
@@ -215,7 +216,7 @@ const UnconnectedGameInfoPanel = (props) => {
                                 </div>
                             </Grid>
                             }
-                            {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED) &&
+                            {((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED && !tournament) &&
                             <Grid item xs>
                                 <div style={{display: 'table', margin: '0 auto'}}>
                                     <Button variant="outlined" color="primary"

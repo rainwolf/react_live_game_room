@@ -92,6 +92,9 @@ export function joinTable(joinEvent, state) {
         table.me = state.me;
         if (state.game === undefined) {
             state.game = new Game();
+        }
+        if (state.tournament) {
+            playSound(new_player_sound);
         } 
     } else if (state.table === joinEvent.table) {
         playSound(new_player_sound);
@@ -238,7 +241,9 @@ export function changeTimer(data, state) {
 export function serverTableMessage(data, state) {
     if (data.table === state.table) {
         addTableMessage({player: 'game server', text: data.message}, state);
-    }
+    } else if (data.table === 0) {
+        addRoomMessage({player: 'game server', text: data.message }, state);
+    } 
 }
 
 // export function adjustTimer(data, state) {

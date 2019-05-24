@@ -18,7 +18,8 @@ const mapStateToProps = state => {
     return {
         users: state.users,
         game: state.game,
-        table: state.tables[state.table]
+        table: state.tables[state.table],
+        tournament: state.tournament
     }
 };
 
@@ -31,10 +32,10 @@ const mapDispatchToProps = dispatch => {
 };
 
 const UnconnectedSeat = (props) => {
-    const { seat, users, game, table } = props;
+    const { seat, users, game, table, tournament } = props;
     const width = 300;
     
-    if (table.seats[seat] === "" && table.seats[3-seat] !== table.me) {
+    if (table.seats[seat] === "" && table.seats[3-seat] !== table.me && !tournament) {
         return (
             <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                   style={{height: '100%', maxWidth: width}}>
@@ -70,7 +71,7 @@ const UnconnectedSeat = (props) => {
                     />
                 </ListItem>
                 </Grid>
-                    {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me) &&
+                    {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me && !tournament) &&
                     <Grid item xs style={{marginTop: 10}}>
                     <Button variant="outlined" color="primary"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }

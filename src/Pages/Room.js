@@ -21,7 +21,8 @@ const mapStateToProps = state => {
             messages: state.room_messages,
             tables: state.tables,
             freeloader: state.freeloader,
-            admin: state.admin
+            admin: state.admin,
+            tournament: state.tournament
         }
 };
 
@@ -68,7 +69,7 @@ class UnconnectedRoom extends Component {
     };
 
     render () {
-        const { users, connected, logged_in, messages, tables, freeloader } = this.props;
+        const { users, connected, logged_in, messages, tables, freeloader, tournament } = this.props;
         if (logged_in) {
             return (
                 <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
@@ -89,11 +90,13 @@ class UnconnectedRoom extends Component {
                                     <ChatComponent messages={messages} players={Object.keys(users)} sendText={this.sendRoomText}/>
                                 </Grid>
                                 <Grid item style={{height: '100%', overflow: 'auto', alignCenter: true}}>
+                                    {!tournament &&
                                     <Fab color="primary"  variant="extended" aria-label="Delete"
                                          style={{width: '100%'}} onClick={() => this.joinRoom(-1)}>
                                         {/*<NavigationIcon className={classes.extendedIcon} />*/}
                                         create new table
                                     </Fab>
+                                    }
                                     <br/>
                                     {Object.keys(tables).map(table => <TableCard
                                         key={table}
