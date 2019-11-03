@@ -6,7 +6,7 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import liveGameApp from './redux_reducers/rootReducer';
-import websocket, { WEBSOCKET_MESSAGE, WEBSOCKET_SEND } from '@giantmachines/redux-websocket';
+import reduxWebsocket, { WEBSOCKET_MESSAGE, WEBSOCKET_SEND } from '@giantmachines/redux-websocket';
 import { disableReactDevTools } from '@fvilers/disable-react-devtools';
 
 if (process.env.NODE_ENV === 'production') {
@@ -24,7 +24,9 @@ const pinger = store => next => action => {
     return result
 };
 
-const store = createStore(liveGameApp, applyMiddleware(websocket, pinger));
+const reduxWebsocketMiddleware = reduxWebsocket();
+
+const store = createStore(liveGameApp, applyMiddleware(reduxWebsocketMiddleware, pinger));
 
 ReactDOM.render(
     <Provider store={store}>

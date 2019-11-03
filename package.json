@@ -6,7 +6,7 @@
   "homepage": "http://pente.org/gameServer/live",
   "dependencies": {
     "@fvilers/disable-react-devtools": "^1.1.0",
-    "@giantmachines/redux-websocket": "^0.3.0",
+    "@giantmachines/redux-websocket": "^1.1.5",
     "@material-ui/core": "^3.9.3",
     "@material-ui/icons": "^3.0.2",
     "@material-ui/styles": "^4.0.0-beta.2",
@@ -15,7 +15,7 @@
     "js-cookie": "^2.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
-    "react-adsense": "0.0.6",
+    "react-adsense": "0.1.0",
     "react-dom": "^16.8.6",
     "react-redux": "^6.0.1",
     "react-scripts": "^3.0.1",

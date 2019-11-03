@@ -4,7 +4,6 @@ import { CONNECT_SERVER, TOGGLE_SETTINGS,
     MOVE_BACK, MOVE_FORWARD, MOVE_GOTO,
     MUTE, UNMUTE, REMOVE_SNACK, SHOW_BOOT_DIALOG,
     REPLIED_INVITATION } from "../redux_actions/actionTypes";
-import { WEBSOCKET_OPEN, WEBSOCKET_CLOSED, WEBSOCKET_MESSAGE } from '@giantmachines/redux-websocket';
 import './utils';
 import User from '../Classes/UserClass';
 import {processUser, addRoomMessage, exitUser, changeTableState,
@@ -33,15 +32,16 @@ const initialState = {
 
 function liveGameApp (state = initialState, action) {
     let newState = { ...state };
+    // console.log(JSON.stringify(action))
     switch(action.type) {
         case CONNECT_SERVER:
             newState.server = action.payload;
             break;
-        case WEBSOCKET_OPEN:
+        case "REDUX_WEBSOCKET::OPEN":
             console.log('socket open');
             newState.connected = true;
             break;
-        case WEBSOCKET_CLOSED:
+        case "REDUX_WEBSOCKET::CLOSED":
             console.log('socket closed');
             return initialState;
         case TOGGLE_SETTINGS:
@@ -81,11 +81,11 @@ function liveGameApp (state = initialState, action) {
         case REPLIED_INVITATION:
             delete newState.received_invitation;
             break;
-        case WEBSOCKET_MESSAGE:
+        case "REDUX_WEBSOCKET::MESSAGE":
             if (process.env.NODE_ENV === 'development') {
-                console.log(action.payload.data);
+                console.log(action.payload.message);
             }
-            const json = JSON.parse(action.payload.data);
+            const json = JSON.parse(action.payload.message);
             if (json.dsgLoginErrorEvent) {
                 return initialState;
             } else if (json.dsgLoginEvent) {

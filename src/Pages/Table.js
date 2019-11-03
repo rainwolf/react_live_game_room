@@ -75,11 +75,12 @@ const UnconnectedTable = (props) => {
 
             <Grid container direction={'column'} alignItems={'center'} wrap={'nowrap'} style={{height: '100%', width: '100%'}}>
                 {freeloader &&
-                <Grid item>
+                <Grid item style={{ display:'inline-block',width:'970px',height:'90px' }}>
                     <AdSense.Google
                         client='ca-pub-3326997956703582'
                         slot='6777680396'
                         style={{ display:'inline-block',width:'970px',height:'90px' }}
+                        format=''
                     />
                 </Grid>
                 }

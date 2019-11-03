@@ -1,4 +1,4 @@
-import { WEBSOCKET_CONNECT, WEBSOCKET_SEND } from '@giantmachines/redux-websocket'
+import { connect, send } from '@giantmachines/redux-websocket'
 
 export const CONNECT_SERVER = 'CONNECT_SERVER';
 // export const SERVER_CONNECTED = 'SERVER_CONNECTED';
@@ -26,23 +26,25 @@ export function connectServer(server) {
 export function connectSocket(server) {
     let host = window.location.hostname;
     if (host === 'localhost' || host === 'machine.local') {
-        // host = 'development.pente.org';
-        host = 'pente.org';
+        host = 'development.pente.org';
+        // host = 'pente.org';
     } 
-    return {
-        type: WEBSOCKET_CONNECT,
-        payload: {
-            url: 'wss://' + host + '/websocketServer/' + server
-        }
-    }
+    // return {
+    //     type: WEBSOCKET_CONNECT,
+    //     payload: {
+    //         url: 'wss://' + host + '/websocketServer/' + server
+    //     }
+    // }
+    return connect('wss://' + host + '/websocketServer/' + server);
 }
 
 export function send_message(payload) {
     // console.log('send '+ JSON.stringify(payload));
-    return {
-        type: WEBSOCKET_SEND,
-        payload: payload
-    }
+    // return {
+    //     type: WEBSOCKET_SEND,
+    //     payload: payload
+    // }
+    return send(payload);
 }
 
 // export function set_timer(payload) {
