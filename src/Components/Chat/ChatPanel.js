@@ -21,7 +21,7 @@ function ChatPanel(props) {
     
     const { classes, messages } = props;
     return (
-            <List className={classes.root}>
+            <List className={classes.root} dense={true}>
                 {messages.map((message, i) => (
                     <ListItem key={i} alignItems="flex-start">
                         <ListItemAvatar>

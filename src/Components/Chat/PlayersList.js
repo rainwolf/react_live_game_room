@@ -55,7 +55,7 @@ function UnconnectedPlayersList(props) {
     const { classes, users, game, players, table, mute, unmute, me, show_boot_dialog, admin } = props;
     
     return (
-        <List className={classes.root}>
+        <List className={classes.root} dense={true}>
             {players.map((name, i) => {
                     if ('game server' === name) { return undefined; }
                     const player = users[name];

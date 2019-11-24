@@ -6,6 +6,7 @@ import Table from "../../Classes/TableClass";
 import User from "../../Classes/UserClass";
 import {send_message} from "../../redux_actions/actionTypes";
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
@@ -33,7 +34,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedSeat = (props) => {
     const { seat, users, game, table, tournament } = props;
-    const width = 300;
+    const width = 250;
     
     if (table.seats[seat] === "" && table.seats[3-seat] !== table.me && !tournament) {
         return (
@@ -73,11 +74,11 @@ const UnconnectedSeat = (props) => {
                 </Grid>
                     {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me && !tournament) &&
                     <Grid item xs style={{marginTop: 10}}>
-                    <Button variant="outlined" color="primary"
+                    <IconButton variant="outlined" color="primary" size="small"
                             onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}}) }
                             >
                         <CloseIcon/>
-                    </Button>
+                    </IconButton>
                     </Grid>
                     }
             </Grid>

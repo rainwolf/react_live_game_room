@@ -82,7 +82,7 @@ const UnconnectedGameInfoPanel = (props) => {
     return (
         <div style={{width: '100%', height: '100%'}}>
             <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} 
-                  style={{width: '100%', height: '100%'}} spacing={8}>
+                  style={{width: '100%', height: '100%'}}>
                 <Grid item>
                     <Paper style={{textAlign: 'center'}}>
                         <Typography variant="h4">
@@ -93,7 +93,8 @@ const UnconnectedGameInfoPanel = (props) => {
                             {table.timed?('timer: '+table.initialMinutes+'/'+table.incrementalSeconds):'timed: no'},&nbsp;
                             {table.tableType===1?'public ':'private '} table
                         </Typography>
-                    </Paper>                    
+                    </Paper>
+                    <hr/>
                 </Grid>
                 {table.timed &&
                 <Grid item>
@@ -238,7 +239,7 @@ const UnconnectedGameInfoPanel = (props) => {
                         </Grid>
                     </Grid>
                 }
-                <Grid item style={{flex: '1 1 auto', minHeight: '0px'}}>
+                <Grid item style={{flex: '1 1 auto', minHeight: '0px', padding: 1}}>
                     <MovesListPanel />
                 </Grid>    
             </Grid>

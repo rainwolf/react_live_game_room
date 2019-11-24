@@ -74,7 +74,7 @@ class UnconnectedRoom extends Component {
             return (
                 <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
 
-                    <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
+                    <Grid container direction={'column'} alignItems={'center'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
                         {freeloader &&
                         <Grid item style={{ display:'inline-block',width:'970px',height:'90px' }}>
                             <AdSense.Google

@@ -92,7 +92,7 @@ const UnconnectedTable = (props) => {
                         <Board />
                     </div>
                 </Grid>
-                <Grid item style={{height:'100%', width: Math.min(600, width - height)}}>
+                <Grid item style={{height:'100%', width: Math.min(500, width - height)}}>
                     <Grid container direction={'column'} alignItems={'stretch'}  wrap={'nowrap'}
                           style={{height:'100%', width: '100%'}}>
                         <Grid item style={{height: '60%', borderWidth: '1px', borderStyle: 'solid'}}>
