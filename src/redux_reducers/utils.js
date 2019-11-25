@@ -288,11 +288,13 @@ export function cancelRequested(data, state) {
     }
 }
 
-// export function cancelReply(data, state) {
-//     if (data.table === state.table) {
-//         addTableMessage({player: 'game server', text: 'set cancellation ' + (data.accepted?'accepted':'denied')}, state);
-//     }
-// }
+export function cancelReply(data, state) {
+    if (data.table === state.table) {
+        state.cancel_requested = undefined;
+        addTableMessage({player: 'game server', text: 'set cancellation ' + (data.accepted?'accepted':'denied')}, state);
+    }
+}
+
 
 export function swapSeats(data, state) {
     if (data.table === state.table) {

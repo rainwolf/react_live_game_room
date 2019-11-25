@@ -63,7 +63,7 @@ const UnconnectedMovesListPanel = (props) => {
         if (move_strs.length > 0) {
             move_cells.push(
                 <TableCell key={0} align='center' onClick={() => props.goto_move(1)}>
-                    <Typography variant={(game.until === 1)?'h5':'h6'} color={(game.until === 1)?'error':'default'}>
+                    <Typography variant={(game.until === 1)?'h5':'h6'} color={(game.until === 1)?'error':'textPrimary'}>
                     {move_strs[0]}
                     </Typography>
                 </TableCell>)
@@ -79,7 +79,7 @@ const UnconnectedMovesListPanel = (props) => {
         }
     } else {
         move_cells = move_strs.map((m,i) => (<TableCell key={i} align='center' onClick={() => props.goto_move(i+1)}>
-            <Typography variant={(game.until === 1 + i)?'h5':'h6'} color={(game.until === 1 + i)?'error':'default'}>
+            <Typography variant={(game.until === 1 + i)?'h5':'h6'} color={(game.until === 1 + i)?'error':'textPrimary'}>
             {m}
             </Typography>
         </TableCell>));

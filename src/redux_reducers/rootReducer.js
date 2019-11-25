@@ -10,7 +10,7 @@ import {processUser, addRoomMessage, exitUser, changeTableState,
     joinTable, exitTable, sitTable, standTable, tableOwner,
     addTableMessage, addMove, changeGameState, changeTimer,
     serverTableMessage, undoRequested, undoReply,
-    cancelRequested, swapSeats, // setPlayingPlayerTable,
+    cancelRequested, swapSeats, cancelReply, // setPlayingPlayerTable,
     rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
     mute, unmute, bootEvent, invitationReceived, invitationReply } from "./utils";
 
@@ -134,6 +134,8 @@ function liveGameApp (state = initialState, action) {
                 cancelRequested(json.dsgCancelRequestTableEvent, newState);
             } else if (json.dsgSwapSeatsTableEvent) {
                 swapSeats(json.dsgSwapSeatsTableEvent, newState);
+            } else if (json.dsgCancelReplyTableEvent) {
+                cancelReply(json.dsgCancelReplyTableEvent, newState);
             // } else if (json.dsgSetPlayingPlayerTableEvent) {
             //     setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
             } else if (json.dsgRejectGoStateEvent) {

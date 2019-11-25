@@ -27,7 +27,7 @@ const UnconnectedCaptures = (props) => {
                 </div>
             </Grid>
             <Grid item xs>
-                <Typography variant="h4" color={game.critical_captures(3 - seat)?'error':'default'}>
+                <Typography variant="h4" color={game.critical_captures(3 - seat)?'error':'textPrimary'}>
                     x {game.captures[3 - seat]}
                 </Typography>
             </Grid>
