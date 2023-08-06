@@ -1,86 +1,85 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Modal from '@material-ui/core/Modal';
 import Button from '@material-ui/core/Button';
 
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 
 function getModalStyle() {
-    const top = 50;
-    const left = 50;
+   const top = 50;
+   const left = 50;
 
-    return {
-        top: `${top}%`,
-        left: `${left}%`,
-        transform: `translate(-${top}%, -${left}%)`,
-    };
+   return {
+      top: `${top}%`,
+      left: `${left}%`,
+      transform: `translate(-${top}%, -${left}%)`,
+   };
 }
 
 const styles = theme => ({
-    paper: {
-        position: 'absolute',
-        width: theme.spacing(50),
-        backgroundColor: theme.palette.background.paper,
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(4),
-        outline: 'none',
-    },
+   paper: {
+      position: 'absolute',
+      width: theme.spacing(50),
+      backgroundColor: theme.palette.background.paper,
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(4),
+      outline: 'none',
+   },
 });
 
 
 const mapStateToProps = state => {
-    return {
-        table: state.tables[state.table],
-        undo_requested: state.undo_requested
-    }
+   return {
+      table: state.tables[state.table],
+      undo_requested: state.undo_requested
+   }
 };
 
 const mapDispatchToProps = dispatch => {
-    return {
-        send_message: message => {
-            dispatch(send_message(message));
-        }
-    }
+   return {
+      send_message: message => {
+         dispatch(send_message(message));
+      }
+   }
 };
-
 
 
 const UnconnectedUndoModal = (props) => {
 
-    const { classes, table, undo_requested } = props;
+   const {classes, table, undo_requested} = props;
 
-    const reply_undo = (reply) => {
-        props.send_message({dsgUndoReplyTableEvent:{accepted: reply, player: table.me, table: table.table, time:0}});
-    };
+   const reply_undo = (reply) => {
+      props.send_message({dsgUndoReplyTableEvent: {accepted: reply, player: table.me, table: table.table, time: 0}});
+   };
 
-    return (
-        <div>
-            <Modal
-                aria-labelledby="simple-modal-title"
-                aria-describedby="simple-modal-description"
-                open={undo_requested !== undefined}
-                // onClose={this.handleClose}
-            >
-                <div style={getModalStyle()} className={classes.paper}>
-                    <Typography variant="h6" id="modal-title">
-                        Undo requested
-                    </Typography>
-                    <Typography variant="subtitle1" id="simple-modal-description">
-                        {undo_requested} requests to undo their last move.
-                    </Typography>
-                    <Button onClick={() => reply_undo(true)}>Accept</Button>
-                    <Button onClick={() => reply_undo(false)}>Deny</Button>
-                </div>
-            </Modal>
-        </div>
-    );
+   return (
+      <div>
+         <Modal
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+            open={undo_requested !== undefined}
+            // onClose={this.handleClose}
+         >
+            <div style={getModalStyle()} className={classes.paper}>
+               <Typography variant="h6" id="modal-title">
+                  Undo requested
+               </Typography>
+               <Typography variant="subtitle1" id="simple-modal-description">
+                  {undo_requested} requests to undo their last move.
+               </Typography>
+               <Button onClick={() => reply_undo(true)}>Accept</Button>
+               <Button onClick={() => reply_undo(false)}>Deny</Button>
+            </div>
+         </Modal>
+      </div>
+   );
 };
 
 UnconnectedUndoModal.propTypes = {
-    classes: PropTypes.object.isRequired,
+   classes: PropTypes.object.isRequired,
 };
 
 const UndoModal = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedUndoModal));

@@ -1,11 +1,28 @@
-.name a, .name a:visited { font-weight:normal; color:black; text-decoration: none; }
-.name a:hover { font-weight:normal; color:black; text-decoration: underline; }
+.name a, .name a:visited {
+    font-weight: normal;
+    color: black;
+    text-decoration: none;
+}
+
+.name a:hover {
+    font-weight: normal;
+    color: black;
+    text-decoration: underline;
+}
 
 @keyframes glowing {
-    0% { box-shadow: 0 0 -10px #00FF00; }
-    40% { box-shadow: 0 0 20px #00FF00; }
-    60% { box-shadow: 0 0 20px #00FF00; }
-    100% { box-shadow: 0 0 -10px #00FF00; }
+    0% {
+        box-shadow: 0 0 -10px #00FF00;
+    }
+    40% {
+        box-shadow: 0 0 20px #00FF00;
+    }
+    60% {
+        box-shadow: 0 0 20px #00FF00;
+    }
+    100% {
+        box-shadow: 0 0 -10px #00FF00;
+    }
 }
 
 .button-glow {
@@ -41,44 +58,57 @@
     --color1: grey;
     --color2: black;
 }
+
 #white-stone-gradient {
     --color1: white;
     --color2: gainsboro;
 }
+
 #red-stone-gradient {
     --color1: pink;
     --color2: red;
 }
+
 .pente {
     fill: #FDDEA3;
 }
+
 .keryo-pente {
     fill: #BAFDA3;
 }
+
 .gomoku {
     fill: #A3FDEB;
 }
+
 .d-pente {
     fill: #A3CDFD;
 }
+
 .g-pente {
     fill: #AEA3FD;
 }
+
 .poof-pente {
     fill: #EDA3FD;
 }
+
 .connect6 {
     fill: #EDA3FD;
 }
+
 .boat-pente {
     fill: #25BAFF;
 }
+
 .dk-pente {
     fill: #FFA500;
 }
+
 .go {
     fill: #FAC832;
 }
+
 .o-pente {
     fill: #52be80
 }
