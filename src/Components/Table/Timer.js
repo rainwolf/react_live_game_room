@@ -3,8 +3,8 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Game, GameState} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
-import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
+import Typography from '@mui/material/Typography';
+import Paper from '@mui/material/Paper';
 import {playLowTimeCapturesSound} from '../../redux_reducers/utils'
 
 const mapStateToProps = state => {

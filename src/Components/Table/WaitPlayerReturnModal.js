@@ -4,10 +4,10 @@ import PropTypes from 'prop-types';
 import {GameState} from "../../Classes/GameClass";
 import Table from '../../Classes/TableClass';
 import {send_message} from "../../redux_actions/actionTypes";
-import Button from '@material-ui/core/Button';
-import {withStyles} from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Modal from '@material-ui/core/Modal';
+import Button from '@mui/material/Button';
+import {withStyles} from '@mui/styles';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 import {DISMISS_WAITING_MODAL} from '../../redux_actions/actionTypes';
 
 function getModalStyle() {
@@ -24,10 +24,9 @@ function getModalStyle() {
 const styles = theme => ({
    paper: {
       position: 'absolute',
-      width: theme.spacing(50),
-      backgroundColor: theme.palette.background.paper,
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(4),
+      backgroundColor: 'white',
+      // boxShadow: theme.shadows[5],
+      padding: '2%',
       outline: 'none',
    },
 });

@@ -8,6 +8,7 @@ import * as serviceWorker from './serviceWorker';
 import liveGameApp from './redux_reducers/rootReducer';
 import reduxWebsocket, {WEBSOCKET_MESSAGE, WEBSOCKET_SEND} from '@giantmachines/redux-websocket';
 import {disableReactDevTools} from '@fvilers/disable-react-devtools';
+import {ThemeProvider} from "@mui/styles";
 
 if (process.env.NODE_ENV === 'production') {
    disableReactDevTools();
@@ -30,7 +31,9 @@ const store = createStore(liveGameApp, applyMiddleware(reduxWebsocketMiddleware,
 
 ReactDOM.render(
    <Provider store={store}>
-      <App/>
+      <ThemeProvider theme={{}}>
+         <App/>
+      </ThemeProvider>
    </Provider>,
    document.getElementById('root')
 );

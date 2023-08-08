@@ -2,12 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Table from '../../Classes/TableClass';
 import User from '../../Classes/UserClass';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 import SimpleStone from '../Board/SimpleStone';
-import HttpsIcon from '@material-ui/icons/Https';
-import {withStyles} from '@material-ui/core/styles';
+import HttpsIcon from '@mui/icons-material/Https';
+import {withStyles} from '@mui/styles';
 
 
 const styles = theme => ({

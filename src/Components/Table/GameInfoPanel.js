@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
 import {send_message, TOGGLE_SETTINGS, PRESSED_PLAY} from "../../redux_actions/actionTypes";
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import Seat from './Seat';
 import Timer from './Timer';
 import Captures from './Captures';
-import {withStyles} from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
+import {withStyles} from '@mui/styles';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 import {GameState} from "../../Classes/GameClass";
 import MovesListPanel from './MovesListPanel';
 import InviteModal from './InviteModal';
@@ -18,9 +18,9 @@ const styles = theme => ({
       flexGrow: 1,
    },
    paper: {
-      padding: theme.spacing(2),
+      // padding: theme.spacing(2),
       textAlign: 'center',
-      color: theme.palette.text.secondary,
+      // color: theme.palette.text.secondary,
    },
 });
 

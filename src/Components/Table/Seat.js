@@ -5,15 +5,15 @@ import {Game, GameState} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
 import User from "../../Classes/UserClass";
 import {send_message} from "../../redux_actions/actionTypes";
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
 import SimpleStone from '../Board/SimpleStone';
-import Grid from '@material-ui/core/Grid';
-import CloseIcon from '@material-ui/icons/Close';
+import Grid from '@mui/material/Grid';
+import CloseIcon from '@mui/icons-material/Close';
 
 const mapStateToProps = state => {
    return {

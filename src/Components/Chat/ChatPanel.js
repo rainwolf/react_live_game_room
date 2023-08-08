@@ -1,19 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
+import {withStyles} from '@mui/styles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
 import User from "../../Classes/UserClass";
-// import Typography from '@material-ui/core/Typography';
+// import Typography from '@mui/material/Typography';
 
 const styles = theme => ({
    root: {
       width: '100%',
       maxWidth: '100%',
-      backgroundColor: theme.palette.background.paper,
+      // backgroundColor: theme?.palette.background.paper,
    }
 });
 

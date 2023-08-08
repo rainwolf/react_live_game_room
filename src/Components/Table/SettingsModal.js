@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Modal from '@material-ui/core/Modal';
-import Button from '@material-ui/core/Button';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import MenuItem from '@material-ui/core/MenuItem';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import Select from '@material-ui/core/Select';
-import Switch from '@material-ui/core/Switch';
+import {withStyles} from '@mui/styles';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Select from '@mui/material/Select';
+import Switch from '@mui/material/Switch';
 
 import {connect} from 'react-redux';
 import {send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
@@ -29,16 +29,15 @@ function getModalStyle() {
 const styles = theme => ({
    paper: {
       position: 'absolute',
-      width: theme.spacing(50),
-      backgroundColor: theme.palette.background.paper,
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(4),
+      backgroundColor: 'white',
+      // boxShadow: theme.shadows[5],
+      padding: '2%',
       outline: 'none',
    },
    root: {
       width: '100%',
       maxWidth: 360,
-      backgroundColor: theme.palette.background.paper,
+      // backgroundColor: theme.palette.background.paper,
    }
 });
 

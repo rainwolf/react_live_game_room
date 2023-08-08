@@ -1,25 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from '@material-ui/core/Avatar';
-// import Typography from '@material-ui/core/Typography';
+import {withStyles} from '@mui/styles';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+// import Typography from '@mui/material/Typography';
 import User from '../../Classes/UserClass';
 import Table from '../../Classes/TableClass';
 import {connect} from 'react-redux';
 import {MUTE, UNMUTE, SHOW_BOOT_DIALOG} from "../../redux_actions/actionTypes";
-import WifiOffIcon from '@material-ui/icons/WifiOff';
-import LaunchIcon from '@material-ui/icons/Launch';
+import WifiOffIcon from '@mui/icons-material/WifiOff';
+import LaunchIcon from '@mui/icons-material/Launch';
 
 
 const styles = theme => ({
    root: {
       width: '100%',
       maxWidth: 360,
-      backgroundColor: theme.palette.background.paper,
+      // backgroundColor: theme?.palette.background.paper,
    },
    icon: {
       fontSize: 30,

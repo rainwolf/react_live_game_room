@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import User from "../Classes/UserClass";
 import Table from '../Classes/TableClass';
 import Board from '../Components/Board/Board';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import ChatComponent from '../Components/Chat/ChatComponent';
 import UndoModal from '../Components/Table/UndoModal';
 import CancelModal from '../Components/Table/CancelModal';

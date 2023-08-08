@@ -22,9 +22,10 @@ function getModalStyle() {
 const styles = theme => ({
    paper: {
       position: 'absolute',
-      backgroundColor: 'white',
+      // width: theme.spacing(50),
+      // backgroundColor: theme.palette.background.paper,
       // boxShadow: theme.shadows[5],
-      padding: '2%',
+      // padding: theme.spacing(4),
       outline: 'none',
    },
 });
@@ -46,7 +47,7 @@ const mapDispatchToProps = dispatch => {
 };
 
 
-const UnconnectedDPenteChoiceModal = (props) => {
+const UnconnectedSwap2ChoiceModal = (props) => {
 
    const {classes, table, game} = props;
 
@@ -64,30 +65,47 @@ const UnconnectedDPenteChoiceModal = (props) => {
       });
    };
 
+   const pass = () => {
+      props.send_message({
+         dsgSwap2PassTableEvent: {
+            silent: false,
+            player: table.me,
+            table: table.table,
+            time: 0
+         }
+      });
+   };
+
+   const playAsP1MeansSwap = game.swap2CanPass();
+
    return (
       <div>
          <Modal
             aria-labelledby="simple-modal-title"
             aria-describedby="simple-modal-description"
-            open={table.myDPenteChoice(game)}
+            open={table.mySwap2Choice(game)}
             // onClose={this.handleClose}
          >
             <div style={getModalStyle()} className={classes.paper}>
                <Typography variant="h6" id="modal-title">
                   Continue this game as... ?
                </Typography>
-               <Button onClick={() => swap(true)}>white (player 1)</Button>
-               <Button onClick={() => swap(false)}>black (player 2)</Button>
+               <Button onClick={() => swap(playAsP1MeansSwap)}>white (player 1)</Button>
+               <Button onClick={() => swap(!playAsP1MeansSwap)}>black (player 2)</Button>
+               {
+                  playAsP1MeansSwap &&
+                  <Button onClick={pass}>Pass the decision</Button>
+               }
             </div>
          </Modal>
       </div>
    );
 };
 
-UnconnectedDPenteChoiceModal.propTypes = {
+UnconnectedSwap2ChoiceModal.propTypes = {
    classes: PropTypes.object.isRequired,
 };
 
-const DPenteChoiceModal = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedDPenteChoiceModal));
+const Swap2ChoiceModal = connect(mapStateToProps, mapDispatchToProps)(withStyles(styles)(UnconnectedSwap2ChoiceModal));
 
-export default DPenteChoiceModal;
+export default Swap2ChoiceModal;
