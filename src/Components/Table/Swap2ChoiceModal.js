@@ -24,7 +24,7 @@ const styles = theme => ({
       position: 'absolute',
       // width: theme.spacing(50),
       // backgroundColor: theme.palette.background.paper,
-      // boxShadow: theme.shadows[5],
+      boxShadow: '10px 10px 10px black',
       // padding: theme.spacing(4),
       outline: 'none',
    },

@@ -30,7 +30,7 @@ const styles = theme => ({
    paper: {
       position: 'absolute',
       backgroundColor: 'white',
-      // boxShadow: theme.shadows[5],
+      boxShadow: '10px 10px 10px black',
       padding: '2%',
       outline: 'none',
    },
