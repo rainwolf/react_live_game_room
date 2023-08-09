@@ -1,14 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import {createStore, applyMiddleware} from 'redux';
+import {applyMiddleware} from 'redux';
+import {legacy_createStore as createStore} from 'redux';
 import {Provider} from 'react-redux';
 import * as serviceWorker from './serviceWorker';
 import liveGameApp from './redux_reducers/rootReducer';
 import reduxWebsocket, {WEBSOCKET_MESSAGE, WEBSOCKET_SEND} from '@giantmachines/redux-websocket';
 import {disableReactDevTools} from '@fvilers/disable-react-devtools';
 import {ThemeProvider} from "@mui/styles";
+import {createRoot} from "react-dom/client";
 
 if (process.env.NODE_ENV === 'production') {
    disableReactDevTools();
@@ -29,13 +30,15 @@ const reduxWebsocketMiddleware = reduxWebsocket();
 
 const store = createStore(liveGameApp, applyMiddleware(reduxWebsocketMiddleware, pinger));
 
-ReactDOM.render(
-   <Provider store={store}>
-      <ThemeProvider theme={{}}>
-         <App/>
-      </ThemeProvider>
-   </Provider>,
-   document.getElementById('root')
+const root = createRoot(document.getElementById("root"));
+root.render(
+   <React.StrictMode>
+      <Provider store={store}>
+         <ThemeProvider theme={{}}>
+            <App/>
+         </ThemeProvider>
+      </Provider>,
+   </React.StrictMode>
 );
 
 // If you want your app to work offline and load faster, you can change

@@ -63,7 +63,6 @@ class UnconnectedTimer extends Component {
       this.setState(newState);
    }
 
-
    componentDidMount() {
       let newState = {...this.state};
       newState.timer = setInterval(this.ticktock, 300);

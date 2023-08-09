@@ -116,7 +116,7 @@ const UnconnectedSettingsModal = (props) => {
                         value={table.game}
                         input={
                            <OutlinedInput
-                              labelWidth={0}
+                              labelwidth={0}
                               name="game"
                               id="outlined-age-simple"
                            />
@@ -125,7 +125,7 @@ const UnconnectedSettingsModal = (props) => {
                         {/*{[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>*/}
                         {/*<MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>*/}
                         {/*)}*/}
-                        {Array.from({length: 26}, (v, i) => i + 1).map(game =>
+                        {Array.from({length: 28}, (v, i) => i + 1).map(game =>
                            <MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>
                         )}
                      </Select>
@@ -162,7 +162,7 @@ const UnconnectedSettingsModal = (props) => {
                            value={table.initialMinutes}
                            input={
                               <OutlinedInput
-                                 labelWidth={0}
+                                 labelwidth={0}
                                  name="initialMinutes"
                                  id="outlined-age-simple"
                               />
@@ -183,7 +183,7 @@ const UnconnectedSettingsModal = (props) => {
                            value={table.incrementalSeconds}
                            input={
                               <OutlinedInput
-                                 labelWidth={0}
+                                 labelwidth={0}
                                  name="incrementalSeconds"
                                  id="outlined-age-simple"
                               />

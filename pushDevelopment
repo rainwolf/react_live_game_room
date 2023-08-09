@@ -1,5 +1,6 @@
 #!/bin/bash
 
+npm run build
 rsync -vart --checksum --stats --delete --progress "build/" -e ssh "rainwolf@development.pente.org:~/tomcat/gameServer/live"
 ssh rainwolf@development.pente.org sudo chown -R rainwolf:tomcat tomcat/
 #ssh -t rainwolf@development.pente.org sudo ./restartTomcat.sh
