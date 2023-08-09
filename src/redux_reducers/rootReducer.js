@@ -15,7 +15,7 @@ import {
    serverTableMessage, undoRequested, undoReply,
    cancelRequested, swapSeats, cancelReply, // setPlayingPlayerTable,
    rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
-   mute, unmute, bootEvent, invitationReceived, invitationReply
+   mute, unmute, bootEvent, invitationReceived, invitationReply, swap2Pass
 } from "./utils";
 
 
@@ -159,6 +159,8 @@ function liveGameApp(state = initialState, action) {
             invitationReceived(json.dsgInviteTableEvent, newState);
          } else if (json.dsgInviteResponseTableEvent) {
             invitationReply(json.dsgInviteResponseTableEvent, newState);
+         } else if (json.dsgSwap2PassTableEvent) {
+            swap2Pass(json.dsgSwap2PassTableEvent, newState);
          }
          // {"dsgInviteResponseTableEvent":{"toPlayer":"rainwolf","responseText":"sure","accept":true,"ignore":false,"player":"iostest","table":1,"time":1554998965841}}
          break;

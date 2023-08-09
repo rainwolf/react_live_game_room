@@ -19,6 +19,7 @@ import AdSense from 'react-adsense';
 import Snack from '../Components/Table/Snack';
 import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
+import Swap2ChoiceModal from "../Components/Table/Swap2ChoiceModal";
 
 const mapStateToProps = state => {
    return {
@@ -112,6 +113,7 @@ const UnconnectedTable = (props) => {
                   <UndoModal/>
                   <CancelModal/>
                   <DPenteChoiceModal/>
+                  <Swap2ChoiceModal/>
                   <SettingsModal/>
                   <EvaluateGoModal/>
                   <WaitPlayerReturnModal/>

@@ -10,6 +10,12 @@ export const GameState = {
       SWAPPED: 1,
       NOT_SWAPPED: 2
    },
+   Swap2State: {
+      NO_CHOICE: 0,
+      SWAPPED: 1,
+      NOT_SWAPPED: 2,
+      SWAP2PASS: 3,
+   },
    GoState: {
       PLAY: 0,
       MARK_STONES: 1,
@@ -210,12 +216,18 @@ export class Game {
       } else if (this.#isDPente()) {
          if (this.moves.length < 4) {
             return 1;
-         } else if (this.moves.length === 4) {
-            if (this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE) {
-               return 2;
-            } else {
-               return 1;
-            }
+         } else if (this.moves.length === 4 && this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE) {
+            return 2;
+         }
+      } else if (this.#isSwap2()) {
+         if (this.moves.length < 3) {
+            return 1;
+         } else if (this.moves.length === 3 && this.gameState.swap2State === GameState.Swap2State.NO_CHOICE) {
+            return 2;
+         } else if (this.moves.length < 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS) {
+            return 2;
+         } else if (this.moves.length === 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS) {
+            return 1;
          }
       } else if (this.isGo() && this.gameState.goState === GameState.GoState.MARK_STONES) {
          return this.mark_dead_stones_player;
@@ -247,6 +259,9 @@ export class Game {
    isGo = () => {
       return this.game > 18 && this.game < 25;
    };
+   #isSwap2 = () => {
+      return this.game === 27 || this.game === 28;
+   };
 
    dPenteChoice = () => {
       return this.#isDPente() && this.moves.length === 4 &&
@@ -254,12 +269,29 @@ export class Game {
          this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE;
    };
 
+   swap2Choice = () => {
+      return this.#isSwap2() && this.gameState.state === GameState.State.STARTED &&
+         ((this.moves.length === 3 && this.gameState.swap2State === GameState.Swap2State.NO_CHOICE) ||
+         (this.moves.length === 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS));
+   };
+
+   swap2CanPass = () => {
+      return this.#isSwap2() && this.moves.length === 3 &&
+         this.gameState.state === GameState.State.STARTED &&
+         this.gameState.swap2State === GameState.Swap2State.NO_CHOICE;
+   };
+
+   swap2Pass = () => {
+      this.gameState.swap2State = GameState.Swap2State.SWAP2PASS;
+   }
+
    reset = () => {
       this.resetBoard();
 
       this.gameState = {
          state: GameState.State.NOT_STARTED,
          dPenteState: GameState.DPenteState.NO_CHOICE,
+         swap2State: GameState.Swap2State.NO_CHOICE,
          goState: GameState.GoState.PLAY
       }
    };
@@ -328,6 +360,8 @@ export class Game {
          this.#replayGoGame(until);
       } else if (this.game < 27) {
          this.#replayOPenteGame(until);
+      } else if (this.game < 29) {
+         this.#replayPenteGame(until);
       }
    };
 
@@ -397,6 +431,9 @@ export class Game {
          } else if (this.rated && this.moves.length === 3) {
             this.#undoTournamentRule();
          }
+      } else if (this.game < 29) {
+         let player = 1 + (i % 2);
+         this.#addPenteMove(x, y, player);
       }
    };
 
@@ -473,6 +510,9 @@ export class Game {
          } else if (this.rated && this.moves.length === 3) {
             this.#undoTournamentRule();
          }
+      } else if (this.game < 29) {
+         let player = 2 - (this.moves.length % 2);
+         this.#addPenteMove(x, y, player);
       }
    };
 

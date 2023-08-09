@@ -315,6 +315,7 @@ export function swapSeats(data, state) {
       }
       const game = state.game.newInstance();
       game.gameState.dPenteState = data.swapped ? GameState.DPenteState.SWAPPED : GameState.DPenteState.NOT_SWAPPED;
+      game.gameState.swap2State = data.swapped ? GameState.Swap2State.SWAPPED : GameState.Swap2State.NOT_SWAPPED;
       state.game = game;
    }
 }
@@ -402,5 +403,13 @@ export function invitationReply(data, state) {
       } else {
          addRoomMessage({player: 'game server', text: message}, state);
       }
+   }
+}
+
+export function swap2Pass(data, state) {
+   if (data.table === state.table) {
+      const game = state.game.newInstance();
+      game.swap2Pass();
+      state.game = game;
    }
 }

@@ -97,8 +97,10 @@ class Table {
          style = '#FFA500'
       } else if (this.game < 25) {
          style = '#FAC832'
+      } else if (this.game < 27) {
+         style = '#52BE80'
       } else {
-         style = '#52be80'
+         style = '#E5AA70'
       }
       return style;
    };
@@ -134,6 +136,8 @@ class Table {
          name = 'Go (13x13)';
       } else if (g < 27) {
          name = 'O-Pente';
+      } else if (g < 29) {
+         name = 'Swap2-Pente';
       }
       if (g % 2 === 0) {
          return 'Speed ' + name;
@@ -206,6 +210,9 @@ class Table {
       return this.isMyTurn(game) && game.dPenteChoice();
    };
 
+   mySwap2Choice = (game) => {
+      return this.isMyTurn(game) && game.swap2Choice();
+   };
 }
 
 export default Table;
