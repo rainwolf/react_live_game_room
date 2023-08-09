@@ -107,6 +107,7 @@ class BoardSquare extends Component {
       this.setState({showStone: false});
    };
 
+
    render() {
       const gridsize = this.props.gridsize,
          size = 10,
@@ -120,7 +121,7 @@ class BoardSquare extends Component {
             onClick={this.clickHandler}
             transform={'translate(' + x + ',' + y + ')'}
          >
-            <rect id={this.props.id} width={size} height={size}
+            <rect id={"\"" + this.props.id + "\""} width={size} height={size}
                   fillOpacity={0.0}/>
             {this.boardpart(size)}
             {this.props.stone && Stone({size: 10, id: this.props.stone})}
