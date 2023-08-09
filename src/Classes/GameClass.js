@@ -272,7 +272,7 @@ export class Game {
    swap2Choice = () => {
       return this.#isSwap2() && this.gameState.state === GameState.State.STARTED &&
          ((this.moves.length === 3 && this.gameState.swap2State === GameState.Swap2State.NO_CHOICE) ||
-         (this.moves.length === 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS));
+            (this.moves.length === 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS));
    };
 
    swap2CanPass = () => {
