@@ -23,9 +23,9 @@ const styles = theme => ({
    paper: {
       position: 'absolute',
       // width: theme.spacing(50),
-      // backgroundColor: theme.palette.background.paper,
+      backgroundColor: 'white',
       boxShadow: '10px 10px 10px black',
-      // padding: theme.spacing(4),
+      padding: '2%',
       outline: 'none',
    },
 });
