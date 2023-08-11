@@ -305,7 +305,7 @@ export function cancelReply(data, state) {
 
 export function swapSeats(data, state) {
    if (data.table === state.table) {
-      if (!data.silent) {
+      if (!data.silent && data.swap) {
          // console.log('swapping at utils')
          const tables = {...state.tables};
          const table = tables[state.table].newInstance();
