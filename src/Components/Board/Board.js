@@ -179,10 +179,12 @@ const UnconnectedBoard = (props) => {
       style = 'dk-pente'
    } else if (game_id < 25) {
       style = 'go'
-   } else if (game_id < 25) {
+   } else if (game_id < 27) {
       style = 'o-pente'
-   } else {
+   } else if (game_id < 29) {
       style = 'swap2-pente'
+   } else {
+      style = 'swap2-keryo'
    }
    let gridsize = 19;
    if (game_id === 21 || game_id === 22) {

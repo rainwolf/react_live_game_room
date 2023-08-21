@@ -260,7 +260,7 @@ export class Game {
       return this.game > 18 && this.game < 25;
    };
    #isSwap2 = () => {
-      return this.game === 27 || this.game === 28;
+      return this.game === 27 || this.game === 28 || this.game === 29 || this.game === 30;
    };
 
    dPenteChoice = () => {
@@ -362,6 +362,8 @@ export class Game {
          this.#replayOPenteGame(until);
       } else if (this.game < 29) {
          this.#replayPenteGame(until);
+      } else if (this.game < 31) {
+         this.#replayKeryoPenteGame(until);
       }
    };
 
@@ -434,6 +436,9 @@ export class Game {
       } else if (this.game < 29) {
          let player = 1 + (i % 2);
          this.#addPenteMove(x, y, player);
+      } else if (this.game < 31) {
+         let player = 1 + (i % 2);
+         this.#addKeryoPenteMove(x, y, player);
       }
    };
 
@@ -513,6 +518,9 @@ export class Game {
       } else if (this.game < 29) {
          let player = 2 - (this.moves.length % 2);
          this.#addPenteMove(x, y, player);
+      } else if (this.game < 31) {
+         let player = 2 - (this.moves.length % 2);
+         this.#addKeryoPenteMove(x, y, player);
       }
    };
 

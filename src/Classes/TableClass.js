@@ -99,8 +99,10 @@ class Table {
          style = '#FAC832'
       } else if (this.game < 27) {
          style = '#52BE80'
-      } else {
+      } else if (this.game < 29) {
          style = '#E5AA70'
+      } else {
+         style = '#50C878';
       }
       return style;
    };
@@ -138,6 +140,8 @@ class Table {
          name = 'O-Pente';
       } else if (g < 29) {
          name = 'Swap2-Pente';
+      } else if (g < 31) {
+         name = 'Swap2-Keryo';
       }
       if (g % 2 === 0) {
          return 'Speed ' + name;
