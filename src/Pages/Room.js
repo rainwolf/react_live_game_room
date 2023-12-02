@@ -80,16 +80,16 @@ class UnconnectedRoom extends Component {
 
                <Grid container direction={'column'} alignItems={'center'} wrap={'nowrap'}
                      style={{width: '100%', height: '100%'}}>
-                  {freeloader &&
-                     <Grid item style={{display: 'inline-block', width: '970px', height: '90px'}}>
-                        <AdSense.Google
-                           client='ca-pub-3326997956703582'
-                           slot='6777680396'
-                           style={{display: 'inline-block', width: '970px', height: '90px'}}
-                           format=''
-                        />
-                     </Grid>
-                  }
+                  {/*{freeloader &&*/}
+                  {/*   <Grid item style={{display: 'inline-block', width: '970px', height: '90px'}}>*/}
+                  {/*      <AdSense.Google*/}
+                  {/*         client='ca-pub-3326997956703582'*/}
+                  {/*         slot='6777680396'*/}
+                  {/*         style={{display: 'inline-block', width: '970px', height: '90px'}}*/}
+                  {/*         format=''*/}
+                  {/*      />*/}
+                  {/*   </Grid>*/}
+                  {/*}*/}
                   <Grid item style={{width: '100%', flex: '1', minHeight: '0px'}}>
                      <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                            style={{width: '100%', height: '100%'}}>
