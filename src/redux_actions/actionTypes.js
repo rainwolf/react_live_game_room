@@ -26,7 +26,7 @@ export function connectServer(server) {
 export function connectSocket(server) {
    let host = window.location.hostname;
    if (host === 'localhost' || host === 'machine.local') {
-      host = 'development.pente.org';
+      // host = 'development.pente.org';
       host = 'localhost';
       // host = 'pente.org';
    }
