@@ -9,7 +9,6 @@ import TableCard from '../Components/Table/TableCard';
 // import Board from '../Components/Board/Board';
 import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
-import AdSense from 'react-adsense';
 import Cookies from 'js-cookie';
 import InvitationResponseModal from "../Components/Room/InvitationResponseModal";
 

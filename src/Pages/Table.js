@@ -15,7 +15,6 @@ import GameInfoPanel from '../Components/Table/GameInfoPanel';
 import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
 import WaitPlayerReturnModal from "../Components/Table/WaitPlayerReturnModal";
 import ResignCancelLostPlayerModal from "../Components/Table/ResignCancelLostPlayerModal";
-import AdSense from 'react-adsense';
 import Snack from '../Components/Table/Snack';
 import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
