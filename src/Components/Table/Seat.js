@@ -14,6 +14,7 @@ import Avatar from '@mui/material/Avatar';
 import SimpleStone from '../Board/SimpleStone';
 import Grid from '@mui/material/Grid';
 import CloseIcon from '@mui/icons-material/Close';
+import Paper from "@mui/material/Paper";
 
 const mapStateToProps = state => {
    return {
@@ -38,50 +39,54 @@ const UnconnectedSeat = (props) => {
 
    if (table.seats[seat] === "" && table.seats[3 - seat] !== table.me && !tournament) {
       return (
-         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-               style={{height: '100%', maxWidth: width}}>
-            <Grid item xs style={{paddingLeft: 10}}>
-               <SimpleStone size={40} id={table.player_color(seat)}/>
+         <Paper style={{textAlign: 'center'}}>
+            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                  style={{height: '100%', maxWidth: width}}>
+               <Grid item xs style={{paddingLeft: 10}}>
+                  <SimpleStone size={40} id={table.player_color(seat)}/>
+               </Grid>
+               <Grid item xs>
+                  <Button variant="outlined" color="primary" className={'button-glow'} fullWidth
+                          onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}})}
+                          style={{paddingLeft: 10}}>
+                     <span style={{whiteSpace: 'nowrap'}}>Take Seat</span>
+                  </Button>
+               </Grid>
             </Grid>
-            <Grid item xs>
-               <Button variant="outlined" color="primary" className={'button-glow'} fullWidth
-                       onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}})}
-                       style={{paddingLeft: 10}}>
-                  <span style={{whiteSpace: 'nowrap'}}>Take Seat</span>
-               </Button>
-            </Grid>
-         </Grid>
+         </Paper>
       );
    } else if (table.seats[seat] !== "" && users[table.seats[seat]]) {
       const player = users[table.seats[seat]];
       return (
-         <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
-               style={{height: '100%', maxWidth: width}}>
-            <Grid item xs={1} style={{paddingLeft: 10, marginTop: 10}}>
-               <SimpleStone size={40} id={table.player_color(seat)}/>
-            </Grid>
-            <Grid item xs={8}>
-               <ListItem key={seat} style={{paddingRight: 10}}>
-                  {/*<SimpleStone size={40} id={table.player_color(seat)}/>*/}
-                  <ListItemAvatar style={{marginLeft: 10}}>
-                     <Avatar alt={table.seats[seat]} src={player.avatar}/>
-                  </ListItemAvatar>
-                  <ListItemText
-                     primary={player.userhtml}
-                     secondary={player.rating(table.game)}
-                  />
-               </ListItem>
-            </Grid>
-            {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me && !tournament) &&
-               <Grid item xs style={{marginTop: 10}}>
-                  <IconButton variant="outlined" color="primary" size="small"
-                              onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}})}
-                  >
-                     <CloseIcon/>
-                  </IconButton>
+         <Paper style={{textAlign: 'center'}}>
+            <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
+                  style={{height: '100%', maxWidth: width, background: table.colorForSeat(seat)}}>
+               {/*<Grid item xs={1} style={{paddingLeft: 10, marginTop: 10}}>*/}
+               {/*   <SimpleStone size={40} id={table.player_color(seat)}/>*/}
+               {/*</Grid>*/}
+               <Grid item xs={8}>
+                  <ListItem key={seat} style={{paddingRight: 10}}>
+                     {/*<SimpleStone size={40} id={table.player_color(seat)}/>*/}
+                     <ListItemAvatar style={{marginLeft: 10}}>
+                        <Avatar alt={table.seats[seat]} src={player.avatar}/>
+                     </ListItemAvatar>
+                     <ListItemText
+                        primary={player.userhtml}
+                        secondary={player.rating(table.game)}
+                     />
+                  </ListItem>
                </Grid>
-            }
-         </Grid>
+               {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me && !tournament) &&
+                  <Grid item xs style={{marginTop: 10}}>
+                     <IconButton variant="outlined" color="primary" size="small"
+                                 onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}})}
+                     >
+                        <CloseIcon/>
+                     </IconButton>
+                  </Grid>
+               }
+            </Grid>
+         </Paper>
       );
    } else {
       return (

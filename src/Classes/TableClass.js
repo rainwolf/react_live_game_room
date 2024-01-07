@@ -149,6 +149,21 @@ class Table {
       return name;
    };
 
+   gameIsGo = () => {
+      return this.game > 19 && this.game < 25;
+   };
+
+   colorForSeat = (seat) => {
+      if (this.gameIsGo()) {
+         seat = 3 - seat;
+      }
+      if (seat === 2) {
+         return 'grey';
+      } else {
+         return 'white';
+      }
+   };
+
    gameHasCaptures = () => {
       return this.game < 5 || this.game > 6;
    };

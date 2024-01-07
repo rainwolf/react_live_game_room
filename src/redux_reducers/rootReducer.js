@@ -93,8 +93,9 @@ function liveGameApp(state = initialState, action) {
          delete newState.received_invitation;
          break;
       case "REDUX_WEBSOCKET::MESSAGE":
-         if (process.env.NODE_ENV === 'development') {
-            console.log(action.payload.message);
+         let host = window.location.hostname;
+         if (host === 'localhost' || host === 'machine.local') {
+            console.log('message: ' + action.payload.message)
          }
          const json = JSON.parse(action.payload.message);
          if (json.dsgLoginErrorEvent) {
