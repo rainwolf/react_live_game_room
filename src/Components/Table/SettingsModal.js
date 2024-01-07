@@ -113,7 +113,7 @@ const UnconnectedSettingsModal = (props) => {
                      />
                      <Select
                         onChange={send_change}
-                        value={table.game}
+                        value={table.game % 2 === 0 ? table.game - 1 : table.game}
                         input={
                            <OutlinedInput
                               labelwidth={0}
