@@ -218,7 +218,11 @@ class User {
    rating = (game) => {
       if (game === undefined) return "";
       const r = this.game_ratings[game];
-      if (r === undefined) return "";
+      if (r === undefined) {
+         return (
+            <span style={{whiteSpace: 'nowrap'}}>-</span>
+         );
+      }
       let gif = ratings_gray;
       if (r >= 1900) {
          gif = ratings_red;
