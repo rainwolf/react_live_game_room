@@ -87,7 +87,7 @@ const UnconnectedGameInfoPanel = (props) => {
    return (
       <div style={{width: '100%', height: '100%'}}>
          <Grid container direction={'column'} alignItems={'stretch'} wrap={'nowrap'}
-               style={{width: '100%', height: '100%'}}>
+               style={{width: '100%', height: '100%'}} spacing={1}>
             <Grid item>
                <Paper style={{textAlign: 'center'}}>
                   <Typography variant="h4">
@@ -99,7 +99,7 @@ const UnconnectedGameInfoPanel = (props) => {
                      {table.tableType === 1 ? 'public ' : 'private '} table
                   </Typography>
                </Paper>
-               <hr/>
+               {/*<hr/>*/}
             </Grid>
             {table.timed &&
                <Grid item>

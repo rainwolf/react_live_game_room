@@ -80,7 +80,8 @@ const UnconnectedMovesListPanel = (props) => {
             </TableCell>)
       }
    } else {
-      move_cells = move_strs.map((m, i) => (<TableCell key={i} align='center' onClick={() => props.goto_move(i + 1)}>
+      move_cells = move_strs.map((m, i) => (
+      <TableCell key={i} align='center' onClick={() => props.goto_move(i + 1)} padding={'none'}>
          <Typography variant={(game.until === 1 + i) ? 'h5' : 'h6'}
                      color={(game.until === 1 + i) ? 'error' : 'textPrimary'}>
             {m}
