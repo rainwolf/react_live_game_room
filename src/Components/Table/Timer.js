@@ -1,7 +1,7 @@
-import React, {Component} from 'react';
+import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Game, GameState} from "../../Classes/GameClass";
+import {Game, GameState, useInterval} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -9,89 +9,81 @@ import {playLowTimeCapturesSound} from '../../redux_reducers/utils'
 
 const mapStateToProps = state => {
    return {
-      // timers: state.table.clocks,
       game: state.game,
       table: state.tables[state.table]
    }
 };
 
-class UnconnectedTimer extends Component {
+const Timer = (props) => {
+   const {game, table, seat} = props;
+   const clock = table.clocks[seat];
 
-   constructor(props) {
-      super(props);
-      this.state = {running: false, ...props.table.clocks[props.seat]};
-      this.state.time_left = this.state.minutes * 60 + this.state.seconds;
-   }
+   const [state, setState] = useState({
+      running: false,
+      ...clock,
+      time_left: (clock.minutes * 60 + clock.seconds) * 10
+   });
 
-   ticktock = () => {
-      let newState = {...this.state};
-      if (!this.props.table.timed ||
-         (this.props.game.currentPlayer() !== this.props.seat) ||
-         this.props.game.gameState.state !== GameState.State.STARTED) {
-         if (newState.running) {
-            newState.running = false;
-            this.setState(newState);
+   const ticktock = () => {
+      setState((prevState) => {
+         let newState = {...prevState};
+         if (!table.timed ||
+            (game.currentPlayer() !== seat) ||
+            game.gameState.state !== GameState.State.STARTED) {
+            if (newState.running) {
+               newState.running = false;
+               setState(newState);
+            }
+            return prevState;
          }
-         return;
-      }
-      if (!newState.running) {
-         newState.running = true;
-         newState.start_time = new Date();
-      }
-      const now = new Date();
-      const passed_seconds = Math.round((now.getTime() - newState.start_time.getTime()) / 1000);
-      // const time_left = newState.minutes + newState.seconds*60;
-      if (newState.time_left > passed_seconds) {
-         const new_time = newState.time_left - passed_seconds;
-         newState.seconds = new_time % 60;
-         newState.minutes = Math.floor(new_time / 60);
-      } else {
-         newState.seconds = 0;
-         newState.minutes = 0;
-      }
-      if (newState.minutes === 0 && newState.seconds < 12 && this.state.seconds >= 12 && this.props.table.isMySeat(this.props.seat)) {
-         playLowTimeCapturesSound();
-      }
-      this.setState(newState);
+         if (!newState.running) {
+            newState.running = true;
+            newState.start_time = new Date();
+         }
+         const now = new Date();
+         const passed_tenth_seconds = Math.round((now.getTime() - newState.start_time.getTime()) / 100);
+         if (newState.time_left > passed_tenth_seconds) {
+            const new_time = newState.time_left - passed_tenth_seconds;
+            newState.tenth_seconds = new_time % 600;
+            newState.minutes = Math.floor(new_time / 600);
+         } else {
+            newState.tenth_seconds = 0;
+            newState.minutes = 0;
+         }
+         if (newState.minutes === 0 && newState.tenth_seconds < 120 && state.tenth_seconds >= 120 && table.isMySeat(seat)) {
+            playLowTimeCapturesSound();
+         }
+         return newState;
+      });
    };
 
+   useEffect(() => {
+      setState((prevState) => {
+         const newState = {...prevState, ...clock};
+         newState.time_left = (clock.minutes * 60 + clock.seconds) * 10;
+         newState.tenth_seconds = clock.seconds * 10;
+         return newState;
+      });
+   }, [clock.time]);
 
-   componentWillReceiveProps(nextProps) {
-      const newTime = nextProps.table.clocks[nextProps.seat];
-      const newState = {...this.state, ...newTime};
-      newState.time_left = newState.minutes * 60 + newState.seconds;
-      this.setState(newState);
-   }
+   useInterval(ticktock, 20);
 
-   componentDidMount() {
-      let newState = {...this.state};
-      newState.timer = setInterval(this.ticktock, 300);
-      this.setState(newState);
-   }
+   const {minutes, tenth_seconds} = state;
+   const seconds = Math.floor(tenth_seconds / 10), tenths = tenth_seconds % 10
 
-   componentWillUnmount() {
-      clearInterval(this.state.timer);
-   }
-
-   render() {
-      const {minutes, seconds} = this.state;
-      return (
-         <Paper style={{textAlign: 'center'}}>
-            <Typography variant="h3" color={(minutes === 0 && seconds < 12) ? 'error' : 'textPrimary'}>
-               {this.props.table.timed ? minutes + ':' + (seconds < 10 ? '0' : '') + seconds : '-:-'}
-            </Typography>
-         </Paper>
-      );
-   };
+   return (
+      <Paper style={{textAlign: 'center'}}>
+         <Typography variant="h3" color={(minutes === 0 && seconds < 12) ? 'error' : 'textPrimary'}>
+            {table.timed ? minutes + ':' + (seconds < 10 ? '0' : '') + seconds + (seconds < 12 ? '.' + tenths : '') : '-:-'}
+         </Typography>
+      </Paper>
+   );
 };
 
-UnconnectedTimer.propTypes = {
+Timer.propTypes = {
    seat: PropTypes.number.isRequired,
    game: PropTypes.instanceOf(Game).isRequired,
    table: PropTypes.instanceOf(Table).isRequired
 };
 
-
-const Timer = connect(mapStateToProps)(UnconnectedTimer);
-
-export default Timer;
+export default connect(mapStateToProps)(Timer);

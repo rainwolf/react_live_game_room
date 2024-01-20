@@ -1,3 +1,5 @@
+import {useEffect, useRef} from "react";
+
 export const GameState = {
    State: {
       NOT_STARTED: 1,
@@ -1525,8 +1527,21 @@ export class Game {
       }
 
    }
-
-
 }
 
-// export default Game;
+export function useInterval(callback, delay) {
+   const savedCallback = useRef();
+
+   useEffect(() => {
+      savedCallback.current = callback;
+   });
+
+   useEffect(() => {
+      function tick() {
+         savedCallback.current();
+      }
+
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+   }, [delay]);
+}
