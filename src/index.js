@@ -18,9 +18,8 @@ if (process.env.NODE_ENV === 'production') {
 // ping middleware to respond to pings
 const pinger = store => next => action => {
    let result = next(action);
-   if (action.type === WEBSOCKET_MESSAGE && action.payload.data.indexOf('dsgPingEvent') > -1) {
-      const replyPing = {type: WEBSOCKET_SEND, payload: JSON.parse(action.payload.data)};
-      replyPing.type = WEBSOCKET_SEND;
+   if (action.type.endsWith(WEBSOCKET_MESSAGE) && action.payload?.message?.indexOf('dsgPingEvent') > -1) {
+      const replyPing = {type: "REDUX_WEBSOCKET::" + WEBSOCKET_SEND, payload: JSON.parse(action.payload.message)};
       store.dispatch(replyPing);
    }
    return result

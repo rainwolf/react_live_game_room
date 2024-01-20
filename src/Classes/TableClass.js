@@ -178,8 +178,9 @@ class Table {
 
    resetClocks = () => {
       const seconds = this.initialMinutes === 0 ? this.incrementalSeconds : 0;
-      this.clocks = [undefined, {minutes: this.initialMinutes, seconds: seconds},
-         {minutes: this.initialMinutes, seconds: seconds}];
+      const time = new Date().getTime();
+      this.clocks = [undefined, {minutes: this.initialMinutes, seconds: seconds, time: time},
+         {minutes: this.initialMinutes, seconds: seconds, time: time}];
    };
 
    addPlayer = (player) => {
