@@ -235,7 +235,7 @@ export function changeTimer(data, state) {
       if (idx < 0) {
          idx = table.seats.indexOf('');
       }
-      table.clocks[idx] = {minutes: data.minutes, seconds: data.seconds, time: data.time};
+      table.clocks[idx] = {millis: data.millis, minutes: data.minutes, seconds: data.seconds, time: data.time};
       tables[data.table] = table;
       state.tables = tables;
    }
