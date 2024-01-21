@@ -65,6 +65,9 @@ const Timer = (props) => {
             newState.tenth_seconds = Math.floor(clock.millis / 100) % 600;
             newState.minutes = Math.floor(clock.millis / 60000);
             newState.seconds = Math.floor(clock.millis / 1000) % 60;
+         } else {
+            newState.time_left = (clock.minutes * 60 + clock.seconds) * 10;
+            newState.tenth_seconds = clock.seconds * 10;
          }
          return newState;
       });
