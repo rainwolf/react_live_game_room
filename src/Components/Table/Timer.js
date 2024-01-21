@@ -81,7 +81,8 @@ const Timer = (props) => {
    return (
       <Paper style={{textAlign: 'center'}}>
          <Typography variant="h3" color={(minutes === 0 && seconds < 12) ? 'error' : 'textPrimary'}>
-            {table.timed ? minutes + ':' + (seconds < 10 ? '0' : '') + seconds + (seconds < 12 ? '.' + tenths : '') : '-:-'}
+            {table.timed ? minutes + ':' + (seconds < 10 ? '0' : '') + seconds +
+               (minutes === 0 && seconds < 12 ? '.' + tenths : '') : '-:-'}
          </Typography>
       </Paper>
    );
