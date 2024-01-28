@@ -61,6 +61,7 @@ const Timer = (props) => {
       setState((prevState) => {
          const newState = {...prevState, ...clock};
          if (clock.millis) {
+            newState.running = false;
             newState.time_left = Math.floor((clock.millis) / 100);
             newState.tenth_seconds = Math.floor(clock.millis / 100) % 600;
             newState.minutes = Math.floor(clock.millis / 60000);
