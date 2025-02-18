@@ -21,12 +21,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.2",
-    "react-scripts": "5.0.1",
     "redux": "^4.2.1"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start --watch --watch-poll",
-    "build": "react-scripts --openssl-legacy-provider build",
+    "start": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -38,5 +38,9 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "@rsbuild/core": "^1.2.8",
+    "@rsbuild/plugin-react": "^1.1.0"
+  }
 }
