@@ -14,5 +14,9 @@ export default defineConfig({
       'process.env': JSON.stringify(rawPublicVars),
     },
   },
+  output: {
+    distPath: {
+      root: 'build',
+    },
+  },
 });
-
