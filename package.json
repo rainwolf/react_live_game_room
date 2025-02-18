@@ -2,8 +2,6 @@
   "name": "react_live_games",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://pente.org",
-  "homepage": "https://pente.org/gameServer/live",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
