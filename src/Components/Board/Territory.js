@@ -5,7 +5,7 @@ function Territory(props) {
       <svg key={'territory'} height={props.size} width={props.size}>
          <rect x={3} y={3} width={4} height={4}
                fill={props.id === 1 ? '#000000' : '#ffffff'}
-               pointerEvents={'none'}/>
+               pointerEvents={'none'}
          />
       </svg>
    );
