@@ -14,6 +14,19 @@ export default defineConfig({
       'process.env': JSON.stringify(rawPublicVars),
     },
   },
+  server: {
+    proxy: {
+      '/websocketServer': {
+        target: 'wss://pente.org',
+        ws: true,
+        changeOrigin: true,
+      },
+      '/gameServer': {
+        target: 'https://pente.org',
+        changeOrigin: true,
+      },
+    },
+  },
   output: {
     distPath: {
       root: 'build',
