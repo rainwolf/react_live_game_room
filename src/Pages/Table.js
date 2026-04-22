@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import {send_message} from "../redux_actions/actionTypes";
 import PropTypes from 'prop-types';
@@ -19,13 +19,15 @@ import Snack from '../Components/Table/Snack';
 import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
 import Swap2ChoiceModal from "../Components/Table/Swap2ChoiceModal";
+import JoinRequestComponent from "../Components/Arena/JoinRequestComponent";
 
 const mapStateToProps = state => {
    return {
       users: state.users,
       messages: state.table_messages,
       table: state.tables[state.table],
-      freeloader: state.freeloader
+      freeloader: state.freeloader,
+      arena: state.arena,
    }
 };
 
@@ -40,20 +42,23 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedTable = (props) => {
 
-   const {messages, table, freeloader} = props;
+   const {messages, table, arena} = props;
+   ;
    const [height, setHeight] = useState(0);
    const [width, setWidth] = useState(0);
    const ref = useRef(null);
 
-   // eslint-disable-next-line
    useEffect(() => {
-      if (ref.current !== null) {
-         // setHeight(ref.current.clientHeight - (freeloader ? 90 : 0));
-         setHeight(ref.current.clientHeight);
-         // console.log(ref.current.clientHeight, ref.current.clientWidth)
-         setWidth(ref.current.clientWidth);
-      }
-   });
+      const measure = () => {
+         if (ref.current !== null) {
+            setHeight(ref.current.clientHeight);
+            setWidth(ref.current.clientWidth);
+         }
+      };
+      measure();
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
+   }, []);
 
 
    const sendTableText = (event) => {
@@ -103,8 +108,12 @@ const UnconnectedTable = (props) => {
                               </div>
                            </Grid>
                            <Grid item style={{height: '40%', borderWidth: '1px', borderStyle: 'solid'}}>
-                              <ChatComponent messages={messages} game={table.game} players={table.players}
-                                             sendText={sendTableText}/>
+                              {table.showChat(arena) ?
+                                 <ChatComponent messages={messages} game={table.game} players={table.players}
+                                                sendText={sendTableText}/>
+                                 :
+                                 <JoinRequestComponent players={table.arenaPlayerRequests} game={table.game}/>
+                              }
                            </Grid>
                         </Grid>
                      </Grid>

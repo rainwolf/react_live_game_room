@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_SETTINGS, PRESSED_PLAY} from "../../redux_actions/actionTypes";
+import {PRESSED_PLAY, send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
 import Grid from '@mui/material/Grid';
 import Seat from './Seat';
 import Timer from './Timer';
@@ -31,7 +31,8 @@ const mapStateToProps = state => {
       game: state.game,
       table: state.tables[state.table],
       admin: state.admin,
-      tournament: state.tournament
+      tournament: state.tournament,
+      arena: state.arena,
    }
 };
 
@@ -51,7 +52,7 @@ const mapDispatchToProps = dispatch => {
 
 
 const UnconnectedGameInfoPanel = (props) => {
-   const {table, game, pressed_play, admin, tournament} = props;
+   const {table, game, pressed_play, admin, tournament, arena} = props;
 
    const requestCancel = () => {
       props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
@@ -208,8 +209,8 @@ const UnconnectedGameInfoPanel = (props) => {
                   </Grid>
                </Grid>
             }
-            {(((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED)
-                  || table.canExit(game)) &&
+            {(!arena && (((table.owner || admin) && game.gameState.state === GameState.State.NOT_STARTED)
+                  || table.canExit(game))) &&
                <Grid item>
                   <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                         style={{width: '100%', height: '100%'}}>

@@ -412,3 +412,24 @@ export function swap2Pass(data, state) {
       state.game = game;
    }
 }
+
+export function arenaJoinRequest(data, state) {
+   if (data.table === state.table) {
+      const tables = {...state.tables};
+      const table = tables[state.table].newInstance();
+      table.addArenaPlayerRequest(data.player);
+      tables[data.table] = table;
+      state.tables = tables;
+   }
+}
+
+
+export function arenaRemoveJoinRequest(data, state) {
+   if (data.table === state.table) {
+      const tables = {...state.tables};
+      const table = tables[state.table].newInstance();
+      table.removeArenaPlayerRequest(data.player);
+      tables[data.table] = table;
+      state.tables = tables;
+   }
+}

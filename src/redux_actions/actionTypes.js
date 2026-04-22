@@ -14,7 +14,8 @@ export const UNMUTE = 'UNMUTE';
 export const REMOVE_SNACK = 'REMOVE_SNACK';
 export const SHOW_BOOT_DIALOG = 'SHOW_BOOT_DIALOG';
 export const REPLIED_INVITATION = 'REPLIED_INVITATION';
-
+export const TOGGLE_CREATE_ARENA_MODAL = 'TOGGLE_CREATE_ARENA_MODAL';
+export const REMOVE_ARENA_JOIN_REQUEST = 'REMOVE_ARENA_JOIN_REQUEST';
 
 export function connectServer(server) {
    return {
@@ -28,7 +29,7 @@ export function connectSocket(server) {
    if (host === 'localhost' || host === 'machine.local') {
       // host = 'development.pente.org';
       host = 'localhost';
-      host = 'pente.org';
+      // host = 'pente.org';
    }
    // return {
    //     type: WEBSOCKET_CONNECT,

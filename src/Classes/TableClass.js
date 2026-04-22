@@ -1,4 +1,5 @@
 import {GameState} from "./GameClass";
+import {game_name} from "./Utils";
 
 const PRIVATE_TABLE = 2;
 
@@ -107,46 +108,31 @@ class Table {
       return style;
    };
 
+   addArenaPlayerRequest = (player) => {
+      if (!this.arenaPlayerRequests) {
+         this.arenaPlayerRequests = [];
+      }
+      this.arenaPlayerRequests.push(player);
+   }
+
+   removeArenaPlayerRequest = (player) => {
+      if (this.arenaPlayerRequests) {
+         this.arenaPlayerRequests = this.arenaPlayerRequests.filter(p => p !== player);
+      }
+   }
+
+   showChat = (arena) => {
+      if (arena) {
+         return this.players.length > 1;
+      }
+      return true;
+   }
+
    game_name = (g) => {
       if (g === undefined) {
          g = this.game;
       }
-      let name;
-      if (g < 3) {
-         name = 'Pente';
-      } else if (g < 5) {
-         name = 'Keryo-Pente';
-      } else if (g < 7) {
-         name = 'Gomoku';
-      } else if (g < 9) {
-         name = 'D-Pente';
-      } else if (g < 11) {
-         name = 'G-Pente';
-      } else if (g < 13) {
-         name = 'Poof-Pente';
-      } else if (g < 15) {
-         name = 'Connect6';
-      } else if (g < 17) {
-         name = 'Boat-Pente';
-      } else if (g < 19) {
-         name = 'DK-Pente';
-      } else if (g < 21) {
-         name = 'Go';
-      } else if (g < 23) {
-         name = 'Go (9x9)';
-      } else if (g < 25) {
-         name = 'Go (13x13)';
-      } else if (g < 27) {
-         name = 'O-Pente';
-      } else if (g < 29) {
-         name = 'Swap2-Pente';
-      } else if (g < 31) {
-         name = 'Swap2-Keryo';
-      }
-      if (g % 2 === 0) {
-         return 'Speed ' + name;
-      }
-      return name;
+      return game_name(g);
    };
 
    gameIsGo = () => {
