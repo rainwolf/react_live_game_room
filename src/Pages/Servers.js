@@ -39,6 +39,7 @@ class UnconnectedServers extends Component {
                const name = str.substr(str.indexOf(' ') + 1);
                servers.push({port: port, name: name});
             }
+            servers.push({port: '15999', name: 'Arena'});
             if (window.location.search && window.location.search.indexOf('?guest') > -1) {
                for (let i = 0; i < servers.length; i++) {
                   if (servers[i].name.indexOf('Main Room') === 0) {

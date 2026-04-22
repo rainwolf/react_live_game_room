@@ -1,21 +1,54 @@
 import '../redux_actions/actionTypes';
 import {
-   CONNECT_SERVER, TOGGLE_SETTINGS,
-   PRESSED_PLAY, DISMISS_WAITING_MODAL,
-   MOVE_BACK, MOVE_FORWARD, MOVE_GOTO,
-   MUTE, UNMUTE, REMOVE_SNACK, SHOW_BOOT_DIALOG,
-   REPLIED_INVITATION
+   CONNECT_SERVER,
+   DISMISS_WAITING_MODAL,
+   MOVE_BACK,
+   MOVE_FORWARD,
+   MOVE_GOTO,
+   MUTE,
+   PRESSED_PLAY,
+   REMOVE_ARENA_JOIN_REQUEST,
+   REMOVE_SNACK,
+   REPLIED_INVITATION,
+   SHOW_BOOT_DIALOG,
+   TOGGLE_CREATE_ARENA_MODAL,
+   TOGGLE_SETTINGS,
+   UNMUTE
 } from "../redux_actions/actionTypes";
 import './utils';
 import User from '../Classes/UserClass';
 import {
-   processUser, addRoomMessage, exitUser, changeTableState,
-   joinTable, exitTable, sitTable, standTable, tableOwner,
-   addTableMessage, addMove, changeGameState, changeTimer,
-   serverTableMessage, undoRequested, undoReply,
-   cancelRequested, swapSeats, cancelReply, // setPlayingPlayerTable,
-   rejectGoState, resignOrCancel, moveForwardBack, moveGoTo,
-   mute, unmute, bootEvent, invitationReceived, invitationReply, swap2Pass
+   addMove,
+   addRoomMessage,
+   addTableMessage,
+   arenaJoinRequest,
+   arenaRemoveJoinRequest,
+   bootEvent,
+   cancelReply,
+   cancelRequested,
+   changeGameState,
+   changeTableState,
+   changeTimer,
+   exitTable,
+   exitUser,
+   invitationReceived,
+   invitationReply,
+   joinTable,
+   moveForwardBack,
+   moveGoTo,
+   mute,
+   processUser,
+   rejectGoState,
+   resignOrCancel,
+   serverTableMessage,
+   sitTable,
+   standTable,
+   swap2Pass,
+   swapSeats,
+   tableOwner,
+   undoReply,
+   undoRequested,
+   unmute
 } from "./utils";
 
 
@@ -34,12 +67,13 @@ const initialState = {
    game: undefined,
    table_messages: [],
    tournament: false,
+   showCreateArenaModal: false,
    // snack: 'rainwolf'
 };
 
 function liveGameApp(state = initialState, action) {
    let newState = {...state};
-   // console.log(JSON.stringify(action))
+   console.log(JSON.stringify(action))
    switch (action.type) {
       case CONNECT_SERVER:
          newState.server = action.payload;
@@ -57,6 +91,16 @@ function liveGameApp(state = initialState, action) {
          } else {
             newState.showSettings = true;
          }
+         break;
+      case TOGGLE_CREATE_ARENA_MODAL:
+         if (newState.showCreateArenaModal) {
+            delete newState.showCreateArenaModal;
+         } else {
+            newState.showCreateArenaModal = true;
+         }
+         break;
+      case REMOVE_ARENA_JOIN_REQUEST:
+         arenaRemoveJoinRequest(action.payload, newState);
          break;
       case PRESSED_PLAY:
          newState.pressed_play = true;
@@ -106,6 +150,7 @@ function liveGameApp(state = initialState, action) {
             newState.freeloader = json.dsgLoginEvent.me.subscriberLevel === 0;
             newState.logged_in = true;
             newState.tournament = json.dsgLoginEvent.serverData.tournament;
+            newState.arena = json.dsgLoginEvent.serverData.arena;
             // } else if (json.dsgPingEvent) {
             //     console.log('ping: ' + action.payload.data)
          } else if (json.dsgJoinMainRoomEvent) {
@@ -162,6 +207,8 @@ function liveGameApp(state = initialState, action) {
             invitationReply(json.dsgInviteResponseTableEvent, newState);
          } else if (json.dsgSwap2PassTableEvent) {
             swap2Pass(json.dsgSwap2PassTableEvent, newState);
+         } else if (json.dsgArenaRequestJoinTableEvent) {
+            arenaJoinRequest(json.dsgArenaRequestJoinTableEvent, newState);
          }
          // {"dsgInviteResponseTableEvent":{"toPlayer":"rainwolf","responseText":"sure","accept":true,"ignore":false,"player":"iostest","table":1,"time":1554998965841}}
          break;
