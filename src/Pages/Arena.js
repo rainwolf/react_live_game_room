@@ -105,7 +105,7 @@ class UnconnectedArena extends Component {
                               padding: '8px',
                               width: '100%'
                            }}>
-                              {Object.keys(tables).map(table =>
+                              {Object.keys(tables).filter(table => tables[table].players.length === 1).map(table =>
                                  <TableCard
                                     key={table}
                                     table={tables[table]}
