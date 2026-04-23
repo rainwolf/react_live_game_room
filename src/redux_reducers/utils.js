@@ -433,3 +433,9 @@ export function arenaRemoveJoinRequest(data, state) {
       state.tables = tables;
    }
 }
+
+export function arenaRejectRequest(data, state) {
+   if (data.playerToReject === state.me) {
+      state.snack = data.message;
+   }
+}

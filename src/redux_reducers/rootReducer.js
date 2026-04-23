@@ -23,6 +23,7 @@ import {
    addTableMessage,
    arenaJoinRequest,
    arenaRemoveJoinRequest,
+   arenaRejectRequest,
    bootEvent,
    cancelReply,
    cancelRequested,
@@ -209,6 +210,8 @@ function liveGameApp(state = initialState, action) {
             swap2Pass(json.dsgSwap2PassTableEvent, newState);
          } else if (json.dsgArenaRequestJoinTableEvent) {
             arenaJoinRequest(json.dsgArenaRequestJoinTableEvent, newState);
+         } else if (json.dsgArenaRejectTableJoinEvent) {
+            arenaRejectRequest(json.dsgArenaRejectTableJoinEvent, newState);
          }
          // {"dsgInviteResponseTableEvent":{"toPlayer":"rainwolf","responseText":"sure","accept":true,"ignore":false,"player":"iostest","table":1,"time":1554998965841}}
          break;

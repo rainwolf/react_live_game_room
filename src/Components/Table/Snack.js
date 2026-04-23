@@ -19,7 +19,7 @@ import User from "../../Classes/UserClass";
 const mapStateToProps = state => {
    return {
       users: state.users,
-      table: state.tables[state.table],
+      table: state.table ? state.tables[state.table] : null,
       snack: state.snack
    }
 };
