@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../redux_actions/actionTypes";
 import PropTypes from 'prop-types';
-import ChatComponent from '../Components/Chat/ChatComponent';
 import User from '../Classes/UserClass';
 import Table from '../Classes/TableClass';
 import TableCard from '../Components/Table/TableCard';
@@ -74,6 +73,14 @@ class UnconnectedArena extends Component {
 
                <Grid container direction={'column'} alignItems={'center'} wrap={'nowrap'}
                      style={{width: '100%', height: '100%'}}>
+                  <Grid item style={{
+                     width: '100%',
+                     alignItems: 'center',
+                     display: 'flex',
+                     justifyContent: 'center'
+                  }}>
+                     <h1>Arena</h1>
+                  </Grid>
                   <Grid item style={{width: '100%', flex: '1', minHeight: '0px'}}>
                      <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'}
                            style={{width: '100%', height: '100%'}}>
@@ -82,19 +89,28 @@ class UnconnectedArena extends Component {
                         {/*                  sendText={this.sendRoomText}/>*/}
                         {/*</Grid>*/}
                         <Grid item style={{height: '100%', overflow: 'auto', alignCenter: true}}>
-                              <Fab color="primary" variant="extended" aria-label="Delete"
-                                   style={{width: '100%'}} onClick={() => this.toggleCreateArenaModal()}>
-                                 {/*<NavigationIcon className={classes.extendedIcon} />*/}
-                                 create new table
-                              </Fab>
+                           <Fab color="primary" variant="extended" aria-label="Delete"
+                                style={{width: '100%'}} onClick={() => this.toggleCreateArenaModal()}>
+                              {/*<NavigationIcon className={classes.extendedIcon} />*/}
+                              create new table
+                           </Fab>
                            <br/>
                         </Grid>
-                        <Grid item style={{height: '100%', overflow: 'auto', alignCenter: true}}>
-                           {Object.keys(tables).map(table => <TableCard
-                              key={table}
-                              table={tables[table]}
-                              joinRoom={this.joinArenaTable}
-                              users={users}/>)}
+                        <Grid item style={{height: '100%', overflow: 'auto', flex: '1', minWidth: '0px'}}>
+                           <div style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(275px, 1fr))',
+                              gap: '16px',
+                              padding: '8px',
+                              width: '100%'
+                           }}>
+                              {Object.keys(tables).map(table =>
+                                 <TableCard
+                                    key={table}
+                                    table={tables[table]}
+                                    joinRoom={this.joinArenaTable}
+                                    users={users}/>)}
+                           </div>
                         </Grid>
                      </Grid>
                   </Grid>

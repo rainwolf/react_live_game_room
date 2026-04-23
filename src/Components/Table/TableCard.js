@@ -34,6 +34,7 @@ const styles = theme => ({
 const TableCard = (props) => {
    const {classes, table, users} = props;
    const seated = table.seats[1] !== "" || table.seats[2] !== "";
+   const game = table.game;
 
    return (
       <Card className={classes.card} style={{backgroundColor: table.table_color()}}
@@ -50,17 +51,24 @@ const TableCard = (props) => {
             {/*adjective*/}
             {/*</Typography>*/}
             {seated &&
-               <Typography component="p">
-                  {(table.seats[1] !== "" && users[table.seats[1]]) &&
-                     <span key={1}>
-                                {users[table.seats[1]].userhtml} <SimpleStone size={15} id={table.player_color(1)}/>
-                            </span>
-                  } &nbsp; - &nbsp;
-                  {(table.seats[2] !== "" && users[table.seats[2]]) &&
-                     <span key={2}>
-                                {users[table.seats[2]].userhtml} <SimpleStone size={15} id={table.player_color(2)}/>
-                            </span>
-                  }
+               <Typography component="div">
+                  <div style={{display: 'grid', gridTemplateColumns: '45% 10% 45%'}}>
+                     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        {(table.seats[1] !== "" && users[table.seats[1]]) && <>
+                           <span>{users[table.seats[1]].userhtml} <SimpleStone size={15}
+                                                                               id={table.player_color(1)}/></span>
+                           <span>{users[table.seats[1]].rating(game)}</span>
+                        </>}
+                     </div>
+                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>-</div>
+                     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                        {(table.seats[2] !== "" && users[table.seats[2]]) && <>
+                           <span>{users[table.seats[2]].userhtml} <SimpleStone size={15}
+                                                                               id={table.player_color(2)}/></span>
+                           <span>{users[table.seats[2]].rating(game)}</span>
+                        </>}
+                     </div>
+                  </div>
                </Typography>
             }
             <Typography component="p">
