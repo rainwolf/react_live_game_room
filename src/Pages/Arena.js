@@ -10,6 +10,7 @@ import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
 import Cookies from 'js-cookie';
 import CreateArenaTableModal from "../Components/Arena/CreateArenaTableModal";
+import MessageSnack from "../Components/MessageSnack";
 
 const mapStateToProps = state => {
    return {
@@ -116,6 +117,7 @@ class UnconnectedArena extends Component {
                   </Grid>
                </Grid>
                <CreateArenaTableModal/>
+               <MessageSnack/>
             </div>
          )
       } else if (connected) {
