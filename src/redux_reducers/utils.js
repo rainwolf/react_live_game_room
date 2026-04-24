@@ -420,6 +420,7 @@ export function arenaJoinRequest(data, state) {
       table.addArenaPlayerRequest(data.player);
       tables[data.table] = table;
       state.tables = tables;
+      playSound(new_player_sound);
    }
 }
 
