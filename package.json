@@ -36,7 +36,6 @@
   "devDependencies": {
     "@rsbuild/core": "^1.7.4",
     "@rsbuild/plugin-react": "^1.4.6",
-    "@rspack/cli": "^1.7.10",
     "@rspack/core": "^1.7.10"
   }
 }
