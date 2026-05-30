@@ -28,7 +28,12 @@ function ChatPanel(props) {
                   <Avatar alt="avatar" src={message.player.avatar}/>
                </ListItemAvatar>
                <ListItemText
-                  primary={message.player.userhtml}
+                  primary={
+                     <React.Fragment>
+                        {message.time ? message.time.toLocaleTimeString() + ' - ' : ''}
+                        {message.player.userhtml}
+                     </React.Fragment>
+                  }
                   secondary={' - ' + message.message}
                   style={{wordWrap: 'break-word'}}
                />

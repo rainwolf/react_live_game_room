@@ -110,6 +110,7 @@ class UnconnectedArena extends Component {
                                     key={table}
                                     table={tables[table]}
                                     joinRoom={this.joinArenaTable}
+                                    countdown={true}
                                     users={users}/>)}
                            </div>
                         </Grid>

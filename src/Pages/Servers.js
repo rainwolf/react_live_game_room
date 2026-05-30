@@ -41,7 +41,7 @@ class UnconnectedServers extends Component {
             }
             if (window.location.search && window.location.search.indexOf('?guest') > -1) {
                for (let i = 0; i < servers.length; i++) {
-                  if (servers[i].name.indexOf('Main Room') === 0) {
+                  if (servers[i].name.indexOf('Arena Server') === 0) {
                      this.props.onServerClick(servers[i]);
                      return;
                   }

@@ -45,7 +45,8 @@ export function addRoomMessage(data, state) {
    if (!user.muted) {
       messages.push({
          message: data.text,
-         player: user
+         player: user,
+         time: new Date()
       });
       state.room_messages = messages;
    }
@@ -161,7 +162,8 @@ export function addTableMessage(data, state) {
    if (!user.muted) {
       messages.push({
          message: data.text,
-         player: user
+         player: user,
+         time: new Date()
       });
       state.table_messages = messages;
    }
