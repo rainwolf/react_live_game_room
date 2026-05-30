@@ -29,7 +29,7 @@ export function connectSocket(server) {
    if (host === 'localhost' || host === 'machine.local') {
       // host = 'development.pente.org';
       host = 'localhost';
-      // host = 'pente.org';
+      host = 'pente.org';
    }
    // return {
    //     type: WEBSOCKET_CONNECT,
