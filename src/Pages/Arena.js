@@ -19,6 +19,7 @@ const mapStateToProps = state => {
       logged_in: state.logged_in,
       messages: state.room_messages,
       tables: state.tables,
+      me: state.me,
       admin: state.admin,
    }
 };
@@ -67,7 +68,9 @@ class UnconnectedArena extends Component {
    }
 
    render() {
-      const {users, connected, logged_in, messages, tables} = this.props;
+      const {users, connected, logged_in, messages, tables, me} = this.props;
+      // Guest users should not see rated tables.
+      const isGuest = (me || '').toLowerCase().startsWith('guest');
       if (logged_in) {
          return (
             <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
@@ -105,7 +108,10 @@ class UnconnectedArena extends Component {
                               padding: '8px',
                               width: '100%'
                            }}>
-                              {Object.keys(tables).filter(table => tables[table].players.length === 1).map(table =>
+                              {Object.keys(tables)
+                                 .filter(table => tables[table].players.length === 1)
+                                 .filter(table => !isGuest || !tables[table].rated)
+                                 .map(table =>
                                  <TableCard
                                     key={table}
                                     table={tables[table]}
