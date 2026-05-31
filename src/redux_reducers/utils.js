@@ -30,7 +30,10 @@ export function processUser(userdata, state) {
       user.updateUser(userdata);
    } else {
       user = new User(userdata);
-      if (state.table === undefined) {
+      // In an arena room, don't play the new-player sound when other players
+      // join the room. The sound is played instead when you receive a join
+      // request (arenaJoinRequest) and when a player joins your table (joinTable).
+      if (state.table === undefined && !state.arena) {
          playSound(new_player_sound);
          // new_player_sound.play();
       }
