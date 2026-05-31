@@ -19,6 +19,7 @@ const mapStateToProps = state => {
       logged_in: state.logged_in,
       messages: state.room_messages,
       tables: state.tables,
+      me: state.me,
       freeloader: state.freeloader,
       admin: state.admin,
       tournament: state.tournament
@@ -72,7 +73,9 @@ class UnconnectedRoom extends Component {
    };
 
    render() {
-      const {users, connected, logged_in, messages, tables, freeloader, tournament} = this.props;
+      const {users, connected, logged_in, messages, tables, me, freeloader, tournament} = this.props;
+      // Guest users should not see rated tables.
+      const isGuest = (me || '').toLowerCase().startsWith('guest');
       if (logged_in) {
          return (
             <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
@@ -105,7 +108,9 @@ class UnconnectedRoom extends Component {
                               </Fab>
                            }
                            <br/>
-                           {Object.keys(tables).map(table => <TableCard
+                           {Object.keys(tables)
+                              .filter(table => !isGuest || !tables[table].rated)
+                              .map(table => <TableCard
                               key={table}
                               table={tables[table]}
                               joinRoom={this.joinRoom}
