@@ -1,6 +1,7 @@
 import Table from '../Classes/TableClass';
 import User from '../Classes/UserClass';
 import {Game, GameState} from '../Classes/GameClass';
+import {notifyTabActivity} from '../utils/tabNotify';
 import move_sound_file from '../resources/sounds/move_sound.mp3';
 import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
 import low_time_captures_file from '../resources/sounds/low_time_captures.mp3';
@@ -103,6 +104,8 @@ export function joinTable(joinEvent, state) {
    } else if (state.table === joinEvent.table) {
       playSound(new_player_sound);
       // new_player_sound.play();
+      // Someone other than me joined my table; nudge the tab if it's backgrounded.
+      notifyTabActivity(joinEvent.player + ' joined your table');
    }
    table.addPlayer(joinEvent.player);
    tables[joinEvent.table] = table;
@@ -426,6 +429,8 @@ export function arenaJoinRequest(data, state) {
       tables[data.table] = table;
       state.tables = tables;
       playSound(new_player_sound);
+      // Arena join request for my table; nudge the tab if it's backgrounded.
+      notifyTabActivity(data.player + ' wants to join your table');
    }
 }
 
