@@ -2,10 +2,14 @@ import React, {Component} from 'react';
 // import { WEBSOCKET_CONNECT } from '@giantmachines/redux-websocket';
 import {connect} from 'react-redux';
 import {connectServer, connectSocket} from '../redux_actions/actionTypes';
+import {requestNotificationPermission} from '../utils/tabNotify';
 
 const mapDispatchToProps = dispatch => {
    return {
       onServerClick: server => {
+         // Selecting a server is a user gesture, the moment browsers will
+         // actually surface the notification permission prompt.
+         requestNotificationPermission();
          dispatch(connectServer(server));
          dispatch(connectSocket(server.port));
       }
