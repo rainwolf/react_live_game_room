@@ -5,7 +5,7 @@ import {Game, GameState, useInterval} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import {playLowTimeCapturesSound} from '../../redux_reducers/utils'
+import {AudioService} from '../../notifications/audio'
 
 const mapStateToProps = state => {
    return {
@@ -51,7 +51,7 @@ const Timer = (props) => {
             newState.minutes = 0;
          }
          if (newState.minutes === 0 && newState.tenth_seconds < 120 && state.tenth_seconds >= 120 && table.isMySeat(seat)) {
-            playLowTimeCapturesSound();
+            AudioService.play('lowTime');
          }
          return newState;
       });

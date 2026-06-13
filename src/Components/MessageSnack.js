@@ -7,7 +7,11 @@ import {withStyles} from '@mui/styles';
 import blue from '@mui/material/colors/blue';
 import {REMOVE_SNACK} from '../redux_actions/actionTypes';
 
-const mapStateToProps = state => ({snack: state.snack});
+// MessageSnack shows generic info notifications (e.g. arena reject). The game-result
+// notification (a winner name) is rendered by Components/Table/Snack instead.
+const mapStateToProps = state => ({
+   snack: state.notification && state.notification.kind === 'info' ? state.notification.message : undefined,
+});
 const mapDispatchToProps = dispatch => ({
    close_snack: () => dispatch({type: REMOVE_SNACK})
 });
