@@ -9,6 +9,7 @@ import {withStyles} from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import {DISMISS_WAITING_MODAL} from '../../redux_actions/actionTypes';
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -104,13 +105,10 @@ class UnconnectedWaitPlayerReturnModal extends Component {
    }
 
    resign = () => {
-      this.props.send_message({
-         dsgResignTableEvent: {
-            player: this.props.table.me,
-            table: this.props.table.table,
-            time: 0
-         }
-      });
+      this.props.send_message(Commands.resign({
+         player: this.props.table.me,
+         table: this.props.table.table
+      }));
    };
 
    render() {

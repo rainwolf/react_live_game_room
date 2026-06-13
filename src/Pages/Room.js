@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
 import Cookies from 'js-cookie';
 import InvitationResponseModal from "../Components/Room/InvitationResponseModal";
+import {Commands} from '../protocol';
 
 const mapStateToProps = state => {
    return {
@@ -40,7 +41,7 @@ class UnconnectedRoom extends Component {
 
       if (window.location.search && window.location.search.indexOf('?guest') > -1) {
          if (connected && !logged_in) {
-            send_message({dsgLoginEvent: {guest: true, time: 0}});
+            send_message(Commands.login({guest: true}));
          }
          return;
       }
@@ -54,21 +55,21 @@ class UnconnectedRoom extends Component {
          password = process.env.REACT_APP_PASSWORD;
       }
       if (connected && !logged_in) {
-         send_message({dsgLoginEvent: {player: username, password: password, guest: false, time: 0}});
+         send_message(Commands.login({player: username, password: password, guest: false}));
       }
    }
 
    sendRoomText = (event) => {
       const str = event.target.value;
       if (event.key === 'Enter' && str !== '') {
-         this.props.send_message({dsgTextMainRoomEvent: {text: str, time: 0}});
+         this.props.send_message(Commands.roomText({text: str}));
          event.target.value = "";
       }
    };
 
    joinRoom = (table) => {
       if (table === -1 || !this.props.tables[table].private() || this.props.admin) {
-         this.props.send_message({dsgJoinTableEvent: {table: table, time: 0}});
+         this.props.send_message(Commands.joinTable({table: table}));
       }
    };
 

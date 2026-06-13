@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../redux_actions/actionTypes";
+import {Commands} from '../protocol';
 import PropTypes from 'prop-types';
 import User from '../Classes/UserClass';
 import Table from '../Classes/TableClass';
@@ -39,7 +40,7 @@ class UnconnectedArena extends Component {
 
       if (window.location.search && window.location.search.indexOf('?guest') > -1) {
          if (connected && !logged_in) {
-            send_message({dsgLoginEvent: {guest: true, time: 0}});
+            send_message(Commands.login({guest: true}));
          }
          return;
       }
@@ -53,13 +54,13 @@ class UnconnectedArena extends Component {
          password = process.env.REACT_APP_PASSWORD;
       }
       if (connected && !logged_in) {
-         send_message({dsgLoginEvent: {player: username, password: password, guest: false, time: 0}});
+         send_message(Commands.login({player: username, password: password, guest: false}));
       }
    }
 
    joinArenaTable = (table) => {
       if (table === -1 || !this.props.tables[table].private() || this.props.admin) {
-         this.props.send_message({dsgArenaRequestJoinTableEvent: {table: table, time: 0}});
+         this.props.send_message(Commands.arenaRequestJoin({table: table}));
       }
    };
 

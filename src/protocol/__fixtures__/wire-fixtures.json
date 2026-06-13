@@ -1,0 +1,1170 @@
+{
+  "_meta": {
+    "source": "captured from local pente.org backend (:443 front) via two-guest WS harness + browser tap",
+    "note": "Real server frames. time fields and guest ids are from the capture session.",
+    "directions": "in = server->client, out = client->server"
+  },
+  "messages": {
+    "dsgAddAITableEvent": {
+      "in": {
+        "aiData": {
+          "name": "mm_ai",
+          "className": "org.pente.gameServer.server.MarksAIPlayer",
+          "numLevels": 8,
+          "validGames": [
+            1,
+            3,
+            -1
+          ],
+          "options": {
+            "configDirectory": "/etc/dsg/marksAI"
+          },
+          "level": 0,
+          "seat": 0,
+          "game": 0
+        },
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365566869
+      }
+    },
+    "dsgArenaAcceptTableJoinEvent": {
+      "out": {
+        "playerToAccept": "guest39",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgArenaCreateTableEvent": {
+      "out": {
+        "timed": true,
+        "initialMinutes": 10,
+        "incrementalSeconds": 1,
+        "rated": false,
+        "game": 1,
+        "playAs": 0,
+        "player": "guest38",
+        "table": -1,
+        "time": 0
+      }
+    },
+    "dsgArenaRejectTableJoinEvent": {
+      "in": {
+        "playerToReject": "guest39",
+        "message": "Wait one minute after rejection before requesting again.",
+        "player": "guest38",
+        "table": 1,
+        "time": 1781359114553
+      },
+      "out": {
+        "playerToReject": "guest39",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgArenaRequestJoinTableEvent": {
+      "in": {
+        "player": "guest39",
+        "table": 1,
+        "time": 1781359113637
+      },
+      "out": {
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgBootTableEvent": {
+      "in": {
+        "toBoot": "guest37",
+        "player": "guest36",
+        "table": 1,
+        "time": 1781359109469
+      },
+      "out": {
+        "toBoot": "guest37",
+        "player": "guest36",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgCancelReplyTableEvent": {
+      "out": {
+        "accepted": true,
+        "player": "guest29",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgCancelRequestTableEvent": {
+      "in": {
+        "player": "guest28",
+        "table": 1,
+        "time": 1781358730607
+      },
+      "out": {
+        "player": "guest28",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgChangeStateTableEvent": {
+      "in": {
+        "timed": true,
+        "initialMinutes": 10,
+        "incrementalSeconds": 1,
+        "rated": false,
+        "game": 27,
+        "tableType": 0,
+        "player": "game server",
+        "table": 1,
+        "time": 1781363498715
+      },
+      "out": {
+        "timed": true,
+        "initialMinutes": 10,
+        "incrementalSeconds": 1,
+        "rated": false,
+        "game": 27,
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgExitMainRoomEvent": {
+      "in": {
+        "player": "guest75",
+        "booted": false,
+        "time": 1781364850387
+      }
+    },
+    "dsgExitTableEvent": {
+      "in": {
+        "forced": false,
+        "booted": false,
+        "player": "guest75",
+        "table": 1,
+        "time": 1781364850410
+      },
+      "out": {
+        "forced": false,
+        "booted": false,
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgGameStateTableEvent": {
+      "in": {
+        "state": 1,
+        "changeText": "game over, graviton resigns. set over, iostest, wins the set!",
+        "winner": "iostest",
+        "gameInSet": 0,
+        "table": 1,
+        "time": 1781365577427
+      }
+    },
+    "dsgInviteResponseTableEvent": {
+      "in": {
+        "toPlayer": "guest36",
+        "responseText": "ok",
+        "accept": true,
+        "ignore": false,
+        "player": "guest37",
+        "table": 1,
+        "time": 1781359108098
+      },
+      "out": {
+        "toPlayer": "guest36",
+        "responseText": "ok",
+        "accept": true,
+        "ignore": false,
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgInviteTableEvent": {
+      "in": {
+        "toInvite": "guest37",
+        "inviteText": "come play",
+        "player": "guest36",
+        "table": 1,
+        "time": 1781359108047
+      },
+      "out": {
+        "toInvite": "guest37",
+        "inviteText": "come play",
+        "player": "guest36",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgJoinMainRoomEvent": {
+      "in": {
+        "player": "iostest",
+        "dsgPlayerData": {
+          "pid": 23000000026419,
+          "name": "iostest",
+          "password": "",
+          "email": "",
+          "emailValid": true,
+          "emailVisible": false,
+          "location": "test account",
+          "sex": "F",
+          "age": 18,
+          "homepage": "",
+          "logins": 2652,
+          "subscriberLevel": 0,
+          "showAds": true,
+          "unlimitedTBGames": false,
+          "unlimitedMobileTBGames": false,
+          "databaseAccess": false,
+          "lastLoginDate": "Jun 13, 2026, 3:11:38\u202fPM",
+          "registerDate": "Dec 9, 2012, 9:42:13\u202fAM",
+          "status": "A",
+          "hashCode": "0182d58109bf9d6a",
+          "lastUpdateDate": "Jan 11, 2026, 8:55:09\u202fPM",
+          "timezone": "America/New_York",
+          "type": "H",
+          "admin": false,
+          "guest": false,
+          "nameColor": {
+            "value": -16751616,
+            "falpha": 0.0
+          },
+          "hasAvatar": false,
+          "mobileAdult": true,
+          "gameData": [
+            {
+              "playerID": 23000000026419,
+              "game": 1,
+              "wins": 3,
+              "losses": 0,
+              "draws": 0,
+              "rating": 2158.170332532,
+              "streak": 3,
+              "lastGameDate": "May 28, 2026, 1:37:14\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 1,
+              "wins": 3,
+              "losses": 0,
+              "draws": 0,
+              "rating": 1769.819564285,
+              "streak": 3,
+              "lastGameDate": "May 28, 2026, 1:37:14\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "Y"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 51,
+              "wins": 7,
+              "losses": 57,
+              "draws": 23,
+              "rating": 1174.581216665,
+              "streak": 2,
+              "lastGameDate": "Jun 9, 2026, 1:56:15\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 53,
+              "wins": 0,
+              "losses": 6,
+              "draws": 0,
+              "rating": 1174.61329866,
+              "streak": -6,
+              "lastGameDate": "Dec 25, 2025, 5:01:39\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 55,
+              "wins": 1,
+              "losses": 7,
+              "draws": 0,
+              "rating": 1267.262726332,
+              "streak": -4,
+              "lastGameDate": "Oct 27, 2025, 4:01:06\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 57,
+              "wins": 0,
+              "losses": 3,
+              "draws": 8,
+              "rating": 1505.450680272,
+              "streak": 0,
+              "lastGameDate": "Mar 7, 2013, 7:45:58\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 59,
+              "wins": 0,
+              "losses": 3,
+              "draws": 1,
+              "rating": 1342.989339926,
+              "streak": -1,
+              "lastGameDate": "Aug 6, 2025, 4:01:06\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 61,
+              "wins": 0,
+              "losses": 0,
+              "draws": 1,
+              "rating": 1600.0,
+              "streak": 0,
+              "lastGameDate": "Jan 4, 2013, 8:17:54\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 63,
+              "wins": 1,
+              "losses": 8,
+              "draws": 3,
+              "rating": 1323.65027444,
+              "streak": -5,
+              "lastGameDate": "Jun 4, 2018, 6:01:27\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 65,
+              "wins": 0,
+              "losses": 2,
+              "draws": 0,
+              "rating": 1400.0,
+              "streak": -2,
+              "lastGameDate": "Jan 8, 2013, 3:08:24\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 77,
+              "wins": 0,
+              "losses": 0,
+              "draws": 1,
+              "rating": 1557.556057977,
+              "streak": 0,
+              "lastGameDate": "Jun 9, 2026, 1:54:46\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            }
+          ]
+        },
+        "time": 1781363498613
+      }
+    },
+    "dsgJoinTableEvent": {
+      "in": {
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365566969
+      },
+      "out": {
+        "table": -1,
+        "time": 0
+      }
+    },
+    "dsgLoginEvent": {
+      "in": {
+        "player": "graviton",
+        "password": "virginia",
+        "guest": false,
+        "me": {
+          "pid": 23000000030075,
+          "name": "graviton",
+          "password": "wY8tktEc6WTqLpZrO2kdrg==",
+          "email": "rainwolf@gmail.com",
+          "emailValid": true,
+          "emailVisible": false,
+          "sex": "U",
+          "age": 0,
+          "logins": 6,
+          "subscriberLevel": 0,
+          "showAds": true,
+          "unlimitedTBGames": false,
+          "unlimitedMobileTBGames": false,
+          "databaseAccess": false,
+          "lastLoginDate": "Jun 13, 2026, 3:46:06\u202fPM",
+          "registerDate": "Jul 23, 2015, 10:31:21\u202fPM",
+          "status": "A",
+          "hashCode": "7f6dd1120763e76b",
+          "lastUpdateDate": "Jul 23, 2015, 10:31:21\u202fPM",
+          "timezone": "America/New_York",
+          "type": "H",
+          "admin": false,
+          "guest": false,
+          "hasAvatar": false,
+          "mobileAdult": true,
+          "gameData": []
+        },
+        "serverData": {
+          "serverId": 1,
+          "name": "Main Room",
+          "port": 16000,
+          "tournament": false,
+          "privateServer": false,
+          "arena": false,
+          "gameEvents": [
+            {
+              "id": 33,
+              "name": "Live Game",
+              "game": 1,
+              "rounds": []
+            },
+            {
+              "id": 139,
+              "name": "Live Game",
+              "game": 3,
+              "rounds": []
+            },
+            {
+              "id": 140,
+              "name": "Live Game",
+              "game": 5,
+              "rounds": []
+            },
+            {
+              "id": 141,
+              "name": "Live Game",
+              "game": 9,
+              "rounds": []
+            },
+            {
+              "id": 142,
+              "name": "Live Game",
+              "game": 11,
+              "rounds": []
+            },
+            {
+              "id": 231,
+              "name": "Live Game",
+              "game": 7,
+              "rounds": []
+            },
+            {
+              "id": 232,
+              "name": "Live Game",
+              "game": 2,
+              "rounds": []
+            },
+            {
+              "id": 233,
+              "name": "Live Game",
+              "game": 4,
+              "rounds": []
+            },
+            {
+              "id": 234,
+              "name": "Live Game",
+              "game": 6,
+              "rounds": []
+            },
+            {
+              "id": 235,
+              "name": "Live Game",
+              "game": 8,
+              "rounds": []
+            },
+            {
+              "id": 236,
+              "name": "Live Game",
+              "game": 10,
+              "rounds": []
+            },
+            {
+              "id": 237,
+              "name": "Live Game",
+              "game": 12,
+              "rounds": []
+            },
+            {
+              "id": 1148,
+              "name": "Live Game",
+              "game": 13,
+              "rounds": []
+            },
+            {
+              "id": 1149,
+              "name": "Live Game",
+              "game": 14,
+              "rounds": []
+            },
+            {
+              "id": 1171,
+              "name": "Live Game",
+              "game": 15,
+              "rounds": []
+            },
+            {
+              "id": 1172,
+              "name": "Live Game",
+              "game": 16,
+              "rounds": []
+            },
+            {
+              "id": 1295,
+              "name": "Live Game",
+              "game": 17,
+              "rounds": []
+            },
+            {
+              "id": 1296,
+              "name": "Live Game",
+              "game": 18,
+              "rounds": []
+            },
+            {
+              "id": 1371,
+              "name": "Live Game",
+              "game": 19,
+              "rounds": []
+            },
+            {
+              "id": 1372,
+              "name": "Live Game",
+              "game": 20,
+              "rounds": []
+            },
+            {
+              "id": 1379,
+              "name": "Live Game",
+              "game": 22,
+              "rounds": []
+            },
+            {
+              "id": 1380,
+              "name": "Live Game",
+              "game": 21,
+              "rounds": []
+            },
+            {
+              "id": 1385,
+              "name": "Live Game",
+              "game": 24,
+              "rounds": []
+            },
+            {
+              "id": 1386,
+              "name": "Live Game",
+              "game": 23,
+              "rounds": []
+            },
+            {
+              "id": 1449,
+              "name": "Live Game",
+              "game": 25,
+              "rounds": []
+            },
+            {
+              "id": 1450,
+              "name": "Live Game",
+              "game": 26,
+              "rounds": []
+            },
+            {
+              "id": 1597,
+              "name": "Live Game",
+              "game": 27,
+              "rounds": []
+            },
+            {
+              "id": 1598,
+              "name": "Live Game",
+              "game": 28,
+              "rounds": []
+            },
+            {
+              "id": 1620,
+              "name": "Live Game",
+              "game": 29,
+              "rounds": []
+            },
+            {
+              "id": 1621,
+              "name": "Live Game",
+              "game": 30,
+              "rounds": []
+            }
+          ],
+          "loginMessages": [
+            "-Type in the bottom box and hit enter to chat",
+            "-Play turn-based games now!",
+            "-Click Play Turn-Based from pente.org home page",
+            "-To play computer create a table and click Play Computer",
+            "-Are you a beginner?  Try finding a game in the beginners room"
+          ]
+        },
+        "time": 1781365566869
+      },
+      "out": {
+        "player": "iostest",
+        "password": "app_tsetsoi",
+        "guest": false,
+        "time": 0
+      }
+    },
+    "dsgMoveTableEvent": {
+      "in": {
+        "move": 180,
+        "moves": [
+          180
+        ],
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365568849
+      },
+      "out": {
+        "move": 180,
+        "moves": [
+          180,
+          184,
+          176,
+          218,
+          142
+        ],
+        "player": "guest55",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgOwnerTableEvent": {
+      "in": {
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365566969
+      }
+    },
+    "dsgPlayTableEvent": {
+      "in": {
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365576063
+      },
+      "out": {
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgPreferenceEvent": {
+      "in": {
+        "pref": {
+          "name": "gameState",
+          "value": {
+            "timed": true,
+            "initialMinutes": 10,
+            "incrementalSeconds": 1,
+            "rated": false,
+            "game": 27,
+            "tableType": 0,
+            "player": "iostest",
+            "table": 1,
+            "time": 1781363352066
+          }
+        },
+        "time": 1781363498613
+      }
+    },
+    "dsgRejectGoStateEvent": {
+      "in": {
+        "player": "iostest",
+        "table": 1,
+        "time": 1781364846649
+      },
+      "out": {
+        "player": "iostest",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgResignTableEvent": {
+      "out": {
+        "player": "graviton",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgSetPlayingPlayerTableEvent": {
+      "in": {
+        "seat": 1,
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365568843
+      }
+    },
+    "dsgSitTableEvent": {
+      "in": {
+        "seat": 1,
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365568132
+      },
+      "out": {
+        "seat": 1,
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgStandTableEvent": {
+      "in": {
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365571006
+      },
+      "out": {
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgStartSetTimerEvent": {
+      "in": {
+        "timeLeft": 60000,
+        "table": 1,
+        "time": 1781365576087
+      }
+    },
+    "dsgSwap2PassTableEvent": {
+      "in": {
+        "silent": false,
+        "player": "guest67",
+        "table": 1,
+        "time": 1781363579965
+      },
+      "out": {
+        "silent": false,
+        "player": "guest44",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgSwapSeatsTableEvent": {
+      "in": {
+        "swap": true,
+        "silent": false,
+        "player": "guest65",
+        "table": 1,
+        "time": 1781363503373
+      },
+      "out": {
+        "swap": false,
+        "silent": false,
+        "player": "guest44",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgSystemMessageTableEvent": {
+      "in": {
+        "message": "Guests are not allowed to play rated games, play unrated or create a free user account!",
+        "player": "system",
+        "table": 1,
+        "time": 1781364836816
+      }
+    },
+    "dsgTextMainRoomEvent": {
+      "in": {
+        "player": "guest68",
+        "text": "hello lobby",
+        "time": 1781363684265
+      },
+      "out": {
+        "text": "hello lobby",
+        "time": 0
+      }
+    },
+    "dsgTextTableEvent": {
+      "in": {
+        "text": "gg wp",
+        "player": "guest28",
+        "table": 1,
+        "time": 1781358731722
+      },
+      "out": {
+        "text": "gg wp",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgTimerChangeTableEvent": {
+      "in": {
+        "minutes": 10,
+        "seconds": 0,
+        "millis": 600000,
+        "player": "graviton",
+        "table": 1,
+        "time": 1781365568847
+      }
+    },
+    "dsgUndoReplyTableEvent": {
+      "in": {
+        "accepted": true,
+        "player": "guest29",
+        "table": 1,
+        "time": 1781358730033
+      },
+      "out": {
+        "accepted": true,
+        "player": "guest29",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgUndoRequestTableEvent": {
+      "in": {
+        "player": "guest28",
+        "table": 1,
+        "time": 1781358729496
+      },
+      "out": {
+        "player": "guest28",
+        "table": 1,
+        "time": 0
+      }
+    },
+    "dsgUpdatePlayerDataEvent": {
+      "in": {
+        "data": {
+          "pid": 23000000026419,
+          "name": "iostest",
+          "password": "",
+          "email": "",
+          "emailValid": true,
+          "emailVisible": false,
+          "location": "test account",
+          "sex": "F",
+          "age": 18,
+          "homepage": "",
+          "logins": 2658,
+          "subscriberLevel": 0,
+          "showAds": true,
+          "unlimitedTBGames": false,
+          "unlimitedMobileTBGames": false,
+          "databaseAccess": false,
+          "lastLoginDate": "Jun 13, 2026, 3:46:06\u202fPM",
+          "registerDate": "Dec 9, 2012, 9:42:13\u202fAM",
+          "status": "A",
+          "hashCode": "0182d58109bf9d6a",
+          "lastUpdateDate": "Jan 11, 2026, 8:55:09\u202fPM",
+          "timezone": "America/New_York",
+          "type": "H",
+          "admin": false,
+          "guest": false,
+          "nameColor": {
+            "value": -16751616,
+            "falpha": 0.0
+          },
+          "hasAvatar": false,
+          "mobileAdult": true,
+          "gameData": [
+            {
+              "playerID": 23000000026419,
+              "game": 1,
+              "wins": 3,
+              "losses": 0,
+              "draws": 0,
+              "rating": 2158.170332532,
+              "streak": 3,
+              "lastGameDate": "May 28, 2026, 1:37:14\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 1,
+              "wins": 4,
+              "losses": 0,
+              "draws": 0,
+              "rating": 1798.592118749375,
+              "streak": 4,
+              "lastGameDate": "Jun 13, 2026, 3:46:17\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "Y"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 51,
+              "wins": 7,
+              "losses": 57,
+              "draws": 23,
+              "rating": 1174.581216665,
+              "streak": 2,
+              "lastGameDate": "Jun 9, 2026, 1:56:15\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 53,
+              "wins": 0,
+              "losses": 6,
+              "draws": 0,
+              "rating": 1174.61329866,
+              "streak": -6,
+              "lastGameDate": "Dec 25, 2025, 5:01:39\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 55,
+              "wins": 1,
+              "losses": 7,
+              "draws": 0,
+              "rating": 1267.262726332,
+              "streak": -4,
+              "lastGameDate": "Oct 27, 2025, 4:01:06\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 57,
+              "wins": 0,
+              "losses": 3,
+              "draws": 8,
+              "rating": 1505.450680272,
+              "streak": 0,
+              "lastGameDate": "Mar 7, 2013, 7:45:58\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 59,
+              "wins": 0,
+              "losses": 3,
+              "draws": 1,
+              "rating": 1342.989339926,
+              "streak": -1,
+              "lastGameDate": "Aug 6, 2025, 4:01:06\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 61,
+              "wins": 0,
+              "losses": 0,
+              "draws": 1,
+              "rating": 1600.0,
+              "streak": 0,
+              "lastGameDate": "Jan 4, 2013, 8:17:54\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 63,
+              "wins": 1,
+              "losses": 8,
+              "draws": 3,
+              "rating": 1323.65027444,
+              "streak": -5,
+              "lastGameDate": "Jun 4, 2018, 6:01:27\u202fAM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 65,
+              "wins": 0,
+              "losses": 2,
+              "draws": 0,
+              "rating": 1400.0,
+              "streak": -2,
+              "lastGameDate": "Jan 8, 2013, 3:08:24\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            },
+            {
+              "playerID": 23000000026419,
+              "game": 77,
+              "wins": 0,
+              "losses": 0,
+              "draws": 1,
+              "rating": 1557.556057977,
+              "streak": 0,
+              "lastGameDate": "Jun 9, 2026, 1:54:46\u202fPM",
+              "tourneyWinner": 0,
+              "computer": "N"
+            }
+          ]
+        },
+        "time": 1781365577677
+      },
+      "out": {
+        "data": {
+          "pid": 5072,
+          "name": "guest71",
+          "password": "",
+          "email": "",
+          "emailValid": false,
+          "emailVisible": false,
+          "sex": "U",
+          "age": 0,
+          "logins": 1,
+          "subscriberLevel": 0,
+          "showAds": false,
+          "unlimitedTBGames": false,
+          "unlimitedMobileTBGames": false,
+          "databaseAccess": false,
+          "lastLoginDate": "Jun 13, 2026, 3:33:57\u202fPM",
+          "registerDate": "Jun 13, 2026, 3:33:57\u202fPM",
+          "status": "A",
+          "lastUpdateDate": "Jun 13, 2026, 3:33:57\u202fPM",
+          "type": "H",
+          "admin": false,
+          "guest": true,
+          "hasAvatar": false,
+          "mobileAdult": false,
+          "gameData": []
+        },
+        "time": 0
+      }
+    },
+    "dsgWaitingPlayerReturnTimeUpTableEvent": {
+      "in": {
+        "waitingForPlayerToReturnSeqNbr": 0,
+        "set": false,
+        "player": "guest74",
+        "table": 1,
+        "time": 1781364910419
+      }
+    }
+  },
+  "errorEvents": {
+    "dsgExitTableErrorEvent": {
+      "2": {
+        "error": 2,
+        "player": "guest37",
+        "table": 1,
+        "time": 1781359109825
+      }
+    },
+    "dsgLoginErrorEvent": {
+      "1": {
+        "error": 1,
+        "player": "iostest",
+        "password": "",
+        "guest": false,
+        "time": 1781363683475
+      }
+    },
+    "dsgMoveTableErrorEvent": {
+      "12": {
+        "move": 180,
+        "error": 12,
+        "player": "guest44",
+        "table": 1,
+        "time": 1781360016857
+      },
+      "13": {
+        "move": 180,
+        "error": 13,
+        "player": "guest45",
+        "table": 1,
+        "time": 1781360017756
+      },
+      "6": {
+        "move": 180,
+        "error": 6,
+        "player": "guest4",
+        "table": 1,
+        "time": 1781357648896
+      },
+      "4": {
+        "move": 180,
+        "error": 4,
+        "player": "guest5",
+        "table": 1,
+        "time": 1781357650422
+      }
+    },
+    "dsgPlayTableErrorEvent": {
+      "9": {
+        "error": 9,
+        "player": "iostest",
+        "table": 1,
+        "time": 1781363500583
+      },
+      "23": {
+        "error": 23,
+        "player": "guest70",
+        "table": 1,
+        "time": 1781364836817
+      }
+    },
+    "dsgResignTableErrorEvent": {
+      "6": {
+        "error": 6,
+        "player": "guest4",
+        "table": 1,
+        "time": 1781357658399
+      },
+      "4": {
+        "error": 4,
+        "player": "guest28",
+        "table": 1,
+        "time": 1781358732029
+      }
+    },
+    "dsgSitTableErrorEvent": {
+      "99": {
+        "seat": 0,
+        "error": 99,
+        "player": "guest4",
+        "table": 1,
+        "time": 1781357643256
+      }
+    },
+    "dsgUndoReplyTableErrorEvent": {
+      "4": {
+        "accepted": true,
+        "error": 4,
+        "player": "guest5",
+        "table": 1,
+        "time": 1781357657794
+      },
+      "16": {
+        "accepted": true,
+        "error": 16,
+        "player": "guest33",
+        "table": 1,
+        "time": 1781358754299
+      }
+    },
+    "dsgUndoRequestTableErrorEvent": {
+      "6": {
+        "error": 6,
+        "player": "guest4",
+        "table": 1,
+        "time": 1781357657288
+      },
+      "15": {
+        "error": 15,
+        "player": "guest32",
+        "table": 1,
+        "time": 1781358753795
+      }
+    }
+  },
+  "_swap2_dpente_note": "CAPTURED. Requires a REGISTERED creator (guest tables reset to pente: resetTable() loads the creator's saved 'gameState' pref, handleChangeState only persists it for non-guests). With iostest as creator the table is real swap2/d-pente: player1 places the opening consecutively (swap2:3, dpente:4), then seat2 sends dsgSwapSeatsTableEvent (or dsgSwap2PassTableEvent; after a pass, seat1 decides at numMoves==5).",
+  "gaps": {
+    "_status": "All known live message types captured for real (both directions where the protocol uses them). dsgUpdatePlayerDataEvent inbound captured via a completed RATED set between two registered users (iostest + graviton) -> rating recalc -> playerChanged broadcast."
+  }
+}

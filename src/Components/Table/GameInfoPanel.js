@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import {GameState} from "../../Classes/GameClass";
 import MovesListPanel from './MovesListPanel';
 import InviteModal from './InviteModal';
+import {Commands} from '../../protocol';
 
 const styles = theme => ({
    root: {
@@ -55,31 +56,28 @@ const UnconnectedGameInfoPanel = (props) => {
    const {table, game, pressed_play, admin, tournament, arena} = props;
 
    const requestCancel = () => {
-      props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.cancelRequest({player: table.me, table: table.table}));
    };
    const resign = () => {
-      props.send_message({dsgResignTableEvent: {player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.resign({player: table.me, table: table.table}));
    };
    const requestUndo = () => {
-      props.send_message({dsgUndoRequestTableEvent: {player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.undoRequest({player: table.me, table: table.table}));
    };
    const leave = () => {
-      props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: table.table, time: 0}});
+      props.send_message(Commands.exitTable({forced: false, booted: false, table: table.table}));
    };
    const pass = () => {
       const pass_move = game.gridSize * game.gridSize;
-      props.send_message({
-         dsgMoveTableEvent: {
-            move: pass_move,
-            moves: [pass_move],
-            player: table.me,
-            table: table.table,
-            time: 0
-         }
-      });
+      props.send_message(Commands.move({
+         move: pass_move,
+         moves: [pass_move],
+         player: table.me,
+         table: table.table
+      }));
    };
    const play = () => {
-      props.send_message({dsgPlayTableEvent: {table: table.table, time: 0}});
+      props.send_message(Commands.play({table: table.table}));
       props.play_pressed();
    };
 
