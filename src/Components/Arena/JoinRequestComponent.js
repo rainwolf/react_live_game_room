@@ -13,6 +13,7 @@ import {connect} from 'react-redux';
 import {REMOVE_ARENA_JOIN_REQUEST, send_message, SHOW_BOOT_DIALOG} from "../../redux_actions/actionTypes";
 import LaunchIcon from '@mui/icons-material/Launch';
 import {ListItemButton} from "@mui/material";
+import {Commands} from '../../protocol';
 
 
 const styles = theme => ({
@@ -49,11 +50,11 @@ const mapDispatchToProps = dispatch => {
          dispatch(send_message(message));
       },
       accept_player: (player, table) => {
-         dispatch(send_message({dsgArenaAcceptTableJoinEvent: {playerToAccept: player, table: table}}));
+         dispatch(send_message(Commands.arenaAccept({playerToAccept: player, table: table})));
       },
       reject_player: (player, table) => {
          dispatch({type: REMOVE_ARENA_JOIN_REQUEST, payload: player});
-         dispatch(send_message({dsgArenaRejectTableJoinEvent: {playerToReject: player, table: table}}));
+         dispatch(send_message(Commands.arenaReject({playerToReject: player, table: table})));
       },
    }
 };

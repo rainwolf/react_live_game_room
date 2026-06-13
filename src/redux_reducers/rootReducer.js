@@ -72,6 +72,50 @@ const initialState = {
    // snack: 'rainwolf'
 };
 
+// Inbound protocol events — the protocol middleware decodes each wss frame into a
+// typed action ({type: 'dsgXEvent', payload}); this registry applies it via the
+// existing utils mutators. One entry per server event, replacing the old 35-branch
+// JSON.parse switch. (dsgLoginErrorEvent resets to initialState — handled in the
+// switch below; dsgPingEvent is answered by the middleware and never reaches here.)
+const EVENT_HANDLERS = {
+   dsgLoginEvent: (p, s) => {
+      s.me = p.player;
+      s.admin = p.me.admin;
+      s.freeloader = p.me.subscriberLevel === 0;
+      s.logged_in = true;
+      s.tournament = p.serverData.tournament;
+      s.arena = p.serverData.arena;
+   },
+   dsgJoinMainRoomEvent: (p, s) => processUser(p.dsgPlayerData, s),
+   dsgUpdatePlayerDataEvent: (p, s) => processUser(p.data, s),
+   dsgTextMainRoomEvent: (p, s) => addRoomMessage(p, s),
+   dsgExitMainRoomEvent: (p, s) => exitUser(p.player, s),
+   dsgChangeStateTableEvent: (p, s) => changeTableState(p, s),
+   dsgJoinTableEvent: (p, s) => joinTable(p, s),
+   dsgExitTableEvent: (p, s) => exitTable(p, s),
+   dsgSitTableEvent: (p, s) => sitTable(p, s),
+   dsgStandTableEvent: (p, s) => standTable(p, s),
+   dsgOwnerTableEvent: (p, s) => tableOwner(p, s),
+   dsgTextTableEvent: (p, s) => addTableMessage(p, s),
+   dsgMoveTableEvent: (p, s) => addMove(p, s),
+   dsgGameStateTableEvent: (p, s) => changeGameState(p, s),
+   dsgTimerChangeTableEvent: (p, s) => changeTimer(p, s),
+   dsgSystemMessageTableEvent: (p, s) => serverTableMessage(p, s),
+   dsgUndoRequestTableEvent: (p, s) => undoRequested(p, s),
+   dsgUndoReplyTableEvent: (p, s) => undoReply(p, s),
+   dsgCancelRequestTableEvent: (p, s) => cancelRequested(p, s),
+   dsgSwapSeatsTableEvent: (p, s) => swapSeats(p, s),
+   dsgCancelReplyTableEvent: (p, s) => cancelReply(p, s),
+   dsgRejectGoStateEvent: (p, s) => rejectGoState(p, s),
+   dsgWaitingPlayerReturnTimeUpTableEvent: (p, s) => resignOrCancel(p, s),
+   dsgBootTableEvent: (p, s) => bootEvent(p, s),
+   dsgInviteTableEvent: (p, s) => invitationReceived(p, s),
+   dsgInviteResponseTableEvent: (p, s) => invitationReply(p, s),
+   dsgSwap2PassTableEvent: (p, s) => swap2Pass(p, s),
+   dsgArenaRequestJoinTableEvent: (p, s) => arenaJoinRequest(p, s),
+   dsgArenaRejectTableJoinEvent: (p, s) => arenaRejectRequest(p, s),
+};
+
 function liveGameApp(state = initialState, action) {
    let newState = {...state};
    console.log(JSON.stringify(action))
@@ -137,86 +181,16 @@ function liveGameApp(state = initialState, action) {
       case REPLIED_INVITATION:
          delete newState.received_invitation;
          break;
-      case "REDUX_WEBSOCKET::MESSAGE":
-         let host = window.location.hostname;
-         if (host === 'localhost' || host === 'machine.local') {
-            console.log('message: ' + action.payload.message)
+      case "dsgLoginErrorEvent":
+         return initialState;
+      default: {
+         // typed protocol events dispatched by the protocol middleware
+         const handler = EVENT_HANDLERS[action.type];
+         if (handler) {
+            handler(action.payload, newState);
          }
-         const json = JSON.parse(action.payload.message);
-         if (json.dsgLoginErrorEvent) {
-            return initialState;
-         } else if (json.dsgLoginEvent) {
-            newState.me = json.dsgLoginEvent.player;
-            newState.admin = json.dsgLoginEvent.me.admin;
-            newState.freeloader = json.dsgLoginEvent.me.subscriberLevel === 0;
-            newState.logged_in = true;
-            newState.tournament = json.dsgLoginEvent.serverData.tournament;
-            newState.arena = json.dsgLoginEvent.serverData.arena;
-            // } else if (json.dsgPingEvent) {
-            //     console.log('ping: ' + action.payload.data)
-         } else if (json.dsgJoinMainRoomEvent) {
-            processUser(json.dsgJoinMainRoomEvent.dsgPlayerData, newState);
-         } else if (json.dsgUpdatePlayerDataEvent) {
-            processUser(json.dsgUpdatePlayerDataEvent.data, newState);
-         } else if (json.dsgTextMainRoomEvent) {
-            addRoomMessage(json.dsgTextMainRoomEvent, newState);
-         } else if (json.dsgExitMainRoomEvent) {
-            exitUser(json.dsgExitMainRoomEvent.player, newState);
-         } else if (json.dsgChangeStateTableEvent) {
-            changeTableState(json.dsgChangeStateTableEvent, newState);
-         } else if (json.dsgJoinTableEvent) {
-            joinTable(json.dsgJoinTableEvent, newState);
-         } else if (json.dsgExitTableEvent) {
-            exitTable(json.dsgExitTableEvent, newState);
-         } else if (json.dsgSitTableEvent) {
-            sitTable(json.dsgSitTableEvent, newState);
-         } else if (json.dsgStandTableEvent) {
-            standTable(json.dsgStandTableEvent, newState);
-         } else if (json.dsgOwnerTableEvent) {
-            tableOwner(json.dsgOwnerTableEvent, newState);
-         } else if (json.dsgTextTableEvent) {
-            addTableMessage(json.dsgTextTableEvent, newState);
-         } else if (json.dsgMoveTableEvent) {
-            addMove(json.dsgMoveTableEvent, newState);
-         } else if (json.dsgGameStateTableEvent) {
-            changeGameState(json.dsgGameStateTableEvent, newState);
-         } else if (json.dsgTimerChangeTableEvent) {
-            changeTimer(json.dsgTimerChangeTableEvent, newState);
-         } else if (json.dsgSystemMessageTableEvent) {
-            serverTableMessage(json.dsgSystemMessageTableEvent, newState);
-         } else if (json.dsgUndoRequestTableEvent) {
-            undoRequested(json.dsgUndoRequestTableEvent, newState);
-         } else if (json.dsgUndoReplyTableEvent) {
-            undoReply(json.dsgUndoReplyTableEvent, newState);
-         } else if (json.dsgCancelRequestTableEvent) {
-            cancelRequested(json.dsgCancelRequestTableEvent, newState);
-         } else if (json.dsgSwapSeatsTableEvent) {
-            swapSeats(json.dsgSwapSeatsTableEvent, newState);
-         } else if (json.dsgCancelReplyTableEvent) {
-            cancelReply(json.dsgCancelReplyTableEvent, newState);
-            // } else if (json.dsgSetPlayingPlayerTableEvent) {
-            //     setPlayingPlayerTable(json.dsgSetPlayingPlayerTableEvent, newState);
-         } else if (json.dsgRejectGoStateEvent) {
-            rejectGoState(json.dsgRejectGoStateEvent, newState);
-         } else if (json.dsgWaitingPlayerReturnTimeUpTableEvent) {
-            resignOrCancel(json.dsgWaitingPlayerReturnTimeUpTableEvent, newState);
-         } else if (json.dsgBootTableEvent) {
-            bootEvent(json.dsgBootTableEvent, newState);
-         } else if (json.dsgInviteTableEvent) {
-            invitationReceived(json.dsgInviteTableEvent, newState);
-         } else if (json.dsgInviteResponseTableEvent) {
-            invitationReply(json.dsgInviteResponseTableEvent, newState);
-         } else if (json.dsgSwap2PassTableEvent) {
-            swap2Pass(json.dsgSwap2PassTableEvent, newState);
-         } else if (json.dsgArenaRequestJoinTableEvent) {
-            arenaJoinRequest(json.dsgArenaRequestJoinTableEvent, newState);
-         } else if (json.dsgArenaRejectTableJoinEvent) {
-            arenaRejectRequest(json.dsgArenaRejectTableJoinEvent, newState);
-         }
-         // {"dsgInviteResponseTableEvent":{"toPlayer":"rainwolf","responseText":"sure","accept":true,"ignore":false,"player":"iostest","table":1,"time":1554998965841}}
          break;
-      default:
-         break;
+      }
    }
    return newState;
 }

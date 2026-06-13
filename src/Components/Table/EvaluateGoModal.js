@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -55,17 +56,14 @@ const UnconnectedEvaluateGoModal = (props) => {
    const accept = (s) => {
       if (s) {
          const move = game.gridSize * game.gridSize;
-         props.send_message({
-            dsgMoveTableEvent: {
-               move: move,
-               moves: [move],
-               player: table.me,
-               table: table.table,
-               time: 0
-            }
-         });
+         props.send_message(Commands.move({
+            move: move,
+            moves: [move],
+            player: table.me,
+            table: table.table
+         }));
       } else {
-         props.send_message({dsgRejectGoStateEvent: {player: table.me, table: table.table, time: 0}});
+         props.send_message(Commands.rejectGoState({player: table.me, table: table.table}));
       }
    };
 

@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import {send_message} from "../redux_actions/actionTypes";
+import {Commands} from '../protocol';
 import PropTypes from 'prop-types';
 import User from "../Classes/UserClass";
 import Table from '../Classes/TableClass';
@@ -64,7 +65,7 @@ const UnconnectedTable = (props) => {
    const sendTableText = (event) => {
       const str = event.target.value;
       if (event.key === 'Enter' && str !== '') {
-         props.send_message({dsgTextTableEvent: {text: str, table: table.table, time: 0}});
+         props.send_message(Commands.tableText({text: str, table: table.table}));
          event.target.value = "";
       }
    };

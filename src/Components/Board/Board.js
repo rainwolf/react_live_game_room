@@ -5,6 +5,7 @@ import Table from "../../Classes/TableClass";
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 const mapStateToProps = state => {
    return {
@@ -28,7 +29,7 @@ const UnconnectedBoard = (props) => {
    const {game_id, game, table, send_message} = props;
 
    const sendMove = (move) => {
-      send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
+      send_message(Commands.move({move: move, moves: [move], player: table.me, table: table.table}));
    };
 
    // console.log(JSON.stringify(game.abstractBoard))

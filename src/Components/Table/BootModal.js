@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 
 import {connect} from 'react-redux';
 import {send_message, SHOW_BOOT_DIALOG} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -56,7 +57,7 @@ const UnconnectedBootModal = (props) => {
    const {classes, toBoot, me, table, send_message, dismiss} = props;
 
    const boot = () => {
-      send_message({dsgBootTableEvent: {toBoot: toBoot, player: me, table: table, time: 0}});
+      send_message(Commands.boot({toBoot: toBoot, player: me, table: table}));
       dismiss();
    };
 

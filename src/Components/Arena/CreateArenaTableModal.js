@@ -15,6 +15,7 @@ import Switch from '@mui/material/Switch';
 import {connect} from 'react-redux';
 import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../../redux_actions/actionTypes";
 import {game_name} from "../../Classes/utils";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -70,16 +71,13 @@ const UnconnectedCreateArenaTableModal = (props) => {
    //     player: table.me, table: table.table, time:0}));
 
    const send_create_arena_table = () => {
-      props.send_message({
-         dsgArenaCreateTableEvent:
-            {
-               timed: timed,
-               initialMinutes: initialMinutes, incrementalSeconds: incrementalSeconds,
-               rated: rated, game: game, // tableType: privateTable ? 2 : 1,
-               playAs: playAs,
-               player: me, table: -1, time: 0
-            }
-      });
+      props.send_message(Commands.arenaCreate({
+         timed: timed,
+         initialMinutes: initialMinutes, incrementalSeconds: incrementalSeconds,
+         rated: rated, game: game, // tableType: privateTable ? 2 : 1,
+         playAs: playAs,
+         player: me, table: -1
+      }));
       props.toggle_create_arena_modal();
    };
 

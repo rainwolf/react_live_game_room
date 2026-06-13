@@ -5,6 +5,7 @@ import {Game, GameState} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
 import User from "../../Classes/UserClass";
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import ListItem from '@mui/material/ListItem';
@@ -47,7 +48,7 @@ const UnconnectedSeat = (props) => {
                </Grid>
                <Grid item xs>
                   <Button variant="outlined" color="primary" className={'button-glow'} fullWidth
-                          onClick={() => props.send_message({dsgSitTableEvent: {seat: seat, table: table.table, time: 0}})}
+                          onClick={() => props.send_message(Commands.sit({seat: seat, table: table.table}))}
                           style={{paddingLeft: 10}}>
                      <span style={{whiteSpace: 'nowrap'}}>Take Seat</span>
                   </Button>
@@ -79,7 +80,7 @@ const UnconnectedSeat = (props) => {
                {(game.gameState.state === GameState.State.NOT_STARTED && player.name === table.me && !tournament) &&
                   <Grid item xs style={{marginTop: 10}}>
                      <IconButton variant="outlined" color="primary" size="small"
-                                 onClick={() => props.send_message({dsgStandTableEvent: {table: table.table, time: 0}})}
+                                 onClick={() => props.send_message(Commands.stand({table: table.table}))}
                      >
                         <CloseIcon/>
                      </IconButton>

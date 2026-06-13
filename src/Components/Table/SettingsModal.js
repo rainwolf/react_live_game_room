@@ -14,6 +14,7 @@ import Switch from '@mui/material/Switch';
 
 import {connect} from 'react-redux';
 import {send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -80,15 +81,14 @@ const UnconnectedSettingsModal = (props) => {
       } else if (event.target.name === 'tableType') {
          correction = {[event.target.name]: (event.target.value === '1') ? 2 : 1};
       }
-      props.send_message({
-         dsgChangeStateTableEvent:
-            Object.assign({
-               timed: table.timed,
-               initialMinutes: table.initialMinutes, incrementalSeconds: table.incrementalSeconds,
-               rated: table.rated, game: table.game, tableType: table.tableType,
-               player: table.me, table: table.table, time: 0
-            }, correction)
-      });
+      props.send_message(Commands.changeState(
+         Object.assign({
+            timed: table.timed,
+            initialMinutes: table.initialMinutes, incrementalSeconds: table.incrementalSeconds,
+            rated: table.rated, game: table.game, tableType: table.tableType,
+            player: table.me, table: table.table
+         }, correction)
+      ));
    };
 
    const incrementalSeconds = Array.from({length: 60}, (v, i) => i);
