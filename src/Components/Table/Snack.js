@@ -20,7 +20,9 @@ const mapStateToProps = state => {
    return {
       users: state.users,
       table: state.table ? state.tables[state.table] : null,
-      snack: state.snack
+      // game-result notification carries the winner's name (this component renders
+      // win/loss); generic info notifications are shown by Components/MessageSnack.
+      snack: state.notification && state.notification.kind === 'gameResult' ? state.notification.winner : undefined
    }
 };
 

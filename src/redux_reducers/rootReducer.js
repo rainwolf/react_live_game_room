@@ -1,6 +1,7 @@
 import '../redux_actions/actionTypes';
 import {
    CONNECT_SERVER,
+   CLEAR_NOTIFICATIONS,
    DISMISS_WAITING_MODAL,
    MOVE_BACK,
    MOVE_FORWARD,
@@ -69,7 +70,7 @@ const initialState = {
    table_messages: [],
    tournament: false,
    showCreateArenaModal: false,
-   // snack: 'rainwolf'
+   pendingNotifications: [],
 };
 
 // Inbound protocol events — the protocol middleware decodes each wss frame into a
@@ -169,7 +170,10 @@ function liveGameApp(state = initialState, action) {
          unmute(action.payload, newState);
          break;
       case REMOVE_SNACK:
-         delete newState.snack;
+         delete newState.notification;
+         break;
+      case CLEAR_NOTIFICATIONS:
+         newState.pendingNotifications = [];
          break;
       case SHOW_BOOT_DIALOG:
          if (action.payload) {

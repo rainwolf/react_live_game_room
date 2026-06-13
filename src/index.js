@@ -8,6 +8,7 @@ import * as serviceWorker from './serviceWorker';
 import liveGameApp from './redux_reducers/rootReducer';
 import reduxWebsocket from '@giantmachines/redux-websocket';
 import {protocolMiddleware} from './protocol/middleware';
+import {notificationMiddleware} from './notifications/middleware';
 import {disableReactDevTools} from '@fvilers/disable-react-devtools';
 import {ThemeProvider} from "@mui/styles";
 import {createRoot} from "react-dom/client";
@@ -18,7 +19,7 @@ if (process.env.NODE_ENV === 'production') {
 
 const reduxWebsocketMiddleware = reduxWebsocket();
 
-const store = createStore(liveGameApp, applyMiddleware(reduxWebsocketMiddleware, protocolMiddleware));
+const store = createStore(liveGameApp, applyMiddleware(reduxWebsocketMiddleware, protocolMiddleware, notificationMiddleware));
 
 const root = createRoot(document.getElementById("root"));
 root.render(
