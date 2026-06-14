@@ -13,9 +13,10 @@ import Select from '@mui/material/Select';
 import Switch from '@mui/material/Switch';
 
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../../redux_actions/actionTypes";
+import {send_message} from "../../redux_actions/actionTypes";
 import {game_name} from "../../Classes/utils";
 import {Commands} from '../../protocol';
+import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
 
 function getModalStyle() {
    const top = 50;
@@ -46,7 +47,7 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
    return {
-      open: state.showCreateArenaModal,
+      open: isModalOpen(state, MODALS.CREATE_ARENA),
       me: state.me,
    }
 };
@@ -56,7 +57,7 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
-      toggle_create_arena_modal: () => dispatch({type: TOGGLE_CREATE_ARENA_MODAL})
+      toggle_create_arena_modal: () => dispatch(toggleModal(MODALS.CREATE_ARENA))
    }
 };
 

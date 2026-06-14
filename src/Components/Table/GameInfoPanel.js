@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {PRESSED_PLAY, send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
+import {PRESSED_PLAY, send_message} from "../../redux_actions/actionTypes";
+import {MODALS, toggleModal} from '../../ui/modals';
 import Grid from '@mui/material/Grid';
 import Seat from './Seat';
 import Timer from './Timer';
@@ -43,7 +44,7 @@ const mapDispatchToProps = dispatch => {
          dispatch(send_message(message));
       },
       toggle_settings: () => {
-         dispatch({type: TOGGLE_SETTINGS})
+         dispatch(toggleModal(MODALS.SETTINGS))
       },
       play_pressed: () => {
          dispatch({type: PRESSED_PLAY})

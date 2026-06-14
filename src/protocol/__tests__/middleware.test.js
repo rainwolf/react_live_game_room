@@ -53,7 +53,7 @@ describe('protocol middleware — the inbound seam', () => {
   });
 
   test('passes ordinary local actions through untouched', () => {
-    const action = { type: 'TOGGLE_SETTINGS' };
+    const action = { type: 'PRESSED_PLAY' };
     const { next } = run(action);
     expect(next).toHaveBeenCalledWith(action);
   });
