@@ -14,6 +14,7 @@ import {MUTE, UNMUTE} from "../../redux_actions/actionTypes";
 import {MODALS, openModal} from '../../ui/modals';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import LaunchIcon from '@mui/icons-material/Launch';
+import {selectCurrentTable} from '../../selectors';
 
 
 const styles = theme => ({
@@ -30,7 +31,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       users: state.users,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       me: state.me,
       admin: state.admin
    }
