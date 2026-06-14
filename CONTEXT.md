@@ -123,6 +123,13 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
   triplicated). `src/game/gameState.js` holds the shared `GameState` enum (re-exported by
   GameClass). The honest second adapter that justifies the seam is the characterization net
   in `src/Classes/__tests__/gameVariantPhase.test.js` — the FSM was previously untested.
+- **Board geometry** — the per-variant visual shape of the board (grid size, board CSS class,
+  star-point/circle markers) derived from the game id. It owns its own module,
+  `src/game/boardGeometry.js` — `gridSizeForGame`, `boardStyleClass`, `boardSpecialPoints` —
+  which `Board.js` calls instead of re-deriving the geometry inline in render (a 13-branch
+  style chain + the dots/circles block), and which `GameClass.setGame` delegates to for grid
+  size (that derivation was duplicated). Special-point `part` codes: 51 = circle marker
+  (non-go boards), 52 = star dot (go boards).
 
 ## Swap2 / D-Pente opening (server-verified protocol invariant, 2026-06-13)
 
