@@ -1,5 +1,6 @@
 import {GameState} from "./GameClass";
 import {game_name} from "./Utils";
+import {isGoBoard} from "../game/boardGeometry";
 
 const PRIVATE_TABLE = 2;
 
@@ -51,7 +52,7 @@ class Table {
    };
 
    player_color = (p) => {
-      if (this.game > 18 && this.game < 25) {
+      if (isGoBoard(this.game)) {
          p = 3 - p;
       }
       if (p === 1) {
@@ -135,9 +136,7 @@ class Table {
       return game_name(g);
    };
 
-   gameIsGo = () => {
-      return this.game > 19 && this.game < 25;
-   };
+   gameIsGo = () => isGoBoard(this.game);
 
    colorForSeat = (seat) => {
       if (this.gameIsGo()) {
