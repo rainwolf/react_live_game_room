@@ -16,6 +16,7 @@ import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
 import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
+import {selectCurrentTable} from '../../selectors';
 
 function getModalStyle() {
    const top = 50;
@@ -46,7 +47,7 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
    return {
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       open: isModalOpen(state, MODALS.SETTINGS)
    }
 };

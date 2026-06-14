@@ -12,6 +12,7 @@ import Fab from '@mui/material/Fab';
 import Cookies from 'js-cookie';
 import InvitationResponseModal from "../Components/Room/InvitationResponseModal";
 import {Commands} from '../protocol';
+import {isGuestName, tableVisibleToGuest} from '../selectors';
 
 const mapStateToProps = state => {
    return {
@@ -76,7 +77,7 @@ class UnconnectedRoom extends Component {
    render() {
       const {users, connected, logged_in, messages, tables, me, freeloader, tournament} = this.props;
       // Guest users should not see rated tables.
-      const isGuest = (me || '').toLowerCase().startsWith('guest');
+      const isGuest = isGuestName(me);
       if (logged_in) {
          return (
             <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
@@ -110,7 +111,7 @@ class UnconnectedRoom extends Component {
                            }
                            <br/>
                            {Object.keys(tables)
-                              .filter(table => !isGuest || !tables[table].rated)
+                              .filter(table => tableVisibleToGuest(tables[table], isGuest))
                               .map(table => <TableCard
                               key={table}
                               table={tables[table]}

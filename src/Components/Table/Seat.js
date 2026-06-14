@@ -16,12 +16,13 @@ import SimpleStone from '../Board/SimpleStone';
 import Grid from '@mui/material/Grid';
 import CloseIcon from '@mui/icons-material/Close';
 import Paper from "@mui/material/Paper";
+import {selectCurrentTable} from '../../selectors';
 
 const mapStateToProps = state => {
    return {
       users: state.users,
       game: state.game,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       tournament: state.tournament
    }
 };

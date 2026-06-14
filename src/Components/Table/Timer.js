@@ -6,11 +6,12 @@ import Table from "../../Classes/TableClass";
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import {AudioService} from '../../notifications/audio'
+import {selectCurrentTable} from '../../selectors';
 
 const mapStateToProps = state => {
    return {
       game: state.game,
-      table: state.tables[state.table]
+      table: selectCurrentTable(state)
    }
 };
 

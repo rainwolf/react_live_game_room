@@ -21,12 +21,13 @@ import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
 import Swap2ChoiceModal from "../Components/Table/Swap2ChoiceModal";
 import JoinRequestComponent from "../Components/Arena/JoinRequestComponent";
+import {selectCurrentTable} from '../selectors';
 
 const mapStateToProps = state => {
    return {
       users: state.users,
       messages: state.table_messages,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       freeloader: state.freeloader,
       arena: state.arena,
    }

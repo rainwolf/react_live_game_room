@@ -15,11 +15,12 @@ import amber from '@mui/material/colors/amber';
 import red from '@mui/material/colors/red';
 import blue from '@mui/material/colors/blue';
 import User from "../../Classes/UserClass";
+import {selectCurrentTable} from '../../selectors';
 
 const mapStateToProps = state => {
    return {
       users: state.users,
-      table: state.table ? state.tables[state.table] : null,
+      table: state.table ? selectCurrentTable(state) : null,
       // game-result notification carries the winner's name (this component renders
       // win/loss); generic info notifications are shown by Components/MessageSnack.
       snack: state.notification && state.notification.kind === 'gameResult' ? state.notification.winner : undefined

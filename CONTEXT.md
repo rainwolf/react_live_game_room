@@ -83,6 +83,25 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
   **Not in the seam:** `InviteModal` keeps its local React `useState` — local concern, local
   state; lifting it into redux would *scatter*, the opposite of deepening.
 
+## Selectors — read seam (crystallized 2026-06-14 — Candidate 4 design)
+
+- **Selectors** — the module (`src/selectors/`) that owns the *read* side of the normalized
+  Redux state, the mirror of how the reducer owns the write side. Components ask named
+  questions instead of re-deriving them by reaching into the state shape, so that shape
+  stays private and each derivation is tested once.
+  - **`selectCurrentTable(state)`** — `state.tables[state.table]`, the two-level reach for
+    "the table I'm at", previously duplicated in **16 components**. Returns undefined when
+    not at a table (faithful to the raw expression). Stable reference → safe in
+    `mapStateToProps`, no memoization needed.
+  - **`isGuestName(name)` / `tableVisibleToGuest(table, isGuest)`** — the guest-detection and
+    "guests never see rated tables" rule (security-relevant), previously duplicated in the
+    Arena and Room lobbies. Pure over args so the lobby filters run in render without
+    churning `mapStateToProps` references.
+  - **Deliberately not one selector per state key.** Bare pass-throughs (`state.me`,
+    `state.users`, `state.admin`, …) are inlined at call sites — wrapping each would be the
+    shallow-module anti-pattern (interface as complex as implementation), not depth. Only
+    multi-step reaches and duplicated derivations earn a home here.
+
 ## Core domain nouns (existing in code)
 
 - **Server** — a backend instance the client connects to (`wss://{host}/websocketServer/{server}`).

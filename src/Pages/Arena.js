@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {send_message} from "../redux_actions/actionTypes";
 import {Commands} from '../protocol';
 import {MODALS, toggleModal} from '../ui/modals';
+import {isGuestName, tableVisibleToGuest} from '../selectors';
 import PropTypes from 'prop-types';
 import User from '../Classes/UserClass';
 import Table from '../Classes/TableClass';
@@ -72,7 +73,7 @@ class UnconnectedArena extends Component {
    render() {
       const {users, connected, logged_in, messages, tables, me} = this.props;
       // Guest users should not see rated tables.
-      const isGuest = (me || '').toLowerCase().startsWith('guest');
+      const isGuest = isGuestName(me);
       if (logged_in) {
          return (
             <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
@@ -112,7 +113,7 @@ class UnconnectedArena extends Component {
                            }}>
                               {Object.keys(tables)
                                  .filter(table => tables[table].players.length === 1)
-                                 .filter(table => !isGuest || !tables[table].rated)
+                                 .filter(table => tableVisibleToGuest(tables[table], isGuest))
                                  .map(table =>
                                  <TableCard
                                     key={table}

@@ -14,6 +14,7 @@ import {GameState} from "../../Classes/GameClass";
 import MovesListPanel from './MovesListPanel';
 import InviteModal from './InviteModal';
 import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 const styles = theme => ({
    root: {
@@ -31,7 +32,7 @@ const mapStateToProps = state => {
       pressed_play: state.pressed_play,
       users: state.users,
       game: state.game,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       admin: state.admin,
       tournament: state.tournament,
       arena: state.arena,

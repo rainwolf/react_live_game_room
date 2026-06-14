@@ -6,12 +6,14 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 const mapStateToProps = state => {
+   const table = selectCurrentTable(state);
    return {
-      game_id: state.tables[state.table].game,
+      game_id: table.game,
       game: state.game,
-      table: state.tables[state.table]
+      table: table
    }
 };
 

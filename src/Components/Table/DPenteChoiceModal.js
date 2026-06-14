@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 function getModalStyle() {
    const top = 70;
@@ -34,7 +35,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       game: state.game,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
    }
 };
 
