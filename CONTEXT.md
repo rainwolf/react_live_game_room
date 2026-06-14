@@ -130,6 +130,19 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
   style chain + the dots/circles block), and which `GameClass.setGame` delegates to for grid
   size (that derivation was duplicated). Special-point `part` codes: 51 = circle marker
   (non-go boards), 52 = star dot (go boards).
+- **Variant partition** — `variantKey(gameId)` in `boardGeometry.js` is the canonical game-id →
+  variant identity (`pente`, `keryo-pente`, … `go`, … `swap2-keryo`), range-keyed lowest-id
+  first. The board CSS class IS this key (`boardStyleClass` aliases it); `TableClass` looks up
+  the lobby table-card colour (`table_color` → `VARIANT_COLORS[variantKey]`) and the capture
+  check (`gameHasCaptures` → `variantKey !== 'gomoku'`) from it, so style/colour/captures share
+  one partition. Likewise `isGoBoard(gameId)` (19..24) is the one go-board predicate —
+  `GameClass.isGo` and `TableClass.gameIsGo`/`player_color` delegate to it.
+  - **Still on the same axis, deliberately not folded in:** `Utils.game_name` (finer — it
+    sub-divides Go by board size: `Go` / `Go (9x9)` / `Go (13x13)`) and `GameClass`'s
+    per-variant replay dispatch (`replayGame`/`addMoveFromList`/`addMove` switch ids onto the
+    per-variant rule engines — a coarser grouping that can't be a flat lookup). Folding those
+    in (e.g. `VARIANT_NAMES[variantKey]` refined by `gridSizeForGame`, or a `variantKey` switch
+    in the replay dispatch) is a possible next step, not done here.
 
 ## Swap2 / D-Pente opening (server-verified protocol invariant, 2026-06-13)
 

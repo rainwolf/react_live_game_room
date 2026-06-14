@@ -1,8 +1,12 @@
-// Board geometry — the per-variant visual shape of the board, derived from the game id.
-// This knowledge was scattered inside Board.js's render (a 13-branch style chain, the
-// gridsize block, and the star-point/circle placement) and the gridsize half was duplicated
-// in GameClass.setGame. Concentrating it here gives one tested home and lets the board
-// component ask for geometry instead of re-deriving it from game-id ranges.
+// Board geometry + the game-id -> variant partition. This knowledge was scattered inside
+// Board.js's render (a 13-branch style chain, the gridsize block, the star-point/circle
+// placement) with the gridsize half duplicated in GameClass.setGame and the variant
+// partition duplicated again in TableClass. Concentrating the game-id range logic here gives
+// one tested home for the geometry and the canonical variant key.
+//
+// This is NOT the only place that switches on the game-id range: GameClass's per-variant
+// replay dispatch and Utils.game_name (which sub-divides Go by board size) carry their own
+// coarser/finer groupings on the same axis and are intentionally left out.
 //
 // Special-point "part" codes match BoardSquare: 51 = circle marker (non-go boards),
 // 52 = star dot (go boards).
@@ -15,8 +19,11 @@ export function gridSizeForGame(gameId) {
   return 19;
 }
 
-// The CSS class that styles the board for a variant (range-keyed, lowest id first).
-export function boardStyleClass(gameId) {
+// The canonical variant identity for a game id (range-keyed, lowest id first). The board CSS
+// class IS this key (boardStyleClass), and TableClass looks up the lobby table-card colour
+// (table_color) and the capture check (gameHasCaptures) from it — so style/colour/captures
+// share one partition instead of re-deriving the same boundaries three times.
+export function variantKey(gameId) {
   if (gameId < 3) return 'pente';
   if (gameId < 5) return 'keryo-pente';
   if (gameId < 7) return 'gomoku';
@@ -31,6 +38,9 @@ export function boardStyleClass(gameId) {
   if (gameId < 29) return 'swap2-pente';
   return 'swap2-keryo';
 }
+
+// The board's CSS class for a variant — the variant key doubles as the class name.
+export const boardStyleClass = variantKey;
 
 // Is this game id a Go board (19..24)? The geometry definition of a go board; GameClass.isGo
 // delegates here so the boundary lives in exactly one place.
