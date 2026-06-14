@@ -1,29 +1,15 @@
 import {useEffect, useRef} from "react";
+import {GameState} from '../game/gameState';
+import {
+   swap2OpeningPlayer,
+   dPenteOpeningPlayer,
+   isSwap2Choice,
+   isSwap2CanPass,
+   isDPenteChoice,
+} from '../game/openingPhase';
 
-export const GameState = {
-   State: {
-      NOT_STARTED: 1,
-      STARTED: 2,
-      PAUSED: 3,
-      HALFSET: 4
-   },
-   DPenteState: {
-      NO_CHOICE: 0,
-      SWAPPED: 1,
-      NOT_SWAPPED: 2
-   },
-   Swap2State: {
-      NO_CHOICE: 0,
-      SWAPPED: 1,
-      NOT_SWAPPED: 2,
-      SWAP2PASS: 3,
-   },
-   GoState: {
-      PLAY: 0,
-      MARK_STONES: 1,
-      EVALUATE_STONES: 2
-   }
-};
+// Re-exported so existing `import {GameState} from '.../GameClass'` call sites keep working.
+export {GameState};
 
 const coordinateLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
 
@@ -216,20 +202,14 @@ export class Game {
       if (this.isConnect6()) {
          return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
       } else if (this.#isDPente()) {
-         if (this.moves.length < 4) {
-            return 1;
-         } else if (this.moves.length === 4 && this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE) {
-            return 2;
+         const p = dPenteOpeningPlayer(this.moves.length, this.gameState.dPenteState);
+         if (p !== null) {
+            return p;
          }
       } else if (this.#isSwap2()) {
-         if (this.moves.length < 3) {
-            return 1;
-         } else if (this.moves.length === 3 && this.gameState.swap2State === GameState.Swap2State.NO_CHOICE) {
-            return 2;
-         } else if (this.moves.length < 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS) {
-            return 2;
-         } else if (this.moves.length === 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS) {
-            return 1;
+         const p = swap2OpeningPlayer(this.moves.length, this.gameState.swap2State);
+         if (p !== null) {
+            return p;
          }
       } else if (this.isGo() && this.gameState.goState === GameState.GoState.MARK_STONES) {
          return this.mark_dead_stones_player;
@@ -265,22 +245,21 @@ export class Game {
       return this.game === 27 || this.game === 28 || this.game === 29 || this.game === 30;
    };
 
+   #started = () => this.gameState.state === GameState.State.STARTED;
+
    dPenteChoice = () => {
-      return this.#isDPente() && this.moves.length === 4 &&
-         this.gameState.state === GameState.State.STARTED &&
-         this.gameState.dPenteState === GameState.DPenteState.NO_CHOICE;
+      return this.#isDPente() &&
+         isDPenteChoice(this.moves.length, this.gameState.dPenteState, this.#started());
    };
 
    swap2Choice = () => {
-      return this.#isSwap2() && this.gameState.state === GameState.State.STARTED &&
-         ((this.moves.length === 3 && this.gameState.swap2State === GameState.Swap2State.NO_CHOICE) ||
-            (this.moves.length === 5 && this.gameState.swap2State === GameState.Swap2State.SWAP2PASS));
+      return this.#isSwap2() &&
+         isSwap2Choice(this.moves.length, this.gameState.swap2State, this.#started());
    };
 
    swap2CanPass = () => {
-      return this.#isSwap2() && this.moves.length === 3 &&
-         this.gameState.state === GameState.State.STARTED &&
-         this.gameState.swap2State === GameState.Swap2State.NO_CHOICE;
+      return this.#isSwap2() &&
+         isSwap2CanPass(this.moves.length, this.gameState.swap2State, this.#started());
    };
 
    swap2Pass = () => {
