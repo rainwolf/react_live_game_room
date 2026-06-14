@@ -1,5 +1,17 @@
 import { describe, test, expect } from 'vitest';
-import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard, variantKey } from '../boardGeometry';
+import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard, variantKey, STANDARD_GAME_IDS } from '../boardGeometry';
+
+describe('STANDARD_GAME_IDS — the selectable variant ids', () => {
+  test('is the 15 standard (odd) ids 1..29, never the nonexistent game 31', () => {
+    expect(STANDARD_GAME_IDS).toEqual([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]);
+    expect(STANDARD_GAME_IDS).toHaveLength(15);
+    expect(STANDARD_GAME_IDS.every((id) => id % 2 === 1)).toBe(true);
+    expect(STANDARD_GAME_IDS).not.toContain(31);
+  });
+  test('maps to 13 distinct variant keys (Go 19/21/23 share the go key but are distinct boards)', () => {
+    expect(new Set(STANDARD_GAME_IDS.map(variantKey)).size).toBe(13);
+  });
+});
 
 describe('variantKey — the canonical game-id -> variant partition', () => {
   test('boardStyleClass is the variant key (the board class IS the variant)', () => {

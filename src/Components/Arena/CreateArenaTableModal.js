@@ -15,6 +15,7 @@ import Switch from '@mui/material/Switch';
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 import {game_name} from "../../Classes/utils";
+import {STANDARD_GAME_IDS} from '../../game/boardGeometry';
 import {Commands} from '../../protocol';
 import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
 
@@ -122,10 +123,7 @@ const UnconnectedCreateArenaTableModal = (props) => {
                            />
                         }
                      >
-                        {/*{[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>*/}
-                        {/*<MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>*/}
-                        {/*)}*/}
-                        {Array.from({length: 32 / 2}, (v, i) => 2*i + 1).map(game =>
+                        {STANDARD_GAME_IDS.map(game =>
                            <MenuItem key={game} value={game}>{game_name(game)}</MenuItem>
                         )}
                      </Select>
