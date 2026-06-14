@@ -13,8 +13,9 @@ import Select from '@mui/material/Select';
 import Switch from '@mui/material/Switch';
 
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
+import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
+import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
 
 function getModalStyle() {
    const top = 50;
@@ -46,7 +47,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       table: state.tables[state.table],
-      open: state.showSettings
+      open: isModalOpen(state, MODALS.SETTINGS)
    }
 };
 
@@ -55,7 +56,7 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
-      toggle_settings: () => dispatch({type: TOGGLE_SETTINGS})
+      toggle_settings: () => dispatch(toggleModal(MODALS.SETTINGS))
    }
 };
 

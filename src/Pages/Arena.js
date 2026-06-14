@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../redux_actions/actionTypes";
+import {send_message} from "../redux_actions/actionTypes";
 import {Commands} from '../protocol';
+import {MODALS, toggleModal} from '../ui/modals';
 import PropTypes from 'prop-types';
 import User from '../Classes/UserClass';
 import Table from '../Classes/TableClass';
@@ -30,7 +31,7 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
-      toggle_create_arena_modal: () => dispatch({type: TOGGLE_CREATE_ARENA_MODAL}),
+      toggle_create_arena_modal: () => dispatch(toggleModal(MODALS.CREATE_ARENA)),
    }
 };
 

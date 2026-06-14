@@ -4,6 +4,7 @@
 // inbound event handlers.
 import { describe, test, expect } from 'vitest';
 import liveGameApp from '../rootReducer';
+import { MODALS, openModal, closeModal, toggleModal, isModalOpen, modalProps } from '../../ui/modals';
 
 const init = () => liveGameApp(undefined, { type: '@@INIT' });
 const dispatch = (state, type, payload) => liveGameApp(state, { type, payload });
@@ -80,6 +81,35 @@ describe('notifications are pure intents (no Audio touched)', () => {
   test('REMOVE_SNACK clears the typed notification', () => {
     const s = dispatch({ notification: { kind: 'info', message: 'x' } }, 'REMOVE_SNACK');
     expect(s.notification).toBeUndefined();
+  });
+});
+
+describe('discretionary modals route through the modal seam', () => {
+  test('initial state starts with an empty modals map', () => {
+    expect(init().modals).toEqual({});
+  });
+
+  test('toggleModal(SETTINGS) opens then closes through liveGameApp', () => {
+    const opened = liveGameApp(init(), toggleModal(MODALS.SETTINGS));
+    expect(isModalOpen(opened, MODALS.SETTINGS)).toBe(true);
+    const closed = liveGameApp(opened, toggleModal(MODALS.SETTINGS));
+    expect(isModalOpen(closed, MODALS.SETTINGS)).toBe(false);
+  });
+
+  test('openModal(BOOT, player) carries the target; closeModal clears it', () => {
+    const opened = liveGameApp(init(), openModal(MODALS.BOOT, 'victim'));
+    expect(opened.modals).toEqual({ boot: 'victim' }); // raw slice, characterized independently of the selector
+    expect(modalProps(opened, MODALS.BOOT)).toBe('victim');
+    const closed = liveGameApp(opened, closeModal(MODALS.BOOT));
+    expect(closed.modals).toEqual({}); // key removed, not a false tombstone
+    expect(modalProps(closed, MODALS.BOOT)).toBeUndefined();
+  });
+
+  test('opening one modal leaves the others untouched', () => {
+    let s = liveGameApp(init(), toggleModal(MODALS.SETTINGS));
+    s = liveGameApp(s, openModal(MODALS.BOOT, 'victim'));
+    expect(isModalOpen(s, MODALS.SETTINGS)).toBe(true);
+    expect(modalProps(s, MODALS.BOOT)).toBe('victim');
   });
 });
 

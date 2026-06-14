@@ -52,6 +52,37 @@ wrapper.
   with zero transport. The honest "second adapter" that justifies the seam is the
   **characterization test harness** that replays recorded server messages into it.
 
+## Modal seam (crystallized 2026-06-14 — Candidate 3 design)
+
+The app shows two *kinds* of modal, and the distinction is load-bearing:
+
+- **Discretionary modal** — opened/closed by a local user click (Settings, Create-Arena,
+  the Boot-picker). Its visibility is a UI *command*. These are the **modal seam**'s job.
+- **Derived modal** — visibility is *computed* from game/server domain state (Undo, Cancel,
+  Swap2/D-Pente choice, Evaluate-Go, Resign-cancel, Wait-return, Invitation-response).
+  It is **not** commanded by the UI; it appears because the domain entered a state. These
+  stay derived — routing them through the seam would fake domain state as a UI command.
+
+- **Modal seam** — the module (`src/ui/modals.js`) that owns discretionary-modal state.
+  Before it, each such modal had its own action constant, its own near-identical reducer
+  case (toggle / set-with-payload / delete), and its own raw-key selector across three
+  files. The seam replaces that with one mechanism:
+  - **state** — a modal is open iff its name is a key in `state.modals`: `true` (open, no
+    data) | `<payload>` (open, carrying data, e.g. the player to boot). `closeModal` removes
+    the key (matching the original reducer's `delete`), so *absent* is the single closed
+    encoding and the map returns to `{}`. Open/close is explicit — nothing is inferred from
+    payload truthiness, so a falsy payload still opens.
+  - **interface** — `openModal(name, props)` / `closeModal(name)` / `toggleModal(name, props)`
+    action creators, a pure `modalsReducer(modals, action)` (delegated to from `rootReducer`),
+    and selectors `isModalOpen(state, name)` / `modalProps(state, name)`. `modalProps`
+    returns `undefined` when closed, preserving the `open={value !== undefined}` render gate.
+  - **MODALS** — the name registry (`SETTINGS`, `CREATE_ARENA`, `BOOT`); a new discretionary
+    modal is one `MODALS` entry + one `openModal` call + one selector, no new action type
+    and no new reducer case.
+
+  **Not in the seam:** `InviteModal` keeps its local React `useState` — local concern, local
+  state; lifting it into redux would *scatter*, the opposite of deepening.
+
 ## Core domain nouns (existing in code)
 
 - **Server** — a backend instance the client connects to (`wss://{host}/websocketServer/{server}`).

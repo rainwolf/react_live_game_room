@@ -11,11 +11,9 @@ import {
    REMOVE_ARENA_JOIN_REQUEST,
    REMOVE_SNACK,
    REPLIED_INVITATION,
-   SHOW_BOOT_DIALOG,
-   TOGGLE_CREATE_ARENA_MODAL,
-   TOGGLE_SETTINGS,
    UNMUTE
 } from "../redux_actions/actionTypes";
+import {modalsReducer} from "../ui/modals";
 import './utils';
 import User from '../Classes/UserClass';
 import {
@@ -69,7 +67,7 @@ const initialState = {
    game: undefined,
    table_messages: [],
    tournament: false,
-   showCreateArenaModal: false,
+   modals: {},
    pendingNotifications: [],
 };
 
@@ -131,20 +129,6 @@ function liveGameApp(state = initialState, action) {
       case "REDUX_WEBSOCKET::CLOSED":
          console.log('socket closed');
          return initialState;
-      case TOGGLE_SETTINGS:
-         if (newState.showSettings) {
-            delete newState.showSettings;
-         } else {
-            newState.showSettings = true;
-         }
-         break;
-      case TOGGLE_CREATE_ARENA_MODAL:
-         if (newState.showCreateArenaModal) {
-            delete newState.showCreateArenaModal;
-         } else {
-            newState.showCreateArenaModal = true;
-         }
-         break;
       case REMOVE_ARENA_JOIN_REQUEST:
          arenaRemoveJoinRequest(action.payload, newState);
          break;
@@ -175,13 +159,6 @@ function liveGameApp(state = initialState, action) {
       case CLEAR_NOTIFICATIONS:
          newState.pendingNotifications = [];
          break;
-      case SHOW_BOOT_DIALOG:
-         if (action.payload) {
-            newState.showBootDialog = action.payload;
-         } else {
-            delete newState.showBootDialog;
-         }
-         break;
       case REPLIED_INVITATION:
          delete newState.received_invitation;
          break;
@@ -196,6 +173,10 @@ function liveGameApp(state = initialState, action) {
          break;
       }
    }
+   // The discretionary-modal slice reduces on every action — the modal seam owns the verb
+   // list (OPEN/CLOSE/TOGGLE_MODAL) and returns the same modals reference for everything
+   // else, so this is a no-op for non-modal actions.
+   newState.modals = modalsReducer(newState.modals, action);
    return newState;
 }
 

@@ -6,8 +6,9 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 
 import {connect} from 'react-redux';
-import {send_message, SHOW_BOOT_DIALOG} from "../../redux_actions/actionTypes";
+import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
+import {MODALS, closeModal, modalProps} from '../../ui/modals';
 
 function getModalStyle() {
    const top = 50;
@@ -33,7 +34,7 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
    return {
-      toBoot: state.showBootDialog,
+      toBoot: modalProps(state, MODALS.BOOT),
       table: state.table,
       me: state.me,
       admin: state.admin
@@ -46,7 +47,7 @@ const mapDispatchToProps = dispatch => {
          dispatch(send_message(message));
       },
       dismiss: () => {
-         dispatch({type: SHOW_BOOT_DIALOG});
+         dispatch(closeModal(MODALS.BOOT));
       }
    }
 };
