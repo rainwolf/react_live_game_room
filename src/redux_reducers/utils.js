@@ -346,13 +346,13 @@ export function moveGoTo(i, state) {
 }
 
 export function mute(player, state) {
-   const user = state.users[player];
+   const user = state.users[player].newInstance();
    user.muted = true;
    state.users = {...state.users, [player]: user};
 }
 
 export function unmute(player, state) {
-   const user = state.users[player];
+   const user = state.users[player].newInstance();
    delete user.muted;
    state.users = {...state.users, [player]: user};
 }
