@@ -1,8 +1,27 @@
 import {GameState} from "./GameClass";
 import {game_name} from "./Utils";
-import {isGoBoard} from "../game/boardGeometry";
+import {isGoBoard, variantKey} from "../game/boardGeometry";
 
 const PRIVATE_TABLE = 2;
+
+// Lobby table-card background colour per variant, keyed by the canonical variantKey so the
+// game-id partition is not duplicated against boardGeometry. poof-pente and connect6
+// deliberately share a colour.
+const VARIANT_COLORS = {
+   'pente': '#FDDEA3',
+   'keryo-pente': '#BAFDA3',
+   'gomoku': '#A3FDEB',
+   'd-pente': '#A3CDFD',
+   'g-pente': '#AEA3FD',
+   'poof-pente': '#EDA3FD',
+   'connect6': '#EDA3FD',
+   'boat-pente': '#25BAFF',
+   'dk-pente': '#FFA500',
+   'go': '#FAC832',
+   'o-pente': '#52BE80',
+   'swap2-pente': '#E5AA70',
+   'swap2-keryo': '#50C878',
+};
 
 class Table {
    constructor(tableState) {
@@ -77,37 +96,7 @@ class Table {
       return this.tableType === PRIVATE_TABLE;
    };
 
-   table_color = () => {
-      let style;
-      if (this.game < 3) {
-         style = '#FDDEA3'
-      } else if (this.game < 5) {
-         style = '#BAFDA3'
-      } else if (this.game < 7) {
-         style = '#A3FDEB'
-      } else if (this.game < 9) {
-         style = '#A3CDFD'
-      } else if (this.game < 11) {
-         style = '#AEA3FD'
-      } else if (this.game < 13) {
-         style = '#EDA3FD'
-      } else if (this.game < 15) {
-         style = '#EDA3FD'
-      } else if (this.game < 17) {
-         style = '#25BAFF'
-      } else if (this.game < 19) {
-         style = '#FFA500'
-      } else if (this.game < 25) {
-         style = '#FAC832'
-      } else if (this.game < 27) {
-         style = '#52BE80'
-      } else if (this.game < 29) {
-         style = '#E5AA70'
-      } else {
-         style = '#50C878';
-      }
-      return style;
-   };
+   table_color = () => VARIANT_COLORS[variantKey(this.game)];
 
    addArenaPlayerRequest = (player) => {
       if (!this.arenaPlayerRequests) {
@@ -149,9 +138,7 @@ class Table {
       }
    };
 
-   gameHasCaptures = () => {
-      return this.game < 5 || this.game > 6;
-   };
+   gameHasCaptures = () => variantKey(this.game) !== 'gomoku';
 
    updateTable = (tableState) => {
       if (this.initialMinutes !== tableState.initialMinutes) {

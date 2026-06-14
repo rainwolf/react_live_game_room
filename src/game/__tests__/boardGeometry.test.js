@@ -1,5 +1,22 @@
 import { describe, test, expect } from 'vitest';
-import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard } from '../boardGeometry';
+import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard, variantKey } from '../boardGeometry';
+
+describe('variantKey — the canonical game-id -> variant partition', () => {
+  test('boardStyleClass is the variant key (the board class IS the variant)', () => {
+    expect(boardStyleClass).toBe(variantKey);
+  });
+  test('returns the variant identity for representative ids', () => {
+    expect(variantKey(1)).toBe('pente');
+    expect(variantKey(13)).toBe('connect6');
+    expect(variantKey(19)).toBe('go');
+    expect(variantKey(30)).toBe('swap2-keryo');
+  });
+  test('poof-pente and connect6 are distinct keys (despite sharing a lobby colour)', () => {
+    expect(variantKey(11)).toBe('poof-pente');
+    expect(variantKey(13)).toBe('connect6');
+    expect(variantKey(11)).not.toBe(variantKey(13));
+  });
+});
 
 describe('gridSizeForGame — the board grid size per variant', () => {
   test('9x9 for games 21/22, 13x13 for 23/24, 19x19 otherwise', () => {
