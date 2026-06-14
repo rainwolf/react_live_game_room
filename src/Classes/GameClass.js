@@ -1,5 +1,6 @@
 import {useEffect, useRef} from "react";
 import {GameState} from '../game/gameState';
+import {gridSizeForGame, isGoBoard} from '../game/boardGeometry';
 import {
    swap2OpeningPlayer,
    dPenteOpeningPlayer,
@@ -75,15 +76,7 @@ export class Game {
 
    setGame = (game) => {
       this.game = game;
-      if (game < 21) {
-         this.gridSize = 19;
-      } else if (game < 23) {
-         this.gridSize = 9;
-      } else if (game < 25) {
-         this.gridSize = 13;
-      } else {
-         this.gridSize = 19;
-      }
+      this.gridSize = gridSizeForGame(game);
    };
 
    critical_captures = (color) => {
@@ -238,9 +231,7 @@ export class Game {
    isConnect6 = () => {
       return this.game === 13 || this.game === 14;
    };
-   isGo = () => {
-      return this.game > 18 && this.game < 25;
-   };
+   isGo = () => isGoBoard(this.game);
    #isSwap2 = () => {
       return this.game === 27 || this.game === 28 || this.game === 29 || this.game === 30;
    };
