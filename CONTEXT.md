@@ -113,6 +113,16 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
   Gomoku, D-Pente, G-Pente, Poof-Pente, Connect6, Go, O-Pente, Swap2 variants…).
 - **Variant state** — `Game.gameState = {state, dPenteState, swap2State, goState}`; the
   per-variant phase (e.g. Swap2's `NO_CHOICE → SWAPPED/NOT_SWAPPED → SWAP2PASS`).
+- **Opening phase** — the swap2 / d-pente OPENING (player 1 lays the opening stones, then a
+  player decides whether to swap; swap2 also lets player 2 pass and lay two more stones,
+  deferring the decision to player 1). "Which opening sub-phase are we in" is derived from
+  `(moves played, recorded swap decision)`. It owns its own module, `src/game/openingPhase.js`
+  — pure functions over primitives (`movesLength`, sub-state, `started`) that
+  `Game.currentPlayer / swap2Choice / swap2CanPass / dPenteChoice` delegate to, instead of
+  each re-deriving the same `moves.length`/sub-state combination (the swap2 conditions were
+  triplicated). `src/game/gameState.js` holds the shared `GameState` enum (re-exported by
+  GameClass). The honest second adapter that justifies the seam is the characterization net
+  in `src/Classes/__tests__/gameVariantPhase.test.js` — the FSM was previously untested.
 
 ## Swap2 / D-Pente opening (server-verified protocol invariant, 2026-06-13)
 
