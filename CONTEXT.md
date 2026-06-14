@@ -134,15 +134,18 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
   variant identity (`pente`, `keryo-pente`, … `go`, … `swap2-keryo`), range-keyed lowest-id
   first. The board CSS class IS this key (`boardStyleClass` aliases it); `TableClass` looks up
   the lobby table-card colour (`table_color` → `VARIANT_COLORS[variantKey]`) and the capture
-  check (`gameHasCaptures` → `variantKey !== 'gomoku'`) from it, so style/colour/captures share
-  one partition. Likewise `isGoBoard(gameId)` (19..24) is the one go-board predicate —
-  `GameClass.isGo` and `TableClass.gameIsGo`/`player_color` delegate to it.
-  - **Still on the same axis, deliberately not folded in:** `Utils.game_name` (finer — it
-    sub-divides Go by board size: `Go` / `Go (9x9)` / `Go (13x13)`) and `GameClass`'s
-    per-variant replay dispatch (`replayGame`/`addMoveFromList`/`addMove` switch ids onto the
-    per-variant rule engines — a coarser grouping that can't be a flat lookup). Folding those
-    in (e.g. `VARIANT_NAMES[variantKey]` refined by `gridSizeForGame`, or a `variantKey` switch
-    in the replay dispatch) is a possible next step, not done here.
+  check (`gameHasCaptures` → `variantKey !== 'gomoku'`) from it; and `Utils.game_name` derives
+  from it too (`VARIANT_NAMES[variantKey]`, Go refined by `gridSizeForGame` since Go is the one
+  variant with board-size variants, plus a `Speed ` prefix on even — "speed timing" — ids). So
+  style/colour/captures/name all share one partition. Likewise `isGoBoard(gameId)` (19..24) is
+  the one go-board predicate — `GameClass.isGo` and `TableClass.gameIsGo`/`player_color`
+  delegate to it. (Game ids run 1..30 = 15 variants × standard/Speed; the settings/create
+  dropdowns generate exactly those 15 odd ids — they previously generated a 16th, nonexistent
+  game 31.)
+  - **Still on the same axis, deliberately not folded in:** `GameClass`'s per-variant replay
+    dispatch (`replayGame`/`addMoveFromList`/`addMove` switch ids onto the per-variant rule
+    engines — a coarser grouping that can't be a flat lookup; a `variantKey` switch is a
+    possible next step).
 
 ## Swap2 / D-Pente opening (server-verified protocol invariant, 2026-06-13)
 

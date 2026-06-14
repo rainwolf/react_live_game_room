@@ -42,6 +42,12 @@ export function variantKey(gameId) {
 // The board's CSS class for a variant — the variant key doubles as the class name.
 export const boardStyleClass = variantKey;
 
+// The selectable game variants: the 15 "standard" (odd) game ids, one per variant (Go's
+// three board sizes are three of them). Even ids are the "Speed" timing pair of the
+// preceding odd id and are not separately selectable. This is the one list the game-picker
+// dropdowns iterate, so they can't drift back to offering a nonexistent id.
+export const STANDARD_GAME_IDS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29];
+
 // Is this game id a Go board (19..24)? The geometry definition of a go board; GameClass.isGo
 // delegates here so the boundary lives in exactly one place.
 export function isGoBoard(gameId) {

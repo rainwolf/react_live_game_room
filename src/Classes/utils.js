@@ -1,38 +1,32 @@
+import {variantKey, gridSizeForGame} from "../game/boardGeometry";
+
+// Display name per variant, keyed by the canonical variantKey so the game-id range partition
+// is not re-encoded here. Go is the only variant with board-size variants, so its name is
+// looked up by gridSizeForGame rather than a flat key. An even game id is the "Speed" timing
+// variant of the preceding odd id.
+const VARIANT_NAMES = {
+   'pente': 'Pente',
+   'keryo-pente': 'Keryo-Pente',
+   'gomoku': 'Gomoku',
+   'd-pente': 'D-Pente',
+   'g-pente': 'G-Pente',
+   'poof-pente': 'Poof-Pente',
+   'connect6': 'Connect6',
+   'boat-pente': 'Boat-Pente',
+   'dk-pente': 'DK-Pente',
+   'o-pente': 'O-Pente',
+   'swap2-pente': 'Swap2-Pente',
+   'swap2-keryo': 'Swap2-Keryo',
+};
+
+const GO_NAMES = {
+   19: 'Go',
+   9: 'Go (9x9)',
+   13: 'Go (13x13)',
+};
+
 export function game_name(g) {
-   let name;
-   if (g < 3) {
-      name = 'Pente';
-   } else if (g < 5) {
-      name = 'Keryo-Pente';
-   } else if (g < 7) {
-      name = 'Gomoku';
-   } else if (g < 9) {
-      name = 'D-Pente';
-   } else if (g < 11) {
-      name = 'G-Pente';
-   } else if (g < 13) {
-      name = 'Poof-Pente';
-   } else if (g < 15) {
-      name = 'Connect6';
-   } else if (g < 17) {
-      name = 'Boat-Pente';
-   } else if (g < 19) {
-      name = 'DK-Pente';
-   } else if (g < 21) {
-      name = 'Go';
-   } else if (g < 23) {
-      name = 'Go (9x9)';
-   } else if (g < 25) {
-      name = 'Go (13x13)';
-   } else if (g < 27) {
-      name = 'O-Pente';
-   } else if (g < 29) {
-      name = 'Swap2-Pente';
-   } else if (g < 31) {
-      name = 'Swap2-Keryo';
-   }
-   if (g % 2 === 0) {
-      return 'Speed ' + name;
-   }
-   return name;
+   const key = variantKey(g);
+   const base = key === 'go' ? GO_NAMES[gridSizeForGame(g)] : VARIANT_NAMES[key];
+   return g % 2 === 0 ? 'Speed ' + base : base;
 }
