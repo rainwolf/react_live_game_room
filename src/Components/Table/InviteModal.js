@@ -8,6 +8,7 @@ import TextField from '@mui/material/TextField';
 import InviteList from './InviteList';
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -57,15 +58,12 @@ const UnconnectedInviteModal = (props) => {
 
    const invite = () => {
       if (player !== '') {
-         send_message({
-            dsgInviteTableEvent: {
-               toInvite: player,
-               inviteText: message,
-               player: me,
-               table: table,
-               time: 0
-            }
-         });
+         send_message(Commands.invite({
+            toInvite: player,
+            inviteText: message,
+            player: me,
+            table: table
+         }));
          dismiss();
       }
    };

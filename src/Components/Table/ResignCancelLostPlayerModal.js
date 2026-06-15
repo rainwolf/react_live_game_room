@@ -7,6 +7,8 @@ import {withStyles} from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import {DISMISS_WAITING_MODAL} from '../../redux_actions/actionTypes';
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 function getModalStyle() {
    const top = 50;
@@ -33,7 +35,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       show: state.time_up_resign_cancel !== undefined,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
    }
 };
 
@@ -52,27 +54,21 @@ const UnconnectedResignCancelLostPlayerModal = (props) => {
 
 
    const resign = () => {
-      props.send_message({dsgResignTableEvent: {player: props.table.me, table: props.table.table, time: 0}});
+      props.send_message(Commands.resign({player: props.table.me, table: props.table.table}));
    };
    const force_resign = () => {
-      props.send_message({
-         dsgForceCancelResignTableEvent: {
-            action: 2,
-            player: props.table.me,
-            table: props.table.table,
-            time: 0
-         }
-      });
+      props.send_message(Commands.forceCancelResign({
+         action: 2,
+         player: props.table.me,
+         table: props.table.table
+      }));
    };
    const cancel = () => {
-      props.send_message({
-         dsgForceCancelResignTableEvent: {
-            action: 1,
-            player: props.table.me,
-            table: props.table.table,
-            time: 0
-         }
-      });
+      props.send_message(Commands.forceCancelResign({
+         action: 1,
+         player: props.table.me,
+         table: props.table.table
+      }));
    };
 
    const {show, classes} = props;

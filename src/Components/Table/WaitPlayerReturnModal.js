@@ -9,6 +9,8 @@ import {withStyles} from '@mui/styles';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import {DISMISS_WAITING_MODAL} from '../../redux_actions/actionTypes';
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 function getModalStyle() {
    const top = 50;
@@ -35,7 +37,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       show: state.game.gameState.state === GameState.State.PAUSED,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       waiting_modal: state.waiting_modal
    }
 };
@@ -104,13 +106,10 @@ class UnconnectedWaitPlayerReturnModal extends Component {
    }
 
    resign = () => {
-      this.props.send_message({
-         dsgResignTableEvent: {
-            player: this.props.table.me,
-            table: this.props.table.table,
-            time: 0
-         }
-      });
+      this.props.send_message(Commands.resign({
+         player: this.props.table.me,
+         table: this.props.table.table
+      }));
    };
 
    render() {

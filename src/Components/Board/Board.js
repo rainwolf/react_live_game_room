@@ -5,12 +5,16 @@ import Table from "../../Classes/TableClass";
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
+import {gridSizeForGame, boardStyleClass, boardSpecialPoints} from '../../game/boardGeometry';
 
 const mapStateToProps = state => {
+   const table = selectCurrentTable(state);
    return {
-      game_id: state.tables[state.table].game,
+      game_id: table.game,
       game: state.game,
-      table: state.tables[state.table]
+      table: table
    }
 };
 
@@ -28,7 +32,7 @@ const UnconnectedBoard = (props) => {
    const {game_id, game, table, send_message} = props;
 
    const sendMove = (move) => {
-      send_message({dsgMoveTableEvent: {move: move, moves: [move], player: table.me, table: table.table, time: 0}});
+      send_message(Commands.move({move: move, moves: [move], player: table.me, table: table.table}));
    };
 
    // console.log(JSON.stringify(game.abstractBoard))
@@ -113,24 +117,9 @@ const UnconnectedBoard = (props) => {
             });
          }
       }
-      if (game_id < 19 || game_id > 24) {
-         const circles = [120, 126, 180, 234, 240];
-         circles.forEach(c => {
-            board[c].part = 51;
-         });
-      } else {
-         let dots = [];
-         if (game_id === 19 || game_id === 20) {
-            dots = [60, 66, 72, 174, 180, 186, 288, 294, 300];
-         } else if (game_id === 21 || game_id === 22) {
-            dots = [20, 24, 40, 56, 60];
-         } else if (game_id === 23 || game_id === 24) {
-            dots = [42, 45, 48, 81, 84, 87, 120, 123, 126];
-         }
-         dots.forEach(d => {
-            board[d].part = 52;
-         });
-      }
+      boardSpecialPoints(game_id).forEach(({index, part}) => {
+         board[index].part = part;
+      });
       const lastMoves = game.last_move();
       lastMoves.forEach(move => {
          if (move !== undefined) {
@@ -158,41 +147,8 @@ const UnconnectedBoard = (props) => {
       return coordinates;
    };
 
-   let style;
-   if (game_id < 3) {
-      style = 'pente'
-   } else if (game_id < 5) {
-      style = 'keryo-pente'
-   } else if (game_id < 7) {
-      style = 'gomoku'
-   } else if (game_id < 9) {
-      style = 'd-pente'
-   } else if (game_id < 11) {
-      style = 'g-pente'
-   } else if (game_id < 13) {
-      style = 'poof-pente'
-   } else if (game_id < 15) {
-      style = 'connect6'
-   } else if (game_id < 17) {
-      style = 'boat-pente'
-   } else if (game_id < 19) {
-      style = 'dk-pente'
-   } else if (game_id < 25) {
-      style = 'go'
-   } else if (game_id < 27) {
-      style = 'o-pente'
-   } else if (game_id < 29) {
-      style = 'swap2-pente'
-   } else {
-      style = 'swap2-keryo'
-   }
-   let gridsize = 19;
-   if (game_id === 21 || game_id === 22) {
-      gridsize = 9;
-   }
-   if (game_id === 23 || game_id === 24) {
-      gridsize = 13;
-   }
+   const style = boardStyleClass(game_id);
+   const gridsize = gridSizeForGame(game_id);
    return (
       <svg id="svgboard" height={'100%'} viewBox={'0 0 ' + (10 * (gridsize + 1)) + ' ' + (10 * (gridsize + 1))}>
          <g id={'whole'} transform={'translate(5,5)'}>

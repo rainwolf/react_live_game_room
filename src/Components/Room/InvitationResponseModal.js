@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import {connect} from 'react-redux';
 import {send_message, REPLIED_INVITATION} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -58,21 +59,18 @@ const UnconnectedInvitationResponseModal = (props) => {
    const [message, setMessage] = useState('');
 
    const reply = (accept, ignore) => {
-      send_message({
-         dsgInviteResponseTableEvent: {
-            toPlayer: invitation.by,
-            responseText: message,
-            accept: accept,
-            ignore: ignore,
-            table: invitation.table,
-            time: 0
-         }
-      })
+      send_message(Commands.inviteResponse({
+         toPlayer: invitation.by,
+         responseText: message,
+         accept: accept,
+         ignore: ignore,
+         table: invitation.table
+      }))
       if (accept) {
          if (table) {
-            send_message({dsgExitTableEvent: {forced: false, booted: false, table: table, time: 0}});
+            send_message(Commands.exitTable({forced: false, booted: false, table: table}));
          }
-         send_message({dsgJoinTableEvent: {table: invitation.table, time: 0}});
+         send_message(Commands.joinTable({table: invitation.table}));
       }
       dismiss();
    };

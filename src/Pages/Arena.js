@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../redux_actions/actionTypes";
+import {send_message} from "../redux_actions/actionTypes";
+import {Commands} from '../protocol';
+import {MODALS, toggleModal} from '../ui/modals';
+import {isGuestName, tableVisibleToGuest} from '../selectors';
 import PropTypes from 'prop-types';
 import User from '../Classes/UserClass';
 import Table from '../Classes/TableClass';
@@ -29,7 +32,7 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
-      toggle_create_arena_modal: () => dispatch({type: TOGGLE_CREATE_ARENA_MODAL}),
+      toggle_create_arena_modal: () => dispatch(toggleModal(MODALS.CREATE_ARENA)),
    }
 };
 
@@ -39,7 +42,7 @@ class UnconnectedArena extends Component {
 
       if (window.location.search && window.location.search.indexOf('?guest') > -1) {
          if (connected && !logged_in) {
-            send_message({dsgLoginEvent: {guest: true, time: 0}});
+            send_message(Commands.login({guest: true}));
          }
          return;
       }
@@ -53,13 +56,13 @@ class UnconnectedArena extends Component {
          password = process.env.REACT_APP_PASSWORD;
       }
       if (connected && !logged_in) {
-         send_message({dsgLoginEvent: {player: username, password: password, guest: false, time: 0}});
+         send_message(Commands.login({player: username, password: password, guest: false}));
       }
    }
 
    joinArenaTable = (table) => {
       if (table === -1 || !this.props.tables[table].private() || this.props.admin) {
-         this.props.send_message({dsgArenaRequestJoinTableEvent: {table: table, time: 0}});
+         this.props.send_message(Commands.arenaRequestJoin({table: table}));
       }
    };
 
@@ -70,7 +73,7 @@ class UnconnectedArena extends Component {
    render() {
       const {users, connected, logged_in, messages, tables, me} = this.props;
       // Guest users should not see rated tables.
-      const isGuest = (me || '').toLowerCase().startsWith('guest');
+      const isGuest = isGuestName(me);
       if (logged_in) {
          return (
             <div style={{height: '100vh', width: '80vw', margin: 'auto'}}>
@@ -110,7 +113,7 @@ class UnconnectedArena extends Component {
                            }}>
                               {Object.keys(tables)
                                  .filter(table => tables[table].players.length === 1)
-                                 .filter(table => !isGuest || !tables[table].rated)
+                                 .filter(table => tableVisibleToGuest(tables[table], isGuest))
                                  .map(table =>
                                  <TableCard
                                     key={table}

@@ -10,9 +10,11 @@ import Avatar from '@mui/material/Avatar';
 import User from '../../Classes/UserClass';
 import Table from '../../Classes/TableClass';
 import {connect} from 'react-redux';
-import {MUTE, UNMUTE, SHOW_BOOT_DIALOG} from "../../redux_actions/actionTypes";
+import {MUTE, UNMUTE} from "../../redux_actions/actionTypes";
+import {MODALS, openModal} from '../../ui/modals';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import LaunchIcon from '@mui/icons-material/Launch';
+import {selectCurrentTable} from '../../selectors';
 
 
 const styles = theme => ({
@@ -29,7 +31,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       users: state.users,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       me: state.me,
       admin: state.admin
    }
@@ -44,7 +46,7 @@ const mapDispatchToProps = dispatch => {
          dispatch({type: UNMUTE, payload: player});
       },
       show_boot_dialog: (player) => {
-         dispatch({type: SHOW_BOOT_DIALOG, payload: player});
+         dispatch(openModal(MODALS.BOOT, player));
       }
 
    }

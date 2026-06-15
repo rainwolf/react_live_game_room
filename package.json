@@ -22,7 +22,9 @@
   "scripts": {
     "start": "rsbuild dev",
     "build": "rsbuild build",
-    "preview": "rsbuild preview"
+    "preview": "rsbuild preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@rsbuild/core": "^1.7.4",
     "@rsbuild/plugin-react": "^1.4.6",
-    "@rspack/core": "^1.7.10"
+    "@rspack/core": "^1.7.10",
+    "vitest": "^2.1.9"
   }
 }

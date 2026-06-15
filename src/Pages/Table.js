@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import {send_message} from "../redux_actions/actionTypes";
+import {Commands} from '../protocol';
 import PropTypes from 'prop-types';
 import User from "../Classes/UserClass";
 import Table from '../Classes/TableClass';
@@ -20,12 +21,13 @@ import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
 import Swap2ChoiceModal from "../Components/Table/Swap2ChoiceModal";
 import JoinRequestComponent from "../Components/Arena/JoinRequestComponent";
+import {selectCurrentTable} from '../selectors';
 
 const mapStateToProps = state => {
    return {
       users: state.users,
       messages: state.table_messages,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       freeloader: state.freeloader,
       arena: state.arena,
    }
@@ -64,7 +66,7 @@ const UnconnectedTable = (props) => {
    const sendTableText = (event) => {
       const str = event.target.value;
       if (event.key === 'Enter' && str !== '') {
-         props.send_message({dsgTextTableEvent: {text: str, table: table.table, time: 0}});
+         props.send_message(Commands.tableText({text: str, table: table.table}));
          event.target.value = "";
       }
    };

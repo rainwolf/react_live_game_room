@@ -10,9 +10,12 @@ import Avatar from '@mui/material/Avatar';
 import User from '../../Classes/UserClass';
 import Table from '../../Classes/TableClass';
 import {connect} from 'react-redux';
-import {REMOVE_ARENA_JOIN_REQUEST, send_message, SHOW_BOOT_DIALOG} from "../../redux_actions/actionTypes";
+import {REMOVE_ARENA_JOIN_REQUEST, send_message} from "../../redux_actions/actionTypes";
+import {MODALS, openModal} from '../../ui/modals';
 import LaunchIcon from '@mui/icons-material/Launch';
 import {ListItemButton} from "@mui/material";
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 
 const styles = theme => ({
@@ -28,7 +31,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       users: state.users,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       me: state.me,
       admin: state.admin
    }
@@ -43,17 +46,17 @@ const mapDispatchToProps = dispatch => {
       //    dispatch({type: UNMUTE, payload: player});
       // },
       show_boot_dialog: (player) => {
-         dispatch({type: SHOW_BOOT_DIALOG, payload: player});
+         dispatch(openModal(MODALS.BOOT, player));
       },
       send_message: message => {
          dispatch(send_message(message));
       },
       accept_player: (player, table) => {
-         dispatch(send_message({dsgArenaAcceptTableJoinEvent: {playerToAccept: player, table: table}}));
+         dispatch(send_message(Commands.arenaAccept({playerToAccept: player, table: table})));
       },
       reject_player: (player, table) => {
          dispatch({type: REMOVE_ARENA_JOIN_REQUEST, payload: player});
-         dispatch(send_message({dsgArenaRejectTableJoinEvent: {playerToReject: player, table: table}}));
+         dispatch(send_message(Commands.arenaReject({playerToReject: player, table: table})));
       },
    }
 };

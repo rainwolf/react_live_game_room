@@ -1,0 +1,150 @@
+// Characterization net for the variant opening FSM (swap2 / d-pente) and the Go evaluate
+// gate. These pin the EXACT current behaviour of the GameClass predicates before the
+// opening-phase logic is consolidated behind a pure module — they must stay green across
+// the refactor (behaviour is preserved; only the implementation moves).
+import { describe, test, expect } from 'vitest';
+import { Game, GameState } from '../GameClass';
+
+const { State, Swap2State, DPenteState, GoState } = GameState;
+
+// A game of variant `g` with `len` moves played and the given sub-state overrides.
+// Only moves.length and gameState drive the opening FSM, so the move values are irrelevant.
+function game(g, len, overrides = {}) {
+  const gm = new Game();
+  gm.setGame(g);
+  gm.moves = new Array(len).fill(0);
+  gm.gameState = {
+    state: State.STARTED,
+    dPenteState: DPenteState.NO_CHOICE,
+    swap2State: Swap2State.NO_CHOICE,
+    goState: GoState.PLAY,
+    ...overrides,
+  };
+  return gm;
+}
+
+const SWAP2 = 27; // also 28, 29, 30
+const DPENTE = 7; // also 8, 17, 18
+const GO = 19; // 19..24
+const PENTE = 1;
+
+describe('swap2 currentPlayer (game 27)', () => {
+  test('player 1 lays the three opening stones', () => {
+    expect(game(SWAP2, 0).currentPlayer()).toBe(1);
+    expect(game(SWAP2, 1).currentPlayer()).toBe(1);
+    expect(game(SWAP2, 2).currentPlayer()).toBe(1);
+  });
+  test('after 3 stones with no choice yet, player 2 decides', () => {
+    expect(game(SWAP2, 3, { swap2State: Swap2State.NO_CHOICE }).currentPlayer()).toBe(2);
+  });
+  test('after a pass, player 2 lays the two extra stones (len 3 and 4)', () => {
+    expect(game(SWAP2, 3, { swap2State: Swap2State.SWAP2PASS }).currentPlayer()).toBe(2);
+    expect(game(SWAP2, 4, { swap2State: Swap2State.SWAP2PASS }).currentPlayer()).toBe(2);
+  });
+  test('after the two extra stones (len 5, passed), player 1 decides', () => {
+    expect(game(SWAP2, 5, { swap2State: Swap2State.SWAP2PASS }).currentPlayer()).toBe(1);
+  });
+  test('non-opening combinations fall through to plain alternation 1 + len%2', () => {
+    expect(game(SWAP2, 3, { swap2State: Swap2State.SWAPPED }).currentPlayer()).toBe(2);
+    expect(game(SWAP2, 4, { swap2State: Swap2State.NO_CHOICE }).currentPlayer()).toBe(1);
+    expect(game(SWAP2, 5, { swap2State: Swap2State.NO_CHOICE }).currentPlayer()).toBe(2);
+    expect(game(SWAP2, 6, { swap2State: Swap2State.NO_CHOICE }).currentPlayer()).toBe(1);
+  });
+  test('currentPlayer does NOT gate on game state (only the choice predicates do)', () => {
+    expect(game(SWAP2, 3, { state: State.NOT_STARTED }).currentPlayer()).toBe(2);
+  });
+});
+
+describe('swap2 choice predicates (game 27)', () => {
+  test('swap2Choice is true only at the two decision points, when STARTED', () => {
+    expect(game(SWAP2, 3, { swap2State: Swap2State.NO_CHOICE }).swap2Choice()).toBe(true);
+    expect(game(SWAP2, 5, { swap2State: Swap2State.SWAP2PASS }).swap2Choice()).toBe(true);
+    expect(game(SWAP2, 3, { swap2State: Swap2State.SWAP2PASS }).swap2Choice()).toBe(false);
+    expect(game(SWAP2, 4, { swap2State: Swap2State.SWAP2PASS }).swap2Choice()).toBe(false);
+    expect(game(SWAP2, 5, { swap2State: Swap2State.NO_CHOICE }).swap2Choice()).toBe(false);
+  });
+  test('swap2Choice requires STARTED', () => {
+    expect(game(SWAP2, 3, { state: State.NOT_STARTED }).swap2Choice()).toBe(false);
+  });
+  test('swap2CanPass is true only at len 3 / NO_CHOICE / STARTED', () => {
+    expect(game(SWAP2, 3, { swap2State: Swap2State.NO_CHOICE }).swap2CanPass()).toBe(true);
+    expect(game(SWAP2, 3, { swap2State: Swap2State.SWAP2PASS }).swap2CanPass()).toBe(false);
+    expect(game(SWAP2, 4, { swap2State: Swap2State.NO_CHOICE }).swap2CanPass()).toBe(false);
+    expect(game(SWAP2, 3, { state: State.NOT_STARTED }).swap2CanPass()).toBe(false);
+  });
+});
+
+describe('d-pente currentPlayer + choice (game 7)', () => {
+  test('player 1 lays the four opening stones', () => {
+    expect(game(DPENTE, 0).currentPlayer()).toBe(1);
+    expect(game(DPENTE, 3).currentPlayer()).toBe(1);
+  });
+  test('after 4 stones with no choice yet, player 2 decides', () => {
+    expect(game(DPENTE, 4, { dPenteState: DPenteState.NO_CHOICE }).currentPlayer()).toBe(2);
+  });
+  test('non-opening combinations fall through to alternation', () => {
+    expect(game(DPENTE, 4, { dPenteState: DPenteState.SWAPPED }).currentPlayer()).toBe(1);
+    expect(game(DPENTE, 5, { dPenteState: DPenteState.NO_CHOICE }).currentPlayer()).toBe(2);
+  });
+  test('dPenteChoice is true only at len 4 / NO_CHOICE / STARTED', () => {
+    expect(game(DPENTE, 4, { dPenteState: DPenteState.NO_CHOICE }).dPenteChoice()).toBe(true);
+    expect(game(DPENTE, 4, { dPenteState: DPenteState.SWAPPED }).dPenteChoice()).toBe(false);
+    expect(game(DPENTE, 3, { dPenteState: DPenteState.NO_CHOICE }).dPenteChoice()).toBe(false);
+    expect(game(DPENTE, 4, { state: State.NOT_STARTED }).dPenteChoice()).toBe(false);
+  });
+});
+
+describe('variant detection covers the whole game-number ranges', () => {
+  test('swap2 detection includes 30', () => {
+    expect(game(30, 3, { swap2State: Swap2State.NO_CHOICE }).swap2Choice()).toBe(true);
+  });
+  test('d-pente detection includes 17', () => {
+    expect(game(17, 4, { dPenteState: DPenteState.NO_CHOICE }).dPenteChoice()).toBe(true);
+  });
+});
+
+describe('Go evaluate gate (game 19)', () => {
+  test('evaluateScore is true only when STARTED and goState is EVALUATE_STONES', () => {
+    expect(game(GO, 0, { goState: GoState.EVALUATE_STONES }).evaluateScore()).toBe(true);
+    expect(game(GO, 0, { goState: GoState.PLAY }).evaluateScore()).toBe(false);
+    expect(game(GO, 0, { state: State.NOT_STARTED, goState: GoState.EVALUATE_STONES }).evaluateScore()).toBe(false);
+  });
+});
+
+describe('gap closures — state gating, variant range, connect6', () => {
+  test('currentPlayer does NOT gate on game state for d-pente either', () => {
+    expect(game(DPENTE, 4, { state: State.NOT_STARTED }).currentPlayer()).toBe(2);
+  });
+  test('choice predicates are false in PAUSED and HALFSET, not only NOT_STARTED', () => {
+    expect(game(SWAP2, 3, { state: State.PAUSED }).swap2Choice()).toBe(false);
+    expect(game(SWAP2, 3, { state: State.HALFSET }).swap2CanPass()).toBe(false);
+    expect(game(DPENTE, 4, { state: State.PAUSED }).dPenteChoice()).toBe(false);
+  });
+  test('opening logic is identical across every game id in each variant range', () => {
+    expect(game(28, 3, { swap2State: Swap2State.NO_CHOICE }).currentPlayer()).toBe(2);
+    expect(game(29, 5, { swap2State: Swap2State.SWAP2PASS }).currentPlayer()).toBe(1);
+    expect(game(8, 4, { dPenteState: DPenteState.NO_CHOICE }).currentPlayer()).toBe(2);
+    expect(game(18, 4, { dPenteState: DPenteState.NO_CHOICE }).dPenteChoice()).toBe(true);
+  });
+  test('connect6 currentPlayer arm is unchanged (1,2,2,1,1 over the first moves)', () => {
+    expect(game(13, 0).currentPlayer()).toBe(1);
+    expect(game(13, 1).currentPlayer()).toBe(2);
+    expect(game(13, 2).currentPlayer()).toBe(2);
+    expect(game(13, 3).currentPlayer()).toBe(1);
+    expect(game(13, 4).currentPlayer()).toBe(1);
+  });
+});
+
+describe('plain pente has no opening choices (game 1)', () => {
+  test('the variant predicates are all false', () => {
+    expect(game(PENTE, 3, { swap2State: Swap2State.NO_CHOICE }).swap2Choice()).toBe(false);
+    expect(game(PENTE, 3, { swap2State: Swap2State.NO_CHOICE }).swap2CanPass()).toBe(false);
+    expect(game(PENTE, 4, { dPenteState: DPenteState.NO_CHOICE }).dPenteChoice()).toBe(false);
+  });
+  test('currentPlayer is plain alternation', () => {
+    expect(game(PENTE, 0).currentPlayer()).toBe(1);
+    expect(game(PENTE, 1).currentPlayer()).toBe(2);
+    expect(game(PENTE, 2).currentPlayer()).toBe(1);
+    expect(game(PENTE, 3).currentPlayer()).toBe(2);
+  });
+});

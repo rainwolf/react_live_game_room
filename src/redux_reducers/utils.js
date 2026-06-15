@@ -1,27 +1,13 @@
 import Table from '../Classes/TableClass';
 import User from '../Classes/UserClass';
 import {Game, GameState} from '../Classes/GameClass';
-import {notifyTabActivity} from '../utils/tabNotify';
-import move_sound_file from '../resources/sounds/move_sound.mp3';
-import new_player_sound_file from '../resources/sounds/newplayer_sound.mp3';
-import low_time_captures_file from '../resources/sounds/low_time_captures.mp3';
 
-const move_sound = new Audio(move_sound_file);
-const new_player_sound = new Audio(new_player_sound_file);
-const low_time_captures_sound = new Audio(low_time_captures_file);
-
-async function playSound(sound) {
-   try {
-      await sound.play();
-   } catch (err) {
-      if (process.env.NODE_ENV === 'development') {
-         console.log('oops, no sound ', err);
-      }
-   }
-}
-
-export function playLowTimeCapturesSound() {
-   playSound(low_time_captures_sound);
+// These reducer helpers are PURE state transforms. Side effects (sound, tab nudge) are
+// emitted as notification intents onto state.pendingNotifications; the notification
+// middleware drains them and fires through AudioService + tabNotify. Snacks become a
+// typed state.notification. No side effects here — so utils/reducer are node-testable.
+function emit(state, notification) {
+   state.pendingNotifications = [...(state.pendingNotifications || []), notification];
 }
 
 export function processUser(userdata, state) {
@@ -35,8 +21,7 @@ export function processUser(userdata, state) {
       // join the room. The sound is played instead when you receive a join
       // request (arenaJoinRequest) and when a player joins your table (joinTable).
       if (state.table === undefined && !state.arena) {
-         playSound(new_player_sound);
-         // new_player_sound.play();
+         emit(state, {sound: 'newPlayer'});
       }
    }
    state.users = {...state.users, [user.name]: user};
@@ -99,13 +84,11 @@ export function joinTable(joinEvent, state) {
          state.game = new Game();
       }
       if (state.tournament) {
-         playSound(new_player_sound);
+         emit(state, {sound: 'newPlayer'});
       }
    } else if (state.table === joinEvent.table) {
-      playSound(new_player_sound);
-      // new_player_sound.play();
-      // Someone other than me joined my table; nudge the tab if it's backgrounded.
-      notifyTabActivity(joinEvent.player + ' joined your table');
+      // Someone other than me joined my table; play the sound and nudge the tab.
+      emit(state, {sound: 'newPlayer', tab: joinEvent.player + ' joined your table'});
    }
    table.addPlayer(joinEvent.player);
    tables[joinEvent.table] = table;
@@ -187,8 +170,7 @@ export function addMove(data, state) {
          }
       }
       if (data.player !== state.me) {
-         playSound(move_sound);
-         // move_sound.play();
+         emit(state, {sound: 'move'});
       }
    }
    state.game = game;
@@ -223,9 +205,7 @@ export function changeGameState(data, state) {
       state.game = game;
       // console.log(JSON.stringify(state.game))
       if (data.winner && data.winner !== '') {
-         // console.log(JSON.stringify(state.game))
-         // console.log('winner ', data.winner)
-         state.snack = data.winner;
+         state.notification = {kind: 'gameResult', winner: data.winner};
       }
       if (data.changeText) {
          addTableMessage({player: 'game server', text: data.changeText}, state);
@@ -366,13 +346,13 @@ export function moveGoTo(i, state) {
 }
 
 export function mute(player, state) {
-   const user = state.users[player];
+   const user = state.users[player].newInstance();
    user.muted = true;
    state.users = {...state.users, [player]: user};
 }
 
 export function unmute(player, state) {
-   const user = state.users[player];
+   const user = state.users[player].newInstance();
    delete user.muted;
    state.users = {...state.users, [player]: user};
 }
@@ -428,9 +408,8 @@ export function arenaJoinRequest(data, state) {
       table.addArenaPlayerRequest(data.player);
       tables[data.table] = table;
       state.tables = tables;
-      playSound(new_player_sound);
-      // Arena join request for my table; nudge the tab if it's backgrounded.
-      notifyTabActivity(data.player + ' wants to join your table');
+      // Arena join request for my table; play the sound and nudge the tab.
+      emit(state, {sound: 'newPlayer', tab: data.player + ' wants to join your table'});
    }
 }
 
@@ -447,6 +426,6 @@ export function arenaRemoveJoinRequest(data, state) {
 
 export function arenaRejectRequest(data, state) {
    if (data.playerToReject === state.me) {
-      state.snack = data.message;
+      state.notification = {kind: 'info', message: data.message};
    }
 }
