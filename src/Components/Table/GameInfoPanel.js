@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {PRESSED_PLAY, send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
+import {PRESSED_PLAY, send_message} from "../../redux_actions/actionTypes";
+import {MODALS, toggleModal} from '../../ui/modals';
 import Grid from '@mui/material/Grid';
 import Seat from './Seat';
 import Timer from './Timer';
@@ -12,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import {GameState} from "../../Classes/GameClass";
 import MovesListPanel from './MovesListPanel';
 import InviteModal from './InviteModal';
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 const styles = theme => ({
    root: {
@@ -29,7 +32,7 @@ const mapStateToProps = state => {
       pressed_play: state.pressed_play,
       users: state.users,
       game: state.game,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       admin: state.admin,
       tournament: state.tournament,
       arena: state.arena,
@@ -42,7 +45,7 @@ const mapDispatchToProps = dispatch => {
          dispatch(send_message(message));
       },
       toggle_settings: () => {
-         dispatch({type: TOGGLE_SETTINGS})
+         dispatch(toggleModal(MODALS.SETTINGS))
       },
       play_pressed: () => {
          dispatch({type: PRESSED_PLAY})
@@ -55,31 +58,28 @@ const UnconnectedGameInfoPanel = (props) => {
    const {table, game, pressed_play, admin, tournament, arena} = props;
 
    const requestCancel = () => {
-      props.send_message({dsgCancelRequestTableEvent: {player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.cancelRequest({player: table.me, table: table.table}));
    };
    const resign = () => {
-      props.send_message({dsgResignTableEvent: {player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.resign({player: table.me, table: table.table}));
    };
    const requestUndo = () => {
-      props.send_message({dsgUndoRequestTableEvent: {player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.undoRequest({player: table.me, table: table.table}));
    };
    const leave = () => {
-      props.send_message({dsgExitTableEvent: {forced: false, booted: false, table: table.table, time: 0}});
+      props.send_message(Commands.exitTable({forced: false, booted: false, table: table.table}));
    };
    const pass = () => {
       const pass_move = game.gridSize * game.gridSize;
-      props.send_message({
-         dsgMoveTableEvent: {
-            move: pass_move,
-            moves: [pass_move],
-            player: table.me,
-            table: table.table,
-            time: 0
-         }
-      });
+      props.send_message(Commands.move({
+         move: pass_move,
+         moves: [pass_move],
+         player: table.me,
+         table: table.table
+      }));
    };
    const play = () => {
-      props.send_message({dsgPlayTableEvent: {table: table.table, time: 0}});
+      props.send_message(Commands.play({table: table.table}));
       props.play_pressed();
    };
 

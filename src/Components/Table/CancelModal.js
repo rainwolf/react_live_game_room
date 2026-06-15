@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
 
 function getModalStyle() {
    const top = 50;
@@ -52,7 +53,7 @@ const UnconnectedCancelModal = (props) => {
    const {classes, cancelRequested, table, me} = props;
 
    const cancel_reply = (accept) => {
-      props.send_message({dsgCancelReplyTableEvent: {accepted: accept, player: me, table: table, time: 0}});
+      props.send_message(Commands.cancelReply({accepted: accept, player: me, table: table}));
    };
 
    return (

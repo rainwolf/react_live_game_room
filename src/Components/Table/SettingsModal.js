@@ -13,7 +13,11 @@ import Select from '@mui/material/Select';
 import Switch from '@mui/material/Switch';
 
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_SETTINGS} from "../../redux_actions/actionTypes";
+import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
+import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
+import {selectCurrentTable} from '../../selectors';
+import {STANDARD_GAME_IDS} from '../../game/boardGeometry';
 
 function getModalStyle() {
    const top = 50;
@@ -44,8 +48,8 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
    return {
-      table: state.tables[state.table],
-      open: state.showSettings
+      table: selectCurrentTable(state),
+      open: isModalOpen(state, MODALS.SETTINGS)
    }
 };
 
@@ -54,7 +58,7 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
-      toggle_settings: () => dispatch({type: TOGGLE_SETTINGS})
+      toggle_settings: () => dispatch(toggleModal(MODALS.SETTINGS))
    }
 };
 
@@ -80,15 +84,14 @@ const UnconnectedSettingsModal = (props) => {
       } else if (event.target.name === 'tableType') {
          correction = {[event.target.name]: (event.target.value === '1') ? 2 : 1};
       }
-      props.send_message({
-         dsgChangeStateTableEvent:
-            Object.assign({
-               timed: table.timed,
-               initialMinutes: table.initialMinutes, incrementalSeconds: table.incrementalSeconds,
-               rated: table.rated, game: table.game, tableType: table.tableType,
-               player: table.me, table: table.table, time: 0
-            }, correction)
-      });
+      props.send_message(Commands.changeState(
+         Object.assign({
+            timed: table.timed,
+            initialMinutes: table.initialMinutes, incrementalSeconds: table.incrementalSeconds,
+            rated: table.rated, game: table.game, tableType: table.tableType,
+            player: table.me, table: table.table
+         }, correction)
+      ));
    };
 
    const incrementalSeconds = Array.from({length: 60}, (v, i) => i);
@@ -122,10 +125,7 @@ const UnconnectedSettingsModal = (props) => {
                            />
                         }
                      >
-                        {/*{[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>*/}
-                        {/*<MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>*/}
-                        {/*)}*/}
-                        {Array.from({length: 32 / 2}, (v, i) => 2*i + 1).map(game =>
+                        {STANDARD_GAME_IDS.map(game =>
                            <MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>
                         )}
                      </Select>

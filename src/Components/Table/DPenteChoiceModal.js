@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 function getModalStyle() {
    const top = 70;
@@ -33,7 +35,7 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       game: state.game,
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
    }
 };
 
@@ -53,15 +55,12 @@ const UnconnectedDPenteChoiceModal = (props) => {
    // console.log('modal state: ', JSON.stringify(game.gameState))
 
    const swap = (s) => {
-      props.send_message({
-         dsgSwapSeatsTableEvent: {
-            swap: s,
-            silent: false,
-            player: table.me,
-            table: table.table,
-            time: 0
-         }
-      });
+      props.send_message(Commands.swapSeats({
+         swap: s,
+         silent: false,
+         player: table.me,
+         table: table.table
+      }));
    };
 
    return (

@@ -7,6 +7,8 @@ import Button from '@mui/material/Button';
 
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
+import {Commands} from '../../protocol';
+import {selectCurrentTable} from '../../selectors';
 
 function getModalStyle() {
    const top = 50;
@@ -32,7 +34,7 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
    return {
-      table: state.tables[state.table],
+      table: selectCurrentTable(state),
       undo_requested: state.undo_requested
    }
 };
@@ -51,7 +53,7 @@ const UnconnectedUndoModal = (props) => {
    const {classes, table, undo_requested} = props;
 
    const reply_undo = (reply) => {
-      props.send_message({dsgUndoReplyTableEvent: {accepted: reply, player: table.me, table: table.table, time: 0}});
+      props.send_message(Commands.undoReply({accepted: reply, player: table.me, table: table.table}));
    };
 
    return (

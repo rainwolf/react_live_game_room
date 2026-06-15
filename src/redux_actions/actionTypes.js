@@ -3,7 +3,6 @@ import {connect, send} from '@giantmachines/redux-websocket'
 export const CONNECT_SERVER = 'CONNECT_SERVER';
 // export const SERVER_CONNECTED = 'SERVER_CONNECTED';
 export const SET_TIMER = 'SET_TIMER';
-export const TOGGLE_SETTINGS = 'TOGGLE_SETTINGS';
 export const PRESSED_PLAY = 'PRESSED_PLAY';
 export const DISMISS_WAITING_MODAL = 'DISMISS_WAITING_MODAL';
 export const MOVE_FORWARD = 'MOVE_FORWARD';
@@ -12,9 +11,8 @@ export const MOVE_GOTO = 'MOVE_GOTO';
 export const MUTE = 'MUTE';
 export const UNMUTE = 'UNMUTE';
 export const REMOVE_SNACK = 'REMOVE_SNACK';
-export const SHOW_BOOT_DIALOG = 'SHOW_BOOT_DIALOG';
+export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS';
 export const REPLIED_INVITATION = 'REPLIED_INVITATION';
-export const TOGGLE_CREATE_ARENA_MODAL = 'TOGGLE_CREATE_ARENA_MODAL';
 export const REMOVE_ARENA_JOIN_REQUEST = 'REMOVE_ARENA_JOIN_REQUEST';
 
 export function connectServer(server) {

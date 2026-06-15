@@ -13,8 +13,11 @@ import Select from '@mui/material/Select';
 import Switch from '@mui/material/Switch';
 
 import {connect} from 'react-redux';
-import {send_message, TOGGLE_CREATE_ARENA_MODAL} from "../../redux_actions/actionTypes";
+import {send_message} from "../../redux_actions/actionTypes";
 import {game_name} from "../../Classes/utils";
+import {STANDARD_GAME_IDS} from '../../game/boardGeometry';
+import {Commands} from '../../protocol';
+import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
 
 function getModalStyle() {
    const top = 50;
@@ -45,7 +48,7 @@ const styles = theme => ({
 
 const mapStateToProps = state => {
    return {
-      open: state.showCreateArenaModal,
+      open: isModalOpen(state, MODALS.CREATE_ARENA),
       me: state.me,
    }
 };
@@ -55,7 +58,7 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
-      toggle_create_arena_modal: () => dispatch({type: TOGGLE_CREATE_ARENA_MODAL})
+      toggle_create_arena_modal: () => dispatch(toggleModal(MODALS.CREATE_ARENA))
    }
 };
 
@@ -70,16 +73,13 @@ const UnconnectedCreateArenaTableModal = (props) => {
    //     player: table.me, table: table.table, time:0}));
 
    const send_create_arena_table = () => {
-      props.send_message({
-         dsgArenaCreateTableEvent:
-            {
-               timed: timed,
-               initialMinutes: initialMinutes, incrementalSeconds: incrementalSeconds,
-               rated: rated, game: game, // tableType: privateTable ? 2 : 1,
-               playAs: playAs,
-               player: me, table: -1, time: 0
-            }
-      });
+      props.send_message(Commands.arenaCreate({
+         timed: timed,
+         initialMinutes: initialMinutes, incrementalSeconds: incrementalSeconds,
+         rated: rated, game: game, // tableType: privateTable ? 2 : 1,
+         playAs: playAs,
+         player: me, table: -1
+      }));
       props.toggle_create_arena_modal();
    };
 
@@ -123,10 +123,7 @@ const UnconnectedCreateArenaTableModal = (props) => {
                            />
                         }
                      >
-                        {/*{[1,3,5,7,9,11,13,15,17,19,21,23].map(game =>*/}
-                        {/*<MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>*/}
-                        {/*)}*/}
-                        {Array.from({length: 32 / 2}, (v, i) => 2*i + 1).map(game =>
+                        {STANDARD_GAME_IDS.map(game =>
                            <MenuItem key={game} value={game}>{game_name(game)}</MenuItem>
                         )}
                      </Select>

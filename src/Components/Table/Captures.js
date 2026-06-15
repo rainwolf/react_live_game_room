@@ -6,11 +6,12 @@ import Table from "../../Classes/TableClass";
 import SimpleStone from '../Board/SimpleStone';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import {selectCurrentTable} from '../../selectors';
 
 const mapStateToProps = state => {
    return {
       game: state.game,
-      table: state.tables[state.table]
+      table: selectCurrentTable(state)
    }
 };
 
