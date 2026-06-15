@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import {Game, GameState, useInterval} from "../../Classes/GameClass";
+import {Game, useInterval} from "../../Classes/GameClass";
 import Table from "../../Classes/TableClass";
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -28,10 +28,14 @@ const Timer = (props) => {
    const ticktock = () => {
       setState((prevState) => {
          let newState = {...prevState};
-         if (!table.timed ||
-            (game.currentPlayer() !== seat) ||
-            game.gameState.state !== GameState.State.STARTED) {
+         if (!table.clockRunning(game, seat)) {
             if (newState.running) {
+               // Fold the time spent so far this turn into time_left, so resuming after a
+               // mid-turn pause (e.g. a seat was vacated) continues from where it stopped
+               // instead of snapping back to the turn's start time. (When the pause is a
+               // turn/state change the server re-syncs time_left anyway via clock.time.)
+               const passed = Math.round((new Date().getTime() - newState.start_time.getTime()) / 100);
+               newState.time_left = Math.max(0, newState.time_left - passed);
                newState.running = false;
                setState(newState);
             }

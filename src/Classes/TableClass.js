@@ -199,6 +199,15 @@ class Table {
       return this.seats[1] !== '' && this.seats[2] !== '';
    };
 
+   // Whether this seat's clock should be counting down: a timed game, both seats filled
+   // (the clock never runs while a seat is empty), the game underway, and it being this
+   // seat's turn.
+   clockRunning = (game, seat) => {
+      return this.timed && this.fullSeats()
+         && game.currentPlayer() === seat
+         && game.gameState.state === GameState.State.STARTED;
+   };
+
    myDPenteChoice = (game) => {
       return this.isMyTurn(game) && game.dPenteChoice();
    };

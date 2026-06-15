@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import Table from '../TableClass';
+import { GameState } from '../GameClass';
 
 function tableForGame(g) {
   const t = new Table();
@@ -64,5 +65,39 @@ describe('gameHasCaptures derives from variantKey (gomoku is the only no-capture
     expect(tableForGame(1).gameHasCaptures()).toBe(true);
     expect(tableForGame(7).gameHasCaptures()).toBe(true);
     expect(tableForGame(19).gameHasCaptures()).toBe(true);
+  });
+});
+
+describe('clockRunning — the clock ticks only for the active seat of a fully-seated, started game', () => {
+  const seated = ({ timed = true, seat1 = 'alice', seat2 = 'bob' } = {}) => {
+    const t = new Table();
+    t.timed = timed;
+    t.seats = [undefined, seat1, seat2];
+    return t;
+  };
+  const game = (player, state = GameState.State.STARTED) => ({
+    currentPlayer: () => player,
+    gameState: { state },
+  });
+
+  test('runs for the seat whose turn it is when both are seated and the game is started', () => {
+    expect(seated().clockRunning(game(1), 1)).toBe(true);
+    expect(seated().clockRunning(game(2), 2)).toBe(true);
+  });
+  test('does not run for the seat whose turn it is NOT', () => {
+    expect(seated().clockRunning(game(1), 2)).toBe(false);
+  });
+  test('PAUSED when fewer than two players are seated', () => {
+    expect(seated({ seat2: '' }).clockRunning(game(1), 1)).toBe(false);
+    expect(seated({ seat1: '' }).clockRunning(game(1), 1)).toBe(false);
+    expect(seated({ seat1: '', seat2: '' }).clockRunning(game(1), 1)).toBe(false);
+  });
+  test('PAUSED when the game is not in the STARTED state', () => {
+    expect(seated().clockRunning(game(1, GameState.State.NOT_STARTED), 1)).toBe(false);
+    expect(seated().clockRunning(game(1, GameState.State.PAUSED), 1)).toBe(false);
+    expect(seated().clockRunning(game(1, GameState.State.HALFSET), 1)).toBe(false);
+  });
+  test('PAUSED on an untimed table', () => {
+    expect(seated({ timed: false }).clockRunning(game(1), 1)).toBe(false);
   });
 });
