@@ -2,12 +2,18 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   // The app is CRA-style: JSX lives inside .js files (components, and even some
-  // domain classes via JSX helpers). Tell esbuild to parse src .js as JSX so the
-  // reducer/utils import chain loads in tests. (Plain-JS modules parse fine too.)
-  esbuild: {
-    loader: 'jsx',
-    include: /src\/.*\.js$/,
-    exclude: [],
+  // domain classes via JSX helpers like UserClass.js). Vite 8 transforms JS with
+  // oxc (not esbuild) and excludes `.js` from JSX parsing by default, so the
+  // reducer/utils import chain fails to load. Add src .js to the JSX transform
+  // while keeping oxc's default ts/jsx patterns, and exclude node_modules.
+  oxc: {
+    // `lang: 'jsx'` forces oxc to parse files as JSX regardless of the .js
+    // extension (oxc otherwise infers lang from the extension and rejects JSX in
+    // .js). `include` routes src .js through the transform; oxc's default
+    // `exclude: /\.js$/` would otherwise skip them.
+    lang: 'jsx',
+    include: [/\.(m?ts|[jt]sx)$/, /src\/.*\.js$/],
+    exclude: /node_modules/,
   },
   test: {
     environment: 'node',

@@ -12,14 +12,14 @@ describe('AudioService — lazy, guarded sound seam', () => {
   });
 
   test('ignores an unknown sound name (no Audio constructed)', () => {
-    global.Audio = vi.fn(() => ({ play: () => Promise.resolve() }));
+    global.Audio = vi.fn(function () { return { play: () => Promise.resolve() }; });
     AudioService.play('nope');
     expect(global.Audio).not.toHaveBeenCalled();
   });
 
   test('lazily constructs the mapped Audio once and plays it on every call', () => {
     const play = vi.fn(() => Promise.resolve());
-    global.Audio = vi.fn(() => ({ play }));
+    global.Audio = vi.fn(function () { return { play }; });
     AudioService.play('newPlayer');
     AudioService.play('newPlayer');
     expect(global.Audio).toHaveBeenCalledTimes(1); // cached after first
@@ -27,7 +27,7 @@ describe('AudioService — lazy, guarded sound seam', () => {
   });
 
   test('swallows a rejected play() (autoplay policy) without throwing', () => {
-    global.Audio = vi.fn(() => ({ play: () => Promise.reject(new Error('blocked')) }));
+    global.Audio = vi.fn(function () { return { play: () => Promise.reject(new Error('blocked')) }; });
     expect(() => AudioService.play('lowTime')).not.toThrow();
   });
 });
