@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "react";
 import {GameState} from '../game/gameState';
-import {gridSizeForGame, isGoBoard} from '../game/boardGeometry';
+import {gridSizeForGame, isGoBoard, variantKey} from '../game/boardGeometry';
 import {
    swap2OpeningPlayer,
    dPenteOpeningPlayer,
@@ -13,6 +13,29 @@ import {
 export {GameState};
 
 const coordinateLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+
+// Per-variant rule profile, keyed by the canonical variantKey — the single source for the
+// move/replay dispatch that was triplicated across replayGame / addMoveFromList / addMove.
+// Several variants share a rule engine (pente serves d-pente/boat-pente/swap2-pente; keryo
+// serves dk-pente/swap2-keryo), and a few have quirks: d-pente/dk-pente disable rated during
+// replay; connect6 replays as Connect6 but adds as Gomoku and uses its own player formula;
+// go applies moves by index, not (x,y). `replay`/`add` name the engine; `postRule` is the
+// tournament/g-pente correction applied after a move; `player` selects the seat formula.
+const VARIANT_RULES = {
+   'pente':       {replay: 'pente',    disableRatedOnReplay: false, add: 'pente',  goMove: false, player: 'standard', postRule: 'tournament'},
+   'keryo-pente': {replay: 'keryo',    disableRatedOnReplay: false, add: 'keryo',  goMove: false, player: 'standard', postRule: 'tournament'},
+   'gomoku':      {replay: 'gomoku',   disableRatedOnReplay: false, add: 'gomoku', goMove: false, player: 'standard', postRule: 'none'},
+   'd-pente':     {replay: 'pente',    disableRatedOnReplay: true,  add: 'pente',  goMove: false, player: 'standard', postRule: 'none'},
+   'g-pente':     {replay: 'gPente',   disableRatedOnReplay: false, add: 'pente',  goMove: false, player: 'standard', postRule: 'gPente'},
+   'poof-pente':  {replay: 'poof',     disableRatedOnReplay: false, add: 'poof',   goMove: false, player: 'standard', postRule: 'tournament'},
+   'connect6':    {replay: 'connect6', disableRatedOnReplay: false, add: 'gomoku', goMove: false, player: 'connect6', postRule: 'none'},
+   'boat-pente':  {replay: 'pente',    disableRatedOnReplay: false, add: 'pente',  goMove: false, player: 'standard', postRule: 'tournament'},
+   'dk-pente':    {replay: 'keryo',    disableRatedOnReplay: true,  add: 'keryo',  goMove: false, player: 'standard', postRule: 'none'},
+   'go':          {replay: 'go',       disableRatedOnReplay: false, add: null,     goMove: true,  player: 'standard', postRule: 'none'},
+   'o-pente':     {replay: 'oPente',   disableRatedOnReplay: false, add: 'oPente', goMove: false, player: 'standard', postRule: 'tournament'},
+   'swap2-pente': {replay: 'pente',    disableRatedOnReplay: false, add: 'pente',  goMove: false, player: 'standard', postRule: 'none'},
+   'swap2-keryo': {replay: 'keryo',    disableRatedOnReplay: false, add: 'keryo',  goMove: false, player: 'standard', postRule: 'none'},
+};
 
 export class Game {
    constructor(gameState) {
@@ -304,114 +327,33 @@ export class Game {
       let moves = this.moves;
       this.resetBoard();
       this.moves = moves;
-      if (this.game < 3) {
-         this.#replayPenteGame(until);
-      } else if (this.game < 5) {
-         this.#replayKeryoPenteGame(until);
-      } else if (this.game < 7) {
-         this.#replayGomokuGame(until);
-      } else if (this.game < 9) {
-         let r = this.rated;
+      const rules = VARIANT_RULES[variantKey(this.game)];
+      const replay = {
+         pente: this.#replayPenteGame, keryo: this.#replayKeryoPenteGame, gomoku: this.#replayGomokuGame,
+         gPente: this.#replayGPenteGame, poof: this.#replayPoofPenteGame, connect6: this.#replayConnect6Game,
+         go: this.#replayGoGame, oPente: this.#replayOPenteGame,
+      }[rules.replay];
+      if (rules.disableRatedOnReplay) {
+         // d-pente / dk-pente replay through the pente / keryo engine, which applies its own
+         // tournament-rule correction when rated; these variants don't use it, so rating is
+         // turned off for the replay.
+         const r = this.rated;
          this.rated = false;
-         this.#replayPenteGame(until);
+         replay(until);
          this.rated = r;
-      } else if (this.game < 11) {
-         this.#replayGPenteGame(until);
-      } else if (this.game < 13) {
-         this.#replayPoofPenteGame(until);
-      } else if (this.game < 15) {
-         this.#replayConnect6Game(until);
-      } else if (this.game < 17) {
-         this.#replayPenteGame(until);
-      } else if (this.game < 19) {
-         let r = this.rated;
-         this.rated = false;
-         this.#replayKeryoPenteGame(until);
-         this.rated = r;
-      } else if (this.game < 25) {
-         this.#replayGoGame(until);
-      } else if (this.game < 27) {
-         this.#replayOPenteGame(until);
-      } else if (this.game < 29) {
-         this.#replayPenteGame(until);
-      } else if (this.game < 31) {
-         this.#replayKeryoPenteGame(until);
+      } else {
+         replay(until);
       }
    };
 
    addMoveFromList = (i) => {
       const move = this.moves[i];
       const x = move % this.gridSize, y = Math.floor(move / this.gridSize);
-      if (this.game < 3) {
-         let player = 1 + (i % 2);
-         this.#addPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 5) {
-         let player = 1 + (i % 2);
-         this.#addKeryoPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 7) {
-         let player = 1 + (i % 2);
-         this.#addGomokuMove(x, y, player);
-      } else if (this.game < 9) {
-         let player = 1 + (i % 2);
-         this.#addPenteMove(x, y, player);
-      } else if (this.game < 11) {
-         let player = 1 + (i % 2);
-         this.#addPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyGPenteRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoGPenteRule();
-         }
-      } else if (this.game < 13) {
-         let player = 1 + (i % 2);
-         this.#addPoofPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 15) {
-         let player = (((i % 4) === 0) || ((i % 4) === 3)) ? 1 : 2;
-         this.#addGomokuMove(x, y, player);
-      } else if (this.game < 17) {
-         let player = 1 + (i % 2);
-         this.#addPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 19) {
-         let player = 1 + (i % 2);
-         this.#addKeryoPenteMove(x, y, player);
-      } else if (this.game < 25) {
-         let player = 1 + (i % 2);
-         this.#addGoMove(move, player);
-      } else if (this.game < 27) {
-         let player = 1 + (i % 2);
-         this.#addOPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 29) {
-         let player = 1 + (i % 2);
-         this.#addPenteMove(x, y, player);
-      } else if (this.game < 31) {
-         let player = 1 + (i % 2);
-         this.#addKeryoPenteMove(x, y, player);
-      }
+      const rules = VARIANT_RULES[variantKey(this.game)];
+      const player = rules.player === 'connect6'
+         ? ((((i % 4) === 0) || ((i % 4) === 3)) ? 1 : 2)
+         : 1 + (i % 2);
+      this.#applyMove(rules, move, x, y, player);
    };
 
    addMove = (move) => {
@@ -424,75 +366,42 @@ export class Game {
       const x = move % this.gridSize, y = Math.floor(move / this.gridSize);
       this.moves.push(move);
       this.until = this.moves.length;
-      if (this.game < 3) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addPenteMove(x, y, player);
+      const rules = VARIANT_RULES[variantKey(this.game)];
+      const player = rules.player === 'connect6'
+         ? ((((this.moves.length % 4) === 1) || ((this.moves.length % 4) === 0)) ? 1 : 2)
+         : 2 - (this.moves.length % 2);
+      this.#applyMove(rules, move, x, y, player);
+   };
+
+   // Apply one move through the variant's rule engine, then its post-move correction. Go
+   // applies by board index; every other variant by (x, y).
+   #applyMove = (rules, move, x, y, player) => {
+      if (rules.goMove) {
+         this.#addGoMove(move, player);
+      } else {
+         ({
+            pente: this.#addPenteMove, keryo: this.#addKeryoPenteMove, gomoku: this.#addGomokuMove,
+            poof: this.#addPoofPenteMove, oPente: this.#addOPenteMove,
+         }[rules.add])(x, y, player);
+      }
+      this.#applyPostRule(rules.postRule);
+   };
+
+   // The rated-only correction applied after moves 2 and 3 (tournament rule for most
+   // capture variants, the g-pente rule for g-pente; none for the rest).
+   #applyPostRule = (kind) => {
+      if (kind === 'tournament') {
          if (this.rated && this.moves.length === 2) {
             this.#applyTournamentRule();
          } else if (this.rated && this.moves.length === 3) {
             this.#undoTournamentRule();
          }
-      } else if (this.game < 5) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addKeryoPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 7) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addGomokuMove(x, y, player);
-      } else if (this.game < 9) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addPenteMove(x, y, player);
-      } else if (this.game < 11) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addPenteMove(x, y, player);
+      } else if (kind === 'gPente') {
          if (this.rated && this.moves.length === 2) {
             this.#applyGPenteRule();
          } else if (this.rated && this.moves.length === 3) {
             this.#undoGPenteRule();
          }
-      } else if (this.game < 13) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addPoofPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 15) {
-         let player = (((this.moves.length % 4) === 1) || ((this.moves.length % 4) === 0)) ? 1 : 2;
-         this.#addGomokuMove(x, y, player);
-      } else if (this.game < 17) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 19) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addKeryoPenteMove(x, y, player);
-      } else if (this.game < 25) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addGoMove(move, player);
-      } else if (this.game < 27) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addOPenteMove(x, y, player);
-         if (this.rated && this.moves.length === 2) {
-            this.#applyTournamentRule();
-         } else if (this.rated && this.moves.length === 3) {
-            this.#undoTournamentRule();
-         }
-      } else if (this.game < 29) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addPenteMove(x, y, player);
-      } else if (this.game < 31) {
-         let player = 2 - (this.moves.length % 2);
-         this.#addKeryoPenteMove(x, y, player);
       }
    };
 
