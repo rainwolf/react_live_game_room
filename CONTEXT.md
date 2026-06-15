@@ -142,10 +142,13 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
   delegate to it. (Game ids run 1..30 = 15 variants × standard/Speed; the settings/create
   dropdowns generate exactly those 15 odd ids — they previously generated a 16th, nonexistent
   game 31.)
-  - **Still on the same axis, deliberately not folded in:** `GameClass`'s per-variant replay
-    dispatch (`replayGame`/`addMoveFromList`/`addMove` switch ids onto the per-variant rule
-    engines — a coarser grouping that can't be a flat lookup; a `variantKey` switch is a
-    possible next step).
+  - `GameClass`'s per-variant move/replay dispatch (`replayGame`/`addMoveFromList`/`addMove`)
+    also keys off `variantKey` now, via a `VARIANT_RULES` descriptor table (replay engine, add
+    engine, `disableRatedOnReplay`, `goMove`, player formula, post-move rule). The table lives
+    in `GameClass` because it names the private rule engines, but its keys are the shared
+    `variantKey`, so the game-id boundaries are no longer re-encoded there. A golden-master
+    test (`replayDispatch.test.js` + `__fixtures__/replay-golden.json`) pins every variant's
+    board/captures/state across all three methods, rated and unrated.
 
 ## Swap2 / D-Pente opening (server-verified protocol invariant, 2026-06-13)
 
