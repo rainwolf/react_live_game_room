@@ -48,6 +48,10 @@ const UnconnectedBoard = (props) => {
    const sendRenjuSelect = (move) => {
       send_message(Commands.renjuSelect1({move: move, player: table.me, table: table.table}));
    };
+   const sendRenjuOffer10 = (moves) => {
+      send_message(Commands.renjuOffer10({moves: moves, player: table.me, table: table.table}));
+      resetRenjuUi();
+   };
 
    // console.log(JSON.stringify(game.abstractBoard))
 
@@ -116,8 +120,16 @@ const UnconnectedBoard = (props) => {
                   // decline + box-constrained Branch-A / window stone
                   if (empty && inBox(m)) clickHandler = () => sendRenjuDecline(m);
                } else if (isRenju && renjuUi.mode === 'offering') {
-                  // Branch-B 10-pick: empty, non-symmetric-duplicate points toggle in/out
-                  if (empty && !isSymmetricDup(m, renjuUi.picks)) clickHandler = () => togglePick(m);
+                  // Branch-B 10-pick. Re-tap an existing candidate to remove it; tap a new empty,
+                  // non-symmetric point to add it. Placing the 10th candidate AUTO-SENDS the offer
+                  // to the server (no separate submit) — so the count can never exceed 10.
+                  if (renjuUi.picks.includes(m)) {
+                     clickHandler = () => togglePick(m);
+                  } else if (empty && !isSymmetricDup(m, renjuUi.picks)) {
+                     clickHandler = renjuUi.picks.length >= 9
+                        ? () => sendRenjuOffer10([...renjuUi.picks, m])
+                        : () => togglePick(m);
+                  }
                } else if (isRenju && renjuPhaseNow === RenjuPhase.SELECTION) {
                   // white selects one of the ten offered candidates
                   if (offers.includes(m)) clickHandler = () => sendRenjuSelect(m);
