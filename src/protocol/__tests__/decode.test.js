@@ -103,3 +103,17 @@ describe('decode — fixes from code review', () => {
     }
   });
 });
+
+describe('renju inbound decode', () => {
+  const frame = (obj) => decode({ type: 'REDUX_WEBSOCKET::MESSAGE', payload: { message: JSON.stringify(obj) } });
+  test('a swap echo decodes to a typed event', () => {
+    const r = frame({ dsgRenjuTaraguchiSwapTableEvent: { swap: false, move: 113, player: 'alice', table: 5, time: 123 } });
+    expect(r.ok).toBe(true);
+    expect(r.event.type).toBe('dsgRenjuTaraguchiSwapTableEvent');
+    expect(r.event.payload.move).toBe(113);
+  });
+  test('an offer10 echo decodes', () => {
+    const r = frame({ dsgRenjuTaraguchiOffer10TableEvent: { moves: [1, 2], player: 'a', table: 5, time: 1 } });
+    expect(r.ok).toBe(true);
+  });
+});
