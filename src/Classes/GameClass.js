@@ -7,6 +7,7 @@ import {
    isSwap2Choice,
    isSwap2CanPass,
    isDPenteChoice,
+   renjuPhase,
    renjuOpeningPlayer,
    isRenjuSwapChoice,
    isRenjuBranchChoice,
@@ -262,6 +263,15 @@ export class Game {
       //     return 3 - currentColor;
       // }
       // return currentColor;
+   };
+   renjuPhaseNow = () => {
+      return renjuPhase(this.moves.length, this.gameState.renjuState);
+   };
+   // Box radius about centre for placing the NEXT stone: numMoves for moves 2-5, else 0
+   // (whole board — move 6 and normal play). Mirrors the server's box constraint.
+   renjuBoxRadius = () => {
+      const n = this.moves.length;
+      return (n >= 1 && n <= 4) ? n : 0;
    };
    // #isPoofPente = () => {
    //     return this.game === 11 || this.game === 12;

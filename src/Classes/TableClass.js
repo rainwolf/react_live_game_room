@@ -216,6 +216,10 @@ class Table {
    mySwap2Choice = (game) => {
       return this.isMyTurn(game) && game.swap2Choice();
    };
+
+   myRenjuChoice = (game) => {
+      return this.isMyTurn(game) && game.renjuChoice();
+   };
 }
 
 export default Table;
