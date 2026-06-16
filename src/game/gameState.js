@@ -27,3 +27,12 @@ export const GameState = {
     EVALUATE_STONES: 2,
   },
 };
+
+// Fresh Renju (Taraguchi-10) opening tracking — the client mirror of the server's
+// openingComplete / awaitingSwap / branchChosen / tenOffer / offeredFifth / selectedFifth.
+// A plain object (not an enum) because it accumulates several decision variables from the
+// opening echoes; renjuPhase() in openingPhase.js classifies it. New object each call so
+// GameClass.reset() never aliases a shared array.
+export function freshRenjuTracking() {
+  return { complete: false, awaitingSwap: false, branchChosen: false, tenOffer: false, offered: [], selected: null };
+}
