@@ -16,6 +16,7 @@
 export function gridSizeForGame(gameId) {
   if (gameId === 21 || gameId === 22) return 9;
   if (gameId === 23 || gameId === 24) return 13;
+  if (gameId === 31 || gameId === 32 || gameId === 81) return 15;
   return 19;
 }
 
@@ -36,6 +37,7 @@ export function variantKey(gameId) {
   if (gameId < 25) return 'go';
   if (gameId < 27) return 'o-pente';
   if (gameId < 29) return 'swap2-pente';
+  if (gameId === 31 || gameId === 32 || gameId === 81) return 'renju';
   return 'swap2-keryo';
 }
 
@@ -46,7 +48,7 @@ export const boardStyleClass = variantKey;
 // three board sizes are three of them). Even ids are the "Speed" timing pair of the
 // preceding odd id and are not separately selectable. This is the one list the game-picker
 // dropdowns iterate, so they can't drift back to offering a nonexistent id.
-export const STANDARD_GAME_IDS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29];
+export const STANDARD_GAME_IDS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31];
 
 // Is this game id a Go board (19..24)? The geometry definition of a go board; GameClass.isGo
 // delegates here so the boundary lives in exactly one place.
@@ -66,6 +68,11 @@ const GO_DOTS = {
 // The marked board points for a variant: circles (part 51) on the non-go boards, star dots
 // (part 52) on the go boards. Returns [{index, part}] so the caller stamps board[index].part.
 export function boardSpecialPoints(gameId) {
+  if (gameId === 31 || gameId === 32 || gameId === 81) {
+    // 9 star points at cols/rows {3,7,11} on the 15x15 board (index = col + row*15; center 112).
+    // Use the go-style dot (part 52); the non-go CIRCLES are 19x19-specific.
+    return [48, 52, 56, 108, 112, 116, 168, 172, 176].map((index) => ({ index, part: 52 }));
+  }
   if (!isGoBoard(gameId)) {
     return CIRCLES.map((index) => ({ index, part: 51 }));
   }
