@@ -2,6 +2,8 @@ import { describe, test, expect } from 'vitest';
 import { addMove, renjuSwap, renjuOffer10, renjuSelect1, swapSeats } from '../utils';
 import { Game, GameState } from '../../Classes/GameClass';
 import Table from '../../Classes/TableClass';
+import liveGameApp from '../rootReducer';
+import { renjuBeginOffer } from '../../ui/renjuOpeningUi';
 
 function renjuState() {
   const g = new Game();
@@ -97,5 +99,25 @@ describe('swapSeats silent rejoin advances renju tracking', () => {
     swapSeats({ table: 5, silent: false, swap: true, swapped: true }, s);
     // non-silent path may swap seats / set dPente/swap2 flags, but must NOT touch renju awaitingSwap via the silent branch
     expect(s.game.gameState.renjuState.awaitingSwap).toBe(before.awaitingSwap);
+  });
+});
+
+describe('rootReducer wiring', () => {
+  test('renjuOffer10 event is routed through EVENT_HANDLERS', () => {
+    // build a started renju table via reducer init + minimal setup is heavy; instead assert
+    // the handler is registered by dispatching the typed action onto a hand-built state.
+    let s = { table: 5, me: 'alice', tables: {}, pendingNotifications: [],
+      game: (() => { const g = new Game(); g.setGame(31); g.gameState.state = GameState.State.STARTED;
+        [112,113,97,98].forEach(m=>g.addMove(m)); return g; })() };
+    s.tables[5] = new Table({ table: 5, initialMinutes: 10 });
+    const out = liveGameApp(s, { type: 'dsgRenjuTaraguchiOffer10TableEvent',
+      payload: { table: 5, moves: [40,41,42,55,57,70,71,72,160,176], player: 'alice' } });
+    expect(out.game.gameState.renjuState.tenOffer).toBe(true);
+  });
+  test('renjuOpeningUi slice is part of root state and reacts to its actions', () => {
+    const base = liveGameApp(undefined, { type: '@@INIT' });
+    expect(base.renjuOpeningUi).toEqual({ mode: 'idle', picks: [] });
+    const out = liveGameApp(base, renjuBeginOffer());
+    expect(out.renjuOpeningUi.mode).toBe('offering');
   });
 });
