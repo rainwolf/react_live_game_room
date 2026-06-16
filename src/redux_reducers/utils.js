@@ -316,13 +316,15 @@ export function swapSeats(data, state) {
       const game = state.game.newInstance();
       game.gameState.dPenteState = data.swapped ? GameState.DPenteState.SWAPPED : GameState.DPenteState.NOT_SWAPPED;
       game.gameState.swap2State = data.swapped ? GameState.Swap2State.SWAPPED : GameState.Swap2State.NOT_SWAPPED;
-      // Renju rejoin: a SILENT swap-seats is the "current window resolved" phase marker
-      // (RenjuRejoin). Advance the tracked window without animating; its swap bit is the
-      // CURRENT window's decision, NOT net orientation (seats come from sendPlayingPlayers).
-      if (data.silent && game.isRenjuGame && game.isRenjuGame()) {
-         const r = game.gameState.renjuState;
-         r.awaitingSwap = false;
-         if (game.moves.length === 4) { r.branchChosen = true; r.tenOffer = false; } // resolved -> BRANCH
+      // Renju: a swap-seats event resolves the CURRENT swap window. The live take-over is a
+      // non-silent DSGSwapSeatsTableEvent (server emits it exactly like swap2/dPente) — the
+      // visual seat swap is done by the !silent && swap branch above; the rejoin marker is a
+      // silent one (seats come from sendPlayingPlayers). EITHER way just clear awaitingSwap so
+      // the phase advances: n<4/5 -> MOVE, n==4 -> BRANCH (branchChosen stays false). The branch
+      // is chosen via offer10 or the swap=false move-4 decline, NOT by a take-over, so do NOT
+      // touch branchChosen/tenOffer here.
+      if (game.isRenjuGame && game.isRenjuGame()) {
+         game.gameState.renjuState.awaitingSwap = false;
       }
       state.game = game;
    }

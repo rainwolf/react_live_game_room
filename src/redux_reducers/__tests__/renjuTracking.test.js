@@ -61,44 +61,44 @@ describe('renju tracking reducers', () => {
     move(s, 200); // move 6 anywhere
     expect(s.game.gameState.renjuState.complete).toBe(true);
   });
-  test('renjuSwap(true) at n=4 clears awaitingSwap only; move 5 opens window 5', () => {
+  test('take-over at n=4 (live swapSeats) -> BRANCH; then move 5 opens window 5', () => {
     const s = renjuState();
-    [112, 113, 97, 98].forEach((m) => move(s, m));
-    renjuSwap({ table: 5, swap: true, player: 'bob' }, s);
+    [112, 113, 97, 98].forEach((m) => move(s, m)); // n=4, window 4 open
+    swapSeats({ table: 5, silent: false, swap: true, player: 'bob' }, s); // live take-over
     expect(s.game.gameState.renjuState.awaitingSwap).toBe(false);
-    expect(s.game.gameState.renjuState.branchChosen).toBe(false); // swap=true leaves branch undecided
-    move(s, 129); // move 5 -> window 5
+    expect(s.game.gameState.renjuState.branchChosen).toBe(false); // -> BRANCH (branch not yet chosen)
+    move(s, 129); // Branch A move 5 placed -> window 5
     expect(s.game.gameState.renjuState.awaitingSwap).toBe(true);
     expect(s.game.gameState.renjuState.complete).toBe(false);
   });
 });
 
-describe('swapSeats silent rejoin advances renju tracking', () => {
-  test('silent swap at n=4 marks window resolved -> branch choice pending', () => {
+describe('swapSeats advances renju tracking (live take-over + silent rejoin)', () => {
+  test('silent rejoin marker at n=4 -> BRANCH (window resolved, branch NOT yet chosen)', () => {
     const s = renjuState();
     [112, 113, 97, 98].forEach((m) => move(s, m)); // n=4, awaitingSwap
-    swapSeats({ table: 5, silent: true, swap: false, swapped: false }, s);
+    swapSeats({ table: 5, silent: true, swap: false }, s);
     const r = s.game.gameState.renjuState;
     expect(r.awaitingSwap).toBe(false);
-    expect(r.branchChosen).toBe(true);
+    expect(r.branchChosen).toBe(false); // BRANCH = awaiting branch choice; branchChosen stays false
     expect(r.tenOffer).toBe(false);
   });
-  test('silent swap at n=5 clears awaitingSwap only (no branch change)', () => {
+  test('silent rejoin marker at n=5 (Branch A) clears awaitingSwap; branch unchanged', () => {
     const s = renjuState();
     [112, 113, 97, 98].forEach((m) => move(s, m));
-    renjuSwap({ table: 5, swap: false, move: 129, player: 'alice' }, s); // branch A
+    renjuSwap({ table: 5, swap: false, move: 129, player: 'alice' }, s); // Branch A (decline @ move 4)
     move(s, 129); // n=5, window 5 open
-    swapSeats({ table: 5, silent: true, swap: false, swapped: false }, s);
+    swapSeats({ table: 5, silent: true, swap: false }, s);
     expect(s.game.gameState.renjuState.awaitingSwap).toBe(false);
-    expect(s.game.gameState.renjuState.branchChosen).toBe(true); // already A from the earlier renjuSwap
+    expect(s.game.gameState.renjuState.branchChosen).toBe(true); // still Branch A from the earlier decline
   });
-  test('NON-silent swap does not run the renju tracking branch', () => {
+  test('live (non-silent) take-over clears awaitingSwap AND swaps the seats', () => {
     const s = renjuState();
-    [112, 113, 97, 98].forEach((m) => move(s, m));
-    const before = { ...s.game.gameState.renjuState };
-    swapSeats({ table: 5, silent: false, swap: true, swapped: true }, s);
-    // non-silent path may swap seats / set dPente/swap2 flags, but must NOT touch renju awaitingSwap via the silent branch
-    expect(s.game.gameState.renjuState.awaitingSwap).toBe(before.awaitingSwap);
+    s.tables[5].seats = [undefined, 'graviton', 'iostest']; // seat1=black, seat2=white
+    move(s, 112); // n=1, window 1 open
+    swapSeats({ table: 5, silent: false, swap: true, player: 'iostest' }, s); // live take-over
+    expect(s.game.gameState.renjuState.awaitingSwap).toBe(false); // window resolved -> MOVE
+    expect(s.tables[5].seats).toEqual([undefined, 'iostest', 'graviton']); // visual seat swap happened
   });
 });
 
