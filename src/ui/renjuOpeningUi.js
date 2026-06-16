@@ -2,7 +2,9 @@
 // sub-slice (same reference returned for unrelated actions). It does double duty: suppresses
 // the decision modal (open gate) and arms the board — `placing` routes board taps to a
 // renjuSwap(swap:false) decline/Branch-A move, `offering` accumulates the 10-pick selection.
-// Reset to idle on the server echo that advances the phase (and on table change / unmount).
+// Reset to idle when the player acts (renjuResetOpeningUi, dispatched on send in Board.js /
+// RenjuOfferPanel) and when leaving a table (dsgExitTableEvent / dsgBootTableEvent), so a
+// half-finished offer can't leak into the next game.
 
 const BEGIN_PLACE = 'RENJU_UI/BEGIN_PLACE';
 const BEGIN_OFFER = 'RENJU_UI/BEGIN_OFFER';
@@ -30,7 +32,10 @@ export function renjuOpeningUiReducer(state = INITIAL, action) {
       return { ...state, picks };
     }
     case RESET:
-      return INITIAL;
+    // leaving / booted from a table — clear transient opening UI so it can't leak into the next game
+    case 'dsgExitTableEvent':
+    case 'dsgBootTableEvent':
+      return state.mode === 'idle' && state.picks.length === 0 ? state : INITIAL;
     default:
       return state;
   }

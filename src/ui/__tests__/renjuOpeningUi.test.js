@@ -27,4 +27,10 @@ describe('renjuOpeningUi slice', () => {
     const s = init();
     expect(renjuOpeningUiReducer(s, { type: 'SOMETHING_ELSE' })).toBe(s);
   });
+  test('table exit / boot resets to idle (stale picks must not leak into the next game)', () => {
+    expect(renjuOpeningUiReducer({ mode: 'offering', picks: [1, 2, 3] }, { type: 'dsgExitTableEvent' }))
+      .toEqual({ mode: 'idle', picks: [] });
+    expect(renjuOpeningUiReducer({ mode: 'placing', picks: [] }, { type: 'dsgBootTableEvent' }))
+      .toEqual({ mode: 'idle', picks: [] });
+  });
 });
