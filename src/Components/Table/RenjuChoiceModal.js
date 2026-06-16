@@ -37,13 +37,15 @@ const UnconnectedRenjuChoiceModal = (props) => {
    const open = table.myRenjuChoice(game) && renjuUi.mode === 'idle';
 
    const takeOver = () => {
-      props.send_message(Commands.renjuSwap({swap: true, move: 0, player: table.me, table: table.table}));
+      // move = -1: no-stone sentinel (server ignores `move` on swap=true; -1 avoids the 0 = corner-cell ambiguity)
+      props.send_message(Commands.renjuSwap({swap: true, move: -1, player: table.me, table: table.table}));
       props.markPending(); // wait for the server's swap-seats echo; don't re-open the modal meanwhile
    };
    const decline = () => {
       if (n === 5) {
-         // window-5 decline is BARE (no bundled stone); move 6 follows as a normal move
-         props.send_message(Commands.renjuSwap({swap: false, move: 0, player: table.me, table: table.table}));
+         // window-5 decline is BARE (no bundled stone); move 6 follows as a normal move.
+         // move = -1: no-stone sentinel (server ignores `move` on this path; -1 is not a real cell)
+         props.send_message(Commands.renjuSwap({swap: false, move: -1, player: table.me, table: table.table}));
          props.markPending();
       } else {
          props.beginPlace(); // arm the board for the box-constrained decline/Branch-A stone
