@@ -158,6 +158,18 @@ export function addTableMessage(data, state) {
    }
 }
 
+// Advance the tracked Renju opening record after a stone lands (mirror RenjuState.addMove):
+// windows open after moves 1-4 and after move 5 in Branch A; the opening completes otherwise
+// (move 6 in Branch A, move 5 in Branch B). No-op for non-renju games.
+function advanceRenjuTrackingAfterMove(game) {
+   if (!game.isRenjuGame || !game.isRenjuGame()) return;
+   const r = game.gameState.renjuState;
+   const n = game.moves.length;
+   const windowOpens = n <= 4 || (n === 5 && !r.tenOffer);
+   r.awaitingSwap = windowOpens;
+   r.complete = !windowOpens && n >= 5;
+}
+
 export function addMove(data, state) {
    const game = state.game.newInstance();
    if (data.table === state.table) {
@@ -172,6 +184,7 @@ export function addMove(data, state) {
       if (data.player !== state.me) {
          emit(state, {sound: 'move'});
       }
+      advanceRenjuTrackingAfterMove(game);
    }
    state.game = game;
 }
@@ -303,6 +316,14 @@ export function swapSeats(data, state) {
       const game = state.game.newInstance();
       game.gameState.dPenteState = data.swapped ? GameState.DPenteState.SWAPPED : GameState.DPenteState.NOT_SWAPPED;
       game.gameState.swap2State = data.swapped ? GameState.Swap2State.SWAPPED : GameState.Swap2State.NOT_SWAPPED;
+      // Renju rejoin: a SILENT swap-seats is the "current window resolved" phase marker
+      // (RenjuRejoin). Advance the tracked window without animating; its swap bit is the
+      // CURRENT window's decision, NOT net orientation (seats come from sendPlayingPlayers).
+      if (data.silent && game.isRenjuGame && game.isRenjuGame()) {
+         const r = game.gameState.renjuState;
+         r.awaitingSwap = false;
+         if (game.moves.length === 4) { r.branchChosen = true; r.tenOffer = false; } // resolved -> BRANCH
+      }
       state.game = game;
    }
 }
@@ -427,5 +448,41 @@ export function arenaRemoveJoinRequest(data, state) {
 export function arenaRejectRequest(data, state) {
    if (data.playerToReject === state.me) {
       state.notification = {kind: 'info', message: data.message};
+   }
+}
+
+export function renjuSwap(data, state) {
+   if (data.table === state.table) {
+      const game = state.game.newInstance();
+      const r = game.gameState.renjuState;
+      r.awaitingSwap = false;
+      // A swap=false at the move-4 window (or the standalone branch-choice state) continues
+      // Branch A; the bundled stone arrives via the following DSGMoveTableEvent. The visual
+      // seat swap for swap=true is handled by swapSeats/table.swap(), NOT here.
+      if (data.swap === false && game.moves.length === 4) {
+         r.branchChosen = true;
+         r.tenOffer = false;
+      }
+      state.game = game;
+   }
+}
+
+export function renjuOffer10(data, state) {
+   if (data.table === state.table) {
+      const game = state.game.newInstance();
+      const r = game.gameState.renjuState;
+      r.branchChosen = true;
+      r.tenOffer = true;
+      r.offered = [...data.moves];
+      r.awaitingSwap = false;
+      state.game = game;
+   }
+}
+
+export function renjuSelect1(data, state) {
+   if (data.table === state.table) {
+      const game = state.game.newInstance();
+      game.gameState.renjuState.selected = data.move;
+      state.game = game;
    }
 }
