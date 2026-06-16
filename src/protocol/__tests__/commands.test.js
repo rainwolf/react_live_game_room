@@ -42,3 +42,18 @@ describe('Commands — validation catches client bugs before they hit the wire',
     }
   });
 });
+
+describe('renju outbound commands', () => {
+  test('renjuSwap frame: type key + fields + auto time:0', () => {
+    expect(Commands.renjuSwap({ swap: false, move: 113, player: 'alice', table: 5 }))
+      .toEqual({ dsgRenjuTaraguchiSwapTableEvent: { swap: false, move: 113, player: 'alice', table: 5, time: 0 } });
+  });
+  test('renjuOffer10 frame', () => {
+    expect(Commands.renjuOffer10({ moves: [40, 41], player: 'alice', table: 5 }))
+      .toEqual({ dsgRenjuTaraguchiOffer10TableEvent: { moves: [40, 41], player: 'alice', table: 5, time: 0 } });
+  });
+  test('renjuSelect1 frame', () => {
+    expect(Commands.renjuSelect1({ move: 57, player: 'bob', table: 5 }))
+      .toEqual({ dsgRenjuTaraguchi10Select1TableEvent: { move: 57, player: 'bob', table: 5, time: 0 } });
+  });
+});

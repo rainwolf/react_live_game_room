@@ -124,7 +124,7 @@ class BoardSquare extends Component {
             transform={'translate(' + x + ',' + y + ')'}
          >
             <rect id={"\"" + this.props.id + "\""} width={size} height={size}
-                  fillOpacity={0.0}/>
+                  fillOpacity={0.0} pointerEvents={'all'}/>
             {this.boardpart(size)}
             {this.props.stone && Stone({size: 10, id: this.props.stone})}
             {this.props.deadStone && SimpleStone({size: 10, id: this.props.deadStone, opacity: 0.6})}

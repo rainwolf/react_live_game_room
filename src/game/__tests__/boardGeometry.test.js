@@ -2,14 +2,14 @@ import { describe, test, expect } from 'vitest';
 import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard, variantKey, STANDARD_GAME_IDS } from '../boardGeometry';
 
 describe('STANDARD_GAME_IDS — the selectable variant ids', () => {
-  test('is the 15 standard (odd) ids 1..29, never the nonexistent game 31', () => {
-    expect(STANDARD_GAME_IDS).toEqual([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]);
-    expect(STANDARD_GAME_IDS).toHaveLength(15);
+  test('is the 16 standard (odd) ids 1..31, including renju (31)', () => {
+    expect(STANDARD_GAME_IDS).toEqual([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31]);
+    expect(STANDARD_GAME_IDS).toHaveLength(16);
     expect(STANDARD_GAME_IDS.every((id) => id % 2 === 1)).toBe(true);
-    expect(STANDARD_GAME_IDS).not.toContain(31);
+    expect(STANDARD_GAME_IDS).toContain(31);
   });
-  test('maps to 13 distinct variant keys (Go 19/21/23 share the go key but are distinct boards)', () => {
-    expect(new Set(STANDARD_GAME_IDS.map(variantKey)).size).toBe(13);
+  test('maps to 14 distinct variant keys (Go 19/21/23 share the go key but are distinct boards)', () => {
+    expect(new Set(STANDARD_GAME_IDS.map(variantKey)).size).toBe(14);
   });
 });
 
@@ -107,5 +107,34 @@ describe('boardSpecialPoints — star points / circles per variant', () => {
       [42, 45, 48, 81, 84, 87, 120, 123, 126].map((index) => ({ index, part: 52 }))
     );
     expect(boardSpecialPoints(24)).toEqual(boardSpecialPoints(23));
+  });
+});
+
+describe('renju geometry (ids 31 / 32 / 81)', () => {
+  test('grid size is 15 for all renju ids', () => {
+    expect(gridSizeForGame(31)).toBe(15);
+    expect(gridSizeForGame(32)).toBe(15);
+    expect(gridSizeForGame(81)).toBe(15);
+  });
+  test("variant key is 'renju'", () => {
+    expect(variantKey(31)).toBe('renju');
+    expect(variantKey(32)).toBe('renju');
+    expect(variantKey(81)).toBe('renju');
+  });
+  test('renju is not a go board', () => {
+    expect(isGoBoard(31)).toBe(false);
+  });
+  test('renju 31 is offered in the picker', () => {
+    expect(STANDARD_GAME_IDS).toContain(31);
+  });
+  test('renju star points are the 9 dots at cols/rows {3,7,11}', () => {
+    const pts = boardSpecialPoints(31);
+    expect(pts.map((p) => p.index).sort((a, b) => a - b)).toEqual([48, 52, 56, 108, 112, 116, 168, 172, 176]);
+    expect(pts.every((p) => p.part === 52)).toBe(true);
+  });
+  test('existing variants unchanged', () => {
+    expect(variantKey(1)).toBe('pente');
+    expect(variantKey(29)).toBe('swap2-keryo');
+    expect(gridSizeForGame(21)).toBe(9);
   });
 });

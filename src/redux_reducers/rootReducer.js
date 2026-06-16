@@ -14,6 +14,7 @@ import {
    UNMUTE
 } from "../redux_actions/actionTypes";
 import {modalsReducer} from "../ui/modals";
+import {renjuOpeningUiReducer, INITIAL as RENJU_UI_INITIAL} from "../ui/renjuOpeningUi";
 import './utils';
 import User from '../Classes/UserClass';
 import {
@@ -39,6 +40,9 @@ import {
    mute,
    processUser,
    rejectGoState,
+   renjuOffer10,
+   renjuSelect1,
+   renjuSwap,
    resignOrCancel,
    serverTableMessage,
    sitTable,
@@ -68,6 +72,7 @@ const initialState = {
    table_messages: [],
    tournament: false,
    modals: {},
+   renjuOpeningUi: RENJU_UI_INITIAL,
    pendingNotifications: [],
 };
 
@@ -111,6 +116,9 @@ const EVENT_HANDLERS = {
    dsgInviteTableEvent: (p, s) => invitationReceived(p, s),
    dsgInviteResponseTableEvent: (p, s) => invitationReply(p, s),
    dsgSwap2PassTableEvent: (p, s) => swap2Pass(p, s),
+   dsgRenjuTaraguchiSwapTableEvent:     (p, s) => renjuSwap(p, s),
+   dsgRenjuTaraguchiOffer10TableEvent:  (p, s) => renjuOffer10(p, s),
+   dsgRenjuTaraguchi10Select1TableEvent:(p, s) => renjuSelect1(p, s),
    dsgArenaRequestJoinTableEvent: (p, s) => arenaJoinRequest(p, s),
    dsgArenaRejectTableJoinEvent: (p, s) => arenaRejectRequest(p, s),
 };
@@ -177,6 +185,7 @@ function liveGameApp(state = initialState, action) {
    // list (OPEN/CLOSE/TOGGLE_MODAL) and returns the same modals reference for everything
    // else, so this is a no-op for non-modal actions.
    newState.modals = modalsReducer(newState.modals, action);
+   newState.renjuOpeningUi = renjuOpeningUiReducer(newState.renjuOpeningUi, action);
    return newState;
 }
 

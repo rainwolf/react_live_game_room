@@ -148,3 +148,53 @@ describe('plain pente has no opening choices (game 1)', () => {
     expect(game(PENTE, 3).currentPlayer()).toBe(2);
   });
 });
+
+function renjuGameAfter(moves) {
+  const g = new Game();
+  g.setGame(31);
+  g.gameState.state = GameState.State.STARTED;
+  // replay drives color + abstractBoard; addMove appends + recolors
+  moves.forEach((m) => g.addMove(m));
+  return g;
+}
+
+describe('renju is black-first (board value 2 = black)', () => {
+  test('currentColor before any move is black (2)', () => {
+    const g = new Game(); g.setGame(31);
+    expect(g.currentColor()).toBe(2); // move 1 (center) is black
+  });
+  test('replayRenjuGame colors stones black, white, black… on the 15x15 grid', () => {
+    const g = renjuGameAfter([112, 113, 97]); // center, +1col, -1row (all in-board on 15x15)
+    g.replayGame();
+    // abstractBoard is indexed [x][y] with x = move % gridSize (col), y = floor(move / gridSize) (row).
+    // move 1 -> value 2 (black) at center 112 = (col 7, row 7)
+    expect(g.abstractBoard[7][7]).toBe(2);
+    // move 2 -> value 1 (white) at 113 = (col 8, row 7)
+    expect(g.abstractBoard[8][7]).toBe(1);
+    // move 3 -> value 2 (black) at 97 = (col 7, row 6)
+    expect(g.abstractBoard[7][6]).toBe(2);
+  });
+});
+
+describe('renju opening player drives isMyTurn', () => {
+  test('currentPlayer uses renjuOpeningPlayer while opening incomplete', () => {
+    const g = new Game(); g.setGame(31);
+    g.gameState.state = GameState.State.STARTED;
+    g.addMove(112); // move 1 placed; reducer normally sets awaitingSwap — set it for the unit test
+    g.gameState.renjuState.awaitingSwap = true;
+    // n=1 awaiting swap: lastColor=1 -> player 2 to move
+    expect(g.currentPlayer()).toBe(2);
+  });
+});
+
+describe('renju newInstance deep-copies renjuState (reducers mutate the copy)', () => {
+  test("mutating the copy's renjuState.offered does not affect the original", () => {
+    const g = new Game(); g.setGame(31);
+    g.gameState.renjuState.offered = [40, 41, 42];
+    const copy = g.newInstance();
+    copy.gameState.renjuState.offered.push(99);
+    copy.gameState.renjuState.tenOffer = true;
+    expect(g.gameState.renjuState.offered).toEqual([40, 41, 42]);
+    expect(g.gameState.renjuState.tenOffer).toBe(false);
+  });
+});

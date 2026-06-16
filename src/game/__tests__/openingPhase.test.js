@@ -107,3 +107,88 @@ describe('decision predicates derive from the same phase (cannot desync from who
     expect(isDPenteChoice(4, DPenteState.NO_CHOICE, false)).toBe(false);
   });
 });
+
+import {
+  RenjuPhase, renjuPhase, renjuOpeningPlayer,
+  isRenjuSwapChoice, isRenjuBranchChoice, isRenjuSelection, renjuModalButtons,
+} from '../openingPhase';
+import { freshRenjuTracking } from '../gameState';
+
+const rs = (over = {}) => ({ ...freshRenjuTracking(), ...over });
+
+describe('renjuPhase — mirrors RenjuState.getOpeningPhase', () => {
+  test('windows 1-4 open => SWAP', () => {
+    for (const n of [1, 2, 3, 4]) {
+      expect(renjuPhase(n, rs({ awaitingSwap: true }))).toBe(RenjuPhase.SWAP);
+    }
+  });
+  test('move-4 window resolved, no branch yet => BRANCH', () => {
+    expect(renjuPhase(4, rs({ awaitingSwap: false, branchChosen: false }))).toBe(RenjuPhase.BRANCH);
+  });
+  test('branch B, ten offers in, none selected => SELECTION', () => {
+    expect(renjuPhase(4, rs({ branchChosen: true, tenOffer: true, offered: new Array(10).fill(0), selected: null })))
+      .toBe(RenjuPhase.SELECTION);
+  });
+  test('branch A move-5 window open => SWAP (window 5)', () => {
+    expect(renjuPhase(5, rs({ branchChosen: true, tenOffer: false, awaitingSwap: true }))).toBe(RenjuPhase.SWAP);
+  });
+  test('branch A move-5 window resolved => MOVE (place move 6)', () => {
+    expect(renjuPhase(5, rs({ branchChosen: true, tenOffer: false, awaitingSwap: false }))).toBe(RenjuPhase.MOVE);
+  });
+  test('branch B after selection (move 5 placed) => COMPLETE', () => {
+    expect(renjuPhase(5, rs({ branchChosen: true, tenOffer: true, complete: true }))).toBe(RenjuPhase.COMPLETE);
+  });
+  test('post-take-over windows 1-3 (awaiting cleared, n<4) => MOVE', () => {
+    for (const n of [1, 2, 3]) {
+      expect(renjuPhase(n, rs({ awaitingSwap: false }))).toBe(RenjuPhase.MOVE);
+    }
+  });
+  test('opening complete => COMPLETE', () => {
+    expect(renjuPhase(6, rs({ complete: true }))).toBe(RenjuPhase.COMPLETE);
+  });
+});
+
+describe('renjuOpeningPlayer — mirrors RenjuState.getCurrentPlayer during the opening', () => {
+  test('awaiting a swap decision: the not-last color is to move', () => {
+    // n=1 (move 1 placed): lastColor=(1-1)%2+1=1 -> returns 2
+    expect(renjuOpeningPlayer(1, rs({ awaitingSwap: true }))).toBe(2);
+    // n=4: lastColor=(4-1)%2+1=2 -> returns 1
+    expect(renjuOpeningPlayer(4, rs({ awaitingSwap: true }))).toBe(1);
+  });
+  test('branch choice at n=4 (no branch yet): black (1)', () => {
+    expect(renjuOpeningPlayer(4, rs({ awaitingSwap: false, branchChosen: false }))).toBe(1);
+  });
+  test('branch B offering: black (1); selecting: white (2)', () => {
+    expect(renjuOpeningPlayer(4, rs({ branchChosen: true, tenOffer: true, offered: [1, 2] }))).toBe(1);
+    expect(renjuOpeningPlayer(4, rs({ branchChosen: true, tenOffer: true, offered: new Array(10).fill(0), selected: null }))).toBe(2);
+  });
+  test('complete => null (caller falls back to parity)', () => {
+    expect(renjuOpeningPlayer(6, rs({ complete: true }))).toBe(null);
+  });
+  test('branch A window-5 and move 6: white (2) is to move either way', () => {
+    expect(renjuOpeningPlayer(5, rs({ branchChosen: true, awaitingSwap: true }))).toBe(2);  // window 5 open
+    expect(renjuOpeningPlayer(5, rs({ branchChosen: true, awaitingSwap: false }))).toBe(2); // window 5 resolved -> move 6
+  });
+  test('branch B after selection (selected set, move 5 not yet placed) falls through to parity', () => {
+    expect(renjuOpeningPlayer(4, rs({ branchChosen: true, tenOffer: true, offered: new Array(10).fill(0), selected: 57 }))).toBe(1);
+  });
+});
+
+describe('renju choice predicates + modal buttons', () => {
+  test('predicates gate on started', () => {
+    expect(isRenjuSwapChoice(2, rs({ awaitingSwap: true }), false)).toBe(false);
+    expect(isRenjuSwapChoice(2, rs({ awaitingSwap: true }), true)).toBe(true);
+    expect(isRenjuBranchChoice(4, rs({ awaitingSwap: false, branchChosen: false }), true)).toBe(true);
+    expect(isRenjuSelection(4, rs({ branchChosen: true, tenOffer: true, offered: new Array(10).fill(0) }), true)).toBe(true);
+  });
+  test('modal buttons by phase', () => {
+    // windows 1-3 open: swap + declinePlace, no offer10
+    expect(renjuModalButtons(2, rs({ awaitingSwap: true }), true)).toEqual({ swap: true, declinePlace: true, offer10: false });
+    // open move-4 window: all three
+    expect(renjuModalButtons(4, rs({ awaitingSwap: true }), true)).toEqual({ swap: true, declinePlace: true, offer10: true });
+    // standalone BRANCH (post take-over): place + offer10, NO swap
+    expect(renjuModalButtons(4, rs({ awaitingSwap: false, branchChosen: false }), true)).toEqual({ swap: false, declinePlace: true, offer10: true });
+    // window 5: swap + decline, no offer10
+    expect(renjuModalButtons(5, rs({ branchChosen: true, awaitingSwap: true }), true)).toEqual({ swap: true, declinePlace: true, offer10: false });
+  });
+});

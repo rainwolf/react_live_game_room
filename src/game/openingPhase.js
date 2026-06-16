@@ -92,3 +92,72 @@ export function isSwap2CanPass(movesLength, swap2State, started) {
 export function isDPenteChoice(movesLength, dPenteState, started) {
   return started && dPentePhase(movesLength, dPenteState) === DPentePhase.P2_DECISION;
 }
+
+// --- renju (Taraguchi-10) -------------------------------------------------------------
+//
+// The CLIENT mirror of RenjuState.getOpeningPhase / getCurrentPlayer (server) and the
+// RenjuRejoin.decode contract. Pure over (numMoves, renjuState) where renjuState is the
+// tracked record (gameState.js freshRenjuTracking) accumulated from the opening echoes —
+// NOT a computed engine state. The thresholds live here and nowhere else.
+
+export const RenjuPhase = {
+  SWAP: 'SWAP',           // a swap window is open (swap, or decline + place)
+  BRANCH: 'BRANCH',       // move-4 window resolved; black picks Branch A vs B
+  SELECTION: 'SELECTION', // Branch B: ten offers in, white picks one
+  MOVE: 'MOVE',           // no decision pending; place a stone
+  COMPLETE: 'COMPLETE',   // six-stone opening done; normal play
+};
+
+// Mirrors RenjuState.getOpeningPhase().
+export function renjuPhase(numMoves, renjuState) {
+  const { complete, awaitingSwap, branchChosen, tenOffer, offered, selected } = renjuState;
+  if (complete) return RenjuPhase.COMPLETE;
+  if (awaitingSwap) return RenjuPhase.SWAP;
+  if (numMoves === 4 && !branchChosen) return RenjuPhase.BRANCH;
+  if (numMoves === 4 && branchChosen && tenOffer && offered.length === 10 && selected == null) {
+    return RenjuPhase.SELECTION;
+  }
+  return RenjuPhase.MOVE;
+}
+
+// Mirrors RenjuState.getCurrentPlayer() during the opening; returns null once complete so
+// the caller (GameClass.currentPlayer) falls back to plain alternation — same shape as
+// swap2OpeningPlayer / dPenteOpeningPlayer.
+export function renjuOpeningPlayer(numMoves, renjuState) {
+  const { complete, awaitingSwap, branchChosen, tenOffer, offered, selected } = renjuState;
+  if (complete) return null;
+  const n = numMoves;
+  if (awaitingSwap) {
+    const lastColor = ((n - 1) % 2) + 1;
+    return 3 - lastColor;
+  }
+  if (branchChosen && tenOffer && n === 4) {
+    if (offered.length < 10) return 1;   // black offering
+    if (selected == null) return 2;      // white selecting
+  }
+  if (n === 4 && !branchChosen) return 1; // black chooses branch (and plays move 5)
+  return (n % 2) + 1;
+}
+
+export function isRenjuSwapChoice(numMoves, renjuState, started) {
+  return started && renjuPhase(numMoves, renjuState) === RenjuPhase.SWAP;
+}
+export function isRenjuBranchChoice(numMoves, renjuState, started) {
+  return started && renjuPhase(numMoves, renjuState) === RenjuPhase.BRANCH;
+}
+export function isRenjuSelection(numMoves, renjuState, started) {
+  return started && renjuPhase(numMoves, renjuState) === RenjuPhase.SELECTION;
+}
+
+// Which decision-modal buttons to show. Swap only while a window is open; Offer-10 whenever
+// Branch B is still reachable (open move-4 window OR the standalone BRANCH after a take-over);
+// Decline/Place at any swap window or the branch choice.
+export function renjuModalButtons(numMoves, renjuState, started) {
+  const swapChoice = isRenjuSwapChoice(numMoves, renjuState, started);
+  const branchChoice = isRenjuBranchChoice(numMoves, renjuState, started);
+  return {
+    swap: swapChoice,
+    declinePlace: swapChoice || branchChoice,
+    offer10: branchChoice || (swapChoice && numMoves === 4),
+  };
+}
