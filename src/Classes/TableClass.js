@@ -21,6 +21,7 @@ const VARIANT_COLORS = {
    'o-pente': '#52BE80',
    'swap2-pente': '#E5AA70',
    'swap2-keryo': '#50C878',
+   'renju': '#D98880',
 };
 
 class Table {
@@ -214,6 +215,10 @@ class Table {
 
    mySwap2Choice = (game) => {
       return this.isMyTurn(game) && game.swap2Choice();
+   };
+
+   myRenjuChoice = (game) => {
+      return this.isMyTurn(game) && game.renjuChoice();
    };
 }
 

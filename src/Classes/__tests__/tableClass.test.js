@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import Table from '../TableClass';
-import { GameState } from '../GameClass';
+import { Game, GameState } from '../GameClass';
 
 function tableForGame(g) {
   const t = new Table();
@@ -43,6 +43,7 @@ describe('table_color — lobby card colour per variant (derived from variantKey
     [1, '#FDDEA3'], [3, '#BAFDA3'], [5, '#A3FDEB'], [7, '#A3CDFD'], [9, '#AEA3FD'],
     [11, '#EDA3FD'], [13, '#EDA3FD'], [15, '#25BAFF'], [17, '#FFA500'], [19, '#FAC832'],
     [24, '#FAC832'], [25, '#52BE80'], [27, '#E5AA70'], [29, '#50C878'], [30, '#50C878'],
+    [31, '#D98880'], [81, '#D98880'], // renju (live + TB): distinct rose, NOT gomoku aqua (#A3FDEB)
   ];
   test.each(cases)('game %i -> %s', (g, expected) => {
     expect(tableForGame(g).table_color()).toBe(expected);
@@ -99,5 +100,29 @@ describe('clockRunning — the clock ticks only for the active seat of a fully-s
   });
   test('PAUSED on an untimed table', () => {
     expect(seated({ timed: false }).clockRunning(game(1), 1)).toBe(false);
+  });
+});
+
+function startedRenju(moves, awaitingSwap = true) {
+  const g = new Game(); g.setGame(31); g.gameState.state = GameState.State.STARTED;
+  moves.forEach((m) => g.addMove(m));
+  g.gameState.renjuState.awaitingSwap = awaitingSwap;
+  return g;
+}
+
+describe('myRenjuChoice + board helpers', () => {
+  test('the to-move seated player has a renju choice during a swap window', () => {
+    const g = startedRenju([112]); // n=1, awaiting -> player 2 to move
+    const t = new Table({ table: 5, initialMinutes: 10 });
+    t.seats = [undefined, 'alice', 'bob']; t.me = 'bob'; // bob is seat 2
+    expect(t.myRenjuChoice(g)).toBe(true);
+    t.me = 'alice';
+    expect(t.myRenjuChoice(g)).toBe(false);
+  });
+  test('renjuBoxRadius: numMoves 1..4 -> that radius; else 0 (whole board)', () => {
+    const g = new Game(); g.setGame(31);
+    g.moves = [0]; expect(g.renjuBoxRadius()).toBe(1);     // placing move 2 -> 3x3
+    g.moves = [0, 0, 0, 0]; expect(g.renjuBoxRadius()).toBe(4); // placing move 5 -> 9x9
+    g.moves = [0, 0, 0, 0, 0]; expect(g.renjuBoxRadius()).toBe(0); // move 6 -> anywhere
   });
 });
