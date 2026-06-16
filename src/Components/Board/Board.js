@@ -8,13 +8,17 @@ import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
 import {selectCurrentTable} from '../../selectors';
 import {gridSizeForGame, boardStyleClass, boardSpecialPoints} from '../../game/boardGeometry';
+import {renjuTogglePick, renjuResetOpeningUi} from '../../ui/renjuOpeningUi';
+import {RenjuPhase} from '../../game/openingPhase';
+import {isSymmetricDup} from '../../game/renjuSymmetry';
 
 const mapStateToProps = state => {
    const table = selectCurrentTable(state);
    return {
       game_id: table.game,
       game: state.game,
-      table: table
+      table: table,
+      renjuUi: state.renjuOpeningUi
    }
 };
 
@@ -23,16 +27,26 @@ const mapDispatchToProps = dispatch => {
       send_message: message => {
          dispatch(send_message(message));
       },
+      togglePick: move => dispatch(renjuTogglePick(move)),
+      resetRenjuUi: () => dispatch(renjuResetOpeningUi()),
    }
 };
 
 
 const UnconnectedBoard = (props) => {
 
-   const {game_id, game, table, send_message} = props;
+   const {game_id, game, table, send_message, renjuUi, togglePick, resetRenjuUi} = props;
 
    const sendMove = (move) => {
       send_message(Commands.move({move: move, moves: [move], player: table.me, table: table.table}));
+   };
+
+   const sendRenjuDecline = (move) => {
+      send_message(Commands.renjuSwap({swap: false, move: move, player: table.me, table: table.table}));
+      resetRenjuUi();
+   };
+   const sendRenjuSelect = (move) => {
+      send_message(Commands.renjuSelect1({move: move, player: table.me, table: table.table}));
    };
 
    // console.log(JSON.stringify(game.abstractBoard))
@@ -54,6 +68,18 @@ const UnconnectedBoard = (props) => {
       // console.log('my turn: ', myTurn);
       // console.log('my turn: ', table.isMyTurn(game));
       // console.log('makeBoard');
+      // --- renju (Taraguchi-10) opening context, computed once before the cell loop ---
+      const isRenju = game.isRenjuGame && game.isRenjuGame();
+      const renjuPhaseNow = isRenju ? game.renjuPhaseNow() : null;
+      const boxRadius = isRenju ? game.renjuBoxRadius() : 0;
+      const center = 7; // 15x15
+      const inBox = (m) => {
+         if (boxRadius === 0) return true;
+         const x = m % 15, y = Math.floor(m / 15);
+         return Math.abs(x - center) <= boxRadius && Math.abs(y - center) <= boxRadius;
+      };
+      const picks = (isRenju && renjuUi.mode === 'offering') ? renjuUi.picks : [];
+      const offers = (isRenju && renjuPhaseNow === RenjuPhase.SELECTION) ? game.gameState.renjuState.offered : [];
       for (let j = 0; j < gridsize; j++) {
          for (let i = 0; i < gridsize; i++) {
             const m = j * gridsize + i;
@@ -83,9 +109,23 @@ const UnconnectedBoard = (props) => {
             }
 
             const stone = player_colors[game.abstractBoard[i][j]];
+            const empty = game.abstractBoard[i][j] === 0;
             let clickHandler = undefined;
             if (myTurn) {
-               if (game.abstractBoard[i][j] === 0) {
+               if (isRenju && renjuUi.mode === 'placing') {
+                  // decline + box-constrained Branch-A / window stone
+                  if (empty && inBox(m)) clickHandler = () => sendRenjuDecline(m);
+               } else if (isRenju && renjuUi.mode === 'offering') {
+                  // Branch-B 10-pick: empty, non-symmetric-duplicate points toggle in/out
+                  if (empty && !isSymmetricDup(m, renjuUi.picks)) clickHandler = () => togglePick(m);
+               } else if (isRenju && renjuPhaseNow === RenjuPhase.SELECTION) {
+                  // white selects one of the ten offered candidates
+                  if (offers.includes(m)) clickHandler = () => sendRenjuSelect(m);
+               } else if (isRenju && (renjuPhaseNow === RenjuPhase.SWAP || renjuPhaseNow === RenjuPhase.BRANCH)) {
+                  // a decision modal is up; the board is inert until a choice is armed
+                  clickHandler = undefined;
+               } else if (empty && (!isRenju || inBox(m))) {
+                  // normal move (incl. renju MOVE/COMPLETE, box-constrained for opening moves 2-5)
                   clickHandler = sendMove;
                }
                if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
@@ -126,6 +166,22 @@ const UnconnectedBoard = (props) => {
             board[move].last_move = true;
          }
       });
+      if (isRenju) {
+         // translucent black candidates: the in-progress 10-pick (offering) or the ten offers
+         // awaiting white's selection. player_colors[2] === 'black-stone-gradient'.
+         const blackTranslucent = player_colors[2];
+         picks.forEach((s) => { if (board[s]) board[s].deadStone = blackTranslucent; });
+         offers.forEach((s) => { if (board[s]) board[s].deadStone = blackTranslucent; });
+         // highlight the legal placement box during a placing decline OR a box-constrained MOVE
+         const highlight = (renjuUi.mode === 'placing') ||
+            (renjuPhaseNow === RenjuPhase.MOVE && boxRadius > 0);
+         if (highlight) {
+            for (let s = 0; s < board.length; s++) {
+               const x = s % 15, y = Math.floor(s / 15);
+               if (Math.abs(x - center) <= boxRadius && Math.abs(y - center) <= boxRadius) board[s].renjuBox = true;
+            }
+         }
+      }
 
       return board.map(p => <BoardSquare {...p}/>);
    };

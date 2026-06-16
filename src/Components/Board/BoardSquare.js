@@ -131,6 +131,10 @@ class BoardSquare extends Component {
             {this.props.territory && Territory({size: 10, id: this.props.territory})}
             {this.state.showStone && SimpleStone({size: 10, id: this.props.hover, opacity: 0.7})}
             {this.props.last_move && LastMove({size: 10})}
+            {this.props.renjuBox && (
+               <rect x={1} y={1} width={8} height={8} fill={"none"} stroke={"#3aa3ff"} strokeWidth={0.6}
+                     pointerEvents={'none'}/>
+            )}
          </g>
       );
    }
