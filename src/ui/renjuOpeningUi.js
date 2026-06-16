@@ -13,15 +13,21 @@ const TOGGLE_PICK = 'RENJU_UI/TOGGLE_PICK';
 const MARK_PENDING = 'RENJU_UI/MARK_PENDING';
 const RESET = 'RENJU_UI/RESET';
 
-// Server echoes that advance the opening (or end the table). Receiving any of these means a
-// pending decision/move was applied, so the transient UI resets to idle and lets the
-// (now-updated) phase decide what shows next — keeping the opening UI strictly server-driven.
+// Server echoes that advance the opening (or end / reset the table, or reject a decision).
+// Receiving any of these means a pending decision/move was applied (or rejected, or the game
+// was reset), so the transient UI resets to idle and lets the (now-updated) phase decide what
+// shows next — keeping the opening UI strictly server-driven. The game/table-reset events and
+// the move-error event are included so a mid-opening mode can't leak into the next game and a
+// server rejection unlocks `pending`.
 const ADVANCING_EVENTS = new Set([
   'dsgMoveTableEvent',
   'dsgSwapSeatsTableEvent',
   'dsgRenjuTaraguchiSwapTableEvent',
   'dsgRenjuTaraguchiOffer10TableEvent',
   'dsgRenjuTaraguchi10Select1TableEvent',
+  'dsgGameStateTableEvent',
+  'dsgChangeStateTableEvent',
+  'dsgMoveTableErrorEvent',
   'dsgExitTableEvent',
   'dsgBootTableEvent',
 ]);
@@ -32,7 +38,7 @@ export const renjuTogglePick = (move) => ({ type: TOGGLE_PICK, move });
 export const renjuMarkPending = () => ({ type: MARK_PENDING });
 export const renjuResetOpeningUi = () => ({ type: RESET });
 
-const INITIAL = { mode: 'idle', picks: [] };
+export const INITIAL = { mode: 'idle', picks: [] };
 
 export function renjuOpeningUiReducer(state = INITIAL, action) {
   switch (action.type) {

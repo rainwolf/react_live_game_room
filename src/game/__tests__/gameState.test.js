@@ -5,7 +5,7 @@ describe('freshRenjuTracking — initial Renju opening tracking record', () => {
   test('defaults: no decisions made, opening not complete', () => {
     expect(freshRenjuTracking()).toEqual({
       complete: false, awaitingSwap: false, branchChosen: false,
-      tenOffer: false, offered: [], selected: null,
+      tenOffer: false, offered: [], selected: null, swapTaken: false,
     });
   });
   test('returns a fresh object each call (no shared mutable state)', () => {

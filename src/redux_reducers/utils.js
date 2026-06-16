@@ -158,14 +158,20 @@ export function addTableMessage(data, state) {
    }
 }
 
-// Advance the tracked Renju opening record after a stone lands (mirror RenjuState.addMove):
-// windows open after moves 1-4 and after move 5 in Branch A; the opening completes otherwise
-// (move 6 in Branch A, move 5 in Branch B). No-op for non-renju games.
-function advanceRenjuTrackingAfterMove(game) {
+// Advance the tracked Renju opening record after a stone lands (mirror RenjuState.addMove).
+// `isRejoin` = this is the bulk resetBoard+replay path (a rejoin/state-sync), where the decision
+// echoes arrive BEFORE the move list (ServerTable sends them first), so we must NOT reopen a
+// window those echoes already resolved. A fresh incremental move opens a new window and consumes
+// any prior take-over marker. (code review #2)
+function advanceRenjuTrackingAfterMove(game, isRejoin) {
    if (!game.isRenjuGame || !game.isRenjuGame()) return;
    const r = game.gameState.renjuState;
    const n = game.moves.length;
-   const windowOpens = n <= 4 || (n === 5 && !r.tenOffer);
+   if (!isRejoin) r.swapTaken = false; // incremental move opens a fresh window; consume the marker
+   // current swap window is RESOLVED (not open) if a decision for it already arrived:
+   const windowResolved = r.swapTaken ||
+      (n === 4 && (r.branchChosen || r.tenOffer || r.selected != null));
+   const windowOpens = !windowResolved && (n <= 4 || (n === 5 && !r.tenOffer));
    r.awaitingSwap = windowOpens;
    r.complete = !windowOpens && n >= 5;
 }
@@ -174,17 +180,21 @@ export function addMove(data, state) {
    const game = state.game.newInstance();
    if (data.table === state.table) {
       if (data.moves.length === 1 && data.move === data.moves[0]) {
+         // incremental append: the decision echo arrived BEFORE this move, so open a fresh window
          game.addMove(data.move);
+         advanceRenjuTrackingAfterMove(game, false);
       } else {
+         // bulk rejoin/state-sync replay: the decision echoes arrived FIRST, so respect any
+         // window they already resolved (do NOT reopen it).
          game.resetBoard();
          for (let i = 0; i < data.moves.length; i++) {
             game.addMove(data.moves[i]);
          }
+         advanceRenjuTrackingAfterMove(game, true);
       }
       if (data.player !== state.me) {
          emit(state, {sound: 'move'});
       }
-      advanceRenjuTrackingAfterMove(game);
    }
    state.game = game;
 }
@@ -316,15 +326,17 @@ export function swapSeats(data, state) {
       const game = state.game.newInstance();
       game.gameState.dPenteState = data.swapped ? GameState.DPenteState.SWAPPED : GameState.DPenteState.NOT_SWAPPED;
       game.gameState.swap2State = data.swapped ? GameState.Swap2State.SWAPPED : GameState.Swap2State.NOT_SWAPPED;
-      // Renju: a swap-seats event resolves the CURRENT swap window. The live take-over is a
-      // non-silent DSGSwapSeatsTableEvent (server emits it exactly like swap2/dPente) — the
-      // visual seat swap is done by the !silent && swap branch above; the rejoin marker is a
-      // silent one (seats come from sendPlayingPlayers). EITHER way just clear awaitingSwap so
-      // the phase advances: n<4/5 -> MOVE, n==4 -> BRANCH (branchChosen stays false). The branch
-      // is chosen via offer10 or the swap=false move-4 decline, NOT by a take-over, so do NOT
-      // touch branchChosen/tenOffer here.
+      // Renju: a swap-seats event resolves the CURRENT swap window by a take-over. The live
+      // take-over is a non-silent DSGSwapSeatsTableEvent (server emits it exactly like
+      // swap2/dPente) — the visual seat swap is done by the !silent && swap branch above; the
+      // rejoin marker is a silent one (seats come from sendPlayingPlayers). EITHER way clear
+      // awaitingSwap so the phase advances: n<4/5 -> MOVE, n==4 -> BRANCH (branchChosen stays
+      // false). Also set swapTaken = true so the bulk rejoin replay does not REOPEN this
+      // resolved window. The branch is chosen via offer10 or the swap=false move-4 decline, NOT
+      // by a take-over, so do NOT touch branchChosen/tenOffer here.
       if (game.isRenjuGame && game.isRenjuGame()) {
          game.gameState.renjuState.awaitingSwap = false;
+         game.gameState.renjuState.swapTaken = true;
       }
       state.game = game;
    }

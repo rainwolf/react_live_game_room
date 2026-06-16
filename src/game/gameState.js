@@ -34,5 +34,5 @@ export const GameState = {
 // opening echoes; renjuPhase() in openingPhase.js classifies it. New object each call so
 // GameClass.reset() never aliases a shared array.
 export function freshRenjuTracking() {
-  return { complete: false, awaitingSwap: false, branchChosen: false, tenOffer: false, offered: [], selected: null };
+  return { complete: false, awaitingSwap: false, branchChosen: false, tenOffer: false, offered: [], selected: null, swapTaken: false };
 }

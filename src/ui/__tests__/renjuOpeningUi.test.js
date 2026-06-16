@@ -42,4 +42,14 @@ describe('renjuOpeningUi slice', () => {
     expect(renjuOpeningUiReducer({ mode: 'offering', picks: [1, 2] }, { type: 'dsgRenjuTaraguchi10Select1TableEvent' }))
       .toEqual({ mode: 'idle', picks: [] });
   });
+  test('game/table reset clears a stale mid-opening mode (no leak into the next game)', () => {
+    expect(renjuOpeningUiReducer({ mode: 'placing', picks: [] }, { type: 'dsgGameStateTableEvent' }))
+      .toEqual({ mode: 'idle', picks: [] });
+    expect(renjuOpeningUiReducer({ mode: 'offering', picks: [40, 41] }, { type: 'dsgChangeStateTableEvent' }))
+      .toEqual({ mode: 'idle', picks: [] });
+  });
+  test('a rejected decision (move-error echo) unlocks pending', () => {
+    const pending = renjuOpeningUiReducer(init(), renjuMarkPending());
+    expect(renjuOpeningUiReducer(pending, { type: 'dsgMoveTableErrorEvent' })).toEqual({ mode: 'idle', picks: [] });
+  });
 });

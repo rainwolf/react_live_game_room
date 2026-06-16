@@ -9,7 +9,7 @@ import {Commands} from '../../protocol';
 import {selectCurrentTable} from '../../selectors';
 import {gridSizeForGame, boardStyleClass, boardSpecialPoints} from '../../game/boardGeometry';
 import {renjuTogglePick, renjuMarkPending} from '../../ui/renjuOpeningUi';
-import {RenjuPhase} from '../../game/openingPhase';
+import {RenjuPhase, isRenjuSelection} from '../../game/openingPhase';
 import {renjuStabilizer, isOfferDup} from '../../game/renjuSymmetry';
 
 const mapStateToProps = state => {
@@ -71,7 +71,8 @@ const UnconnectedBoard = (props) => {
       if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
          hover = 'red-stone-gradient';
       }
-      const myTurn = table.isMyTurn(game) && game.gameState.state === GameState.State.STARTED;
+      const started = game.gameState.state === GameState.State.STARTED;
+      const myTurn = table.isMyTurn(game) && started;
       // console.log('my turn: ', myTurn);
       // console.log('my turn: ', table.isMyTurn(game));
       // console.log('makeBoard');
@@ -79,10 +80,11 @@ const UnconnectedBoard = (props) => {
       const isRenju = game.isRenjuGame && game.isRenjuGame();
       const renjuPhaseNow = isRenju ? game.renjuPhaseNow() : null;
       const boxRadius = isRenju ? game.renjuBoxRadius() : 0;
-      const center = 7; // 15x15
+      const size = gridsize;
+      const center = Math.floor(size / 2);
       const inBox = (m) => {
          if (boxRadius === 0) return true;
-         const x = m % 15, y = Math.floor(m / 15);
+         const x = m % size, y = Math.floor(m / size);
          return Math.abs(x - center) <= boxRadius && Math.abs(y - center) <= boxRadius;
       };
       const picks = (isRenju && renjuUi.mode === 'offering') ? renjuUi.picks : [];
@@ -90,8 +92,8 @@ const UnconnectedBoard = (props) => {
       // offer-symmetry pre-check: the stabilizer of the CURRENT placed position, computed once per
       // render, mirroring the server/JSP — so only genuine symmetric (or exact) duplicates are
       // blocked, never arbitrary rotations on an asymmetric board.
-      const valueAt = (q) => game.abstractBoard[q % 15][Math.floor(q / 15)];
-      const offerStab = (isRenju && renjuUi.mode === 'offering') ? renjuStabilizer(valueAt) : [];
+      const valueAt = (q) => game.abstractBoard[q % size][Math.floor(q / size)];
+      const offerStab = (isRenju && renjuUi.mode === 'offering') ? renjuStabilizer(valueAt, size) : [];
       for (let j = 0; j < gridsize; j++) {
          for (let i = 0; i < gridsize; i++) {
             const m = j * gridsize + i;
@@ -135,14 +137,20 @@ const UnconnectedBoard = (props) => {
                   // to the server (no separate submit) — so the count can never exceed 10.
                   if (renjuUi.picks.includes(m)) {
                      clickHandler = () => togglePick(m);
-                  } else if (empty && !isOfferDup(m, renjuUi.picks, offerStab)) {
+                  } else if (empty && !isOfferDup(m, renjuUi.picks, offerStab, size)) {
                      clickHandler = renjuUi.picks.length >= 9
                         ? () => sendRenjuOffer10([...renjuUi.picks, m])
                         : () => togglePick(m);
                   }
-               } else if (isRenju && renjuPhaseNow === RenjuPhase.SELECTION) {
+               } else if (isRenju && isRenjuSelection(game.moves.length, game.gameState.renjuState, started)) {
                   // white selects one of the ten offered candidates
                   if (offers.includes(m)) clickHandler = () => sendRenjuSelect(m);
+               } else if (isRenju && game.gameState.renjuState.selected != null && game.moves.length === 4) {
+                  // Branch-B gap: white's fifth-move is selected (select1 echo in) but the move-5
+                  // dsgMoveTableEvent hasn't landed yet (numMoves still 4, phase reads MOVE). Keep the
+                  // board inert — like the SWAP/BRANCH decision-pending arm — so black's normal-move
+                  // handler can't transiently fire. (placed AFTER the SELECTION branch, which needs
+                  // selected==null, so it can never shadow it.)
                } else if (isRenju && (renjuPhaseNow === RenjuPhase.SWAP || renjuPhaseNow === RenjuPhase.BRANCH)) {
                   // a decision modal is up; the board is inert until a choice is armed
                   clickHandler = undefined;

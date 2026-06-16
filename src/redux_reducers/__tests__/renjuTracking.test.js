@@ -4,6 +4,7 @@ import { Game, GameState } from '../../Classes/GameClass';
 import Table from '../../Classes/TableClass';
 import liveGameApp from '../rootReducer';
 import { renjuBeginOffer } from '../../ui/renjuOpeningUi';
+import { renjuPhase, RenjuPhase } from '../../game/openingPhase';
 
 function renjuState() {
   const g = new Game();
@@ -71,6 +72,23 @@ describe('renju tracking reducers', () => {
     expect(s.game.gameState.renjuState.awaitingSwap).toBe(true);
     expect(s.game.gameState.renjuState.complete).toBe(false);
   });
+  test('renjuSwap(false) at a window 1-3 decline does NOT choose a branch', () => {
+    const s = renjuState();
+    [112, 113].forEach((m) => move(s, m)); // n=2, window 2 open
+    renjuSwap({ table: 5, swap: false, move: 97, player: 'bob' }, s);
+    const r = s.game.gameState.renjuState;
+    expect(r.branchChosen).toBe(false); // branch is chosen only at the move-4 window
+    expect(r.awaitingSwap).toBe(false);
+  });
+  test('renjuSwap(true) take-over echo at n=4 clears awaitingSwap, leaves branch unchosen', () => {
+    const s = renjuState();
+    [112, 113, 97, 98].forEach((m) => move(s, m)); // n=4
+    renjuSwap({ table: 5, swap: true, move: -1, player: 'bob' }, s);
+    const r = s.game.gameState.renjuState;
+    expect(r.branchChosen).toBe(false);
+    expect(r.tenOffer).toBe(false);
+    expect(r.awaitingSwap).toBe(false);
+  });
 });
 
 describe('swapSeats advances renju tracking (live take-over + silent rejoin)', () => {
@@ -99,6 +117,36 @@ describe('swapSeats advances renju tracking (live take-over + silent rejoin)', (
     swapSeats({ table: 5, silent: false, swap: true, player: 'iostest' }, s); // live take-over
     expect(s.game.gameState.renjuState.awaitingSwap).toBe(false); // window resolved -> MOVE
     expect(s.tables[5].seats).toEqual([undefined, 'iostest', 'graviton']); // visual seat swap happened
+  });
+});
+
+describe('rejoin: a decision echo BEFORE the bulk move-list must not reopen a resolved window (code review #2)', () => {
+  // On rejoin the server sends the decision echo FIRST, then the full move list (ServerTable
+  // sendMoves). The bulk replay must respect the window the echo already resolved — otherwise it
+  // clobbers awaitingSwap back to true and pops a spurious take-over modal in BRANCH/SELECTION.
+  const bulk = (s, arr, player = 'srv') => addMove({ table: 5, move: arr[arr.length - 1], moves: arr, player }, s);
+  const phaseOf = (s) => renjuPhase(s.game.moves.length, s.game.gameState.renjuState);
+
+  test('SELECTION rejoin: offer10 echo then bulk 4 moves -> SELECTION (not a spurious SWAP)', () => {
+    const s = renjuState();
+    renjuOffer10({ table: 5, moves: [113, 114, 115, 116, 128, 129, 130, 131, 144, 145], player: 'alice' }, s);
+    bulk(s, [112, 113, 97, 98]); // full move list arrives last
+    expect(s.game.gameState.renjuState.awaitingSwap).toBe(false);
+    expect(phaseOf(s)).toBe(RenjuPhase.SELECTION);
+  });
+  test('BRANCH rejoin: silent swap-seats marker then bulk 4 moves -> BRANCH (not SWAP)', () => {
+    const s = renjuState();
+    swapSeats({ table: 5, silent: true, swap: false }, s); // rejoin take-over marker (sets swapTaken)
+    bulk(s, [112, 113, 97, 98]);
+    expect(s.game.gameState.renjuState.awaitingSwap).toBe(false);
+    expect(s.game.gameState.renjuState.branchChosen).toBe(false);
+    expect(phaseOf(s)).toBe(RenjuPhase.BRANCH);
+  });
+  test('open-window rejoin: bulk 4 moves with NO decision echo -> SWAP (window 4 open)', () => {
+    const s = renjuState();
+    bulk(s, [112, 113, 97, 98]);
+    expect(s.game.gameState.renjuState.awaitingSwap).toBe(true);
+    expect(phaseOf(s)).toBe(RenjuPhase.SWAP);
   });
 });
 

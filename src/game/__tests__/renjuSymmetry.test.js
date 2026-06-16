@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { renjuRotate, renjuStabilizer, isSymmetricDup } from '../renjuSymmetry';
+import { renjuRotate, renjuStabilizer, isSymmetricDup, isOfferDup } from '../renjuSymmetry';
 
 // valueAt built from a {moveIndex: stoneValue} map (0 = empty elsewhere).
 const board = (occ) => (m) => occ[m] || 0;
@@ -32,5 +32,16 @@ describe('renju symmetry — mirrors server isSymmetricDuplicate / JSP renjuStab
     expect(renjuStabilizer(valueAt).length).toBe(8);
     expect(isSymmetricDup(184, [40], valueAt)).toBe(true); // 184 is a rotation-image of 40
     expect(isSymmetricDup(56, [40], valueAt)).toBe(false); // 56 is not in 40's orbit
+  });
+
+  test('a single-axis-symmetric position has a 2-element stabilizer (mirror-dup only)', () => {
+    // centre (black) + a white stone on the vertical centre line (col 7): 127 = (7,8).
+    // Invariant only under identity + the vertical-axis mirror.
+    const valueAt = board({ 112: 2, 127: 1 });
+    const stab = renjuStabilizer(valueAt);
+    expect(stab.length).toBe(2);
+    // 100 = (10,6): its vertical mirror 94 = (4,6) is a dup; its 90-degree rotation 158 = (8,10) is legal.
+    expect(isOfferDup(94, [100], stab)).toBe(true);
+    expect(isOfferDup(158, [100], stab)).toBe(false);
   });
 });

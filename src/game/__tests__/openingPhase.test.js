@@ -165,6 +165,13 @@ describe('renjuOpeningPlayer — mirrors RenjuState.getCurrentPlayer during the 
   test('complete => null (caller falls back to parity)', () => {
     expect(renjuOpeningPlayer(6, rs({ complete: true }))).toBe(null);
   });
+  test('branch A window-5 and move 6: white (2) is to move either way', () => {
+    expect(renjuOpeningPlayer(5, rs({ branchChosen: true, awaitingSwap: true }))).toBe(2);  // window 5 open
+    expect(renjuOpeningPlayer(5, rs({ branchChosen: true, awaitingSwap: false }))).toBe(2); // window 5 resolved -> move 6
+  });
+  test('branch B after selection (selected set, move 5 not yet placed) falls through to parity', () => {
+    expect(renjuOpeningPlayer(4, rs({ branchChosen: true, tenOffer: true, offered: new Array(10).fill(0), selected: 57 }))).toBe(1);
+  });
 });
 
 describe('renju choice predicates + modal buttons', () => {

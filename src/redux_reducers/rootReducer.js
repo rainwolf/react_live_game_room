@@ -14,7 +14,7 @@ import {
    UNMUTE
 } from "../redux_actions/actionTypes";
 import {modalsReducer} from "../ui/modals";
-import {renjuOpeningUiReducer} from "../ui/renjuOpeningUi";
+import {renjuOpeningUiReducer, INITIAL as RENJU_UI_INITIAL} from "../ui/renjuOpeningUi";
 import './utils';
 import User from '../Classes/UserClass';
 import {
@@ -72,7 +72,7 @@ const initialState = {
    table_messages: [],
    tournament: false,
    modals: {},
-   renjuOpeningUi: { mode: 'idle', picks: [] },
+   renjuOpeningUi: RENJU_UI_INITIAL,
    pendingNotifications: [],
 };
 
