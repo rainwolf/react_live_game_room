@@ -1,5 +1,5 @@
 import {useEffect, useRef} from "react";
-import {GameState} from '../game/gameState';
+import {GameState, freshRenjuTracking} from '../game/gameState';
 import {gridSizeForGame, isGoBoard, variantKey} from '../game/boardGeometry';
 import {
    swap2OpeningPlayer,
@@ -7,6 +7,9 @@ import {
    isSwap2Choice,
    isSwap2CanPass,
    isDPenteChoice,
+   renjuOpeningPlayer,
+   isRenjuSwapChoice,
+   isRenjuBranchChoice,
 } from '../game/openingPhase';
 
 // Re-exported so existing `import {GameState} from '.../GameClass'` call sites keep working.
@@ -35,6 +38,7 @@ const VARIANT_RULES = {
    'o-pente':     {replay: 'oPente',   disableRatedOnReplay: false, add: 'oPente', goMove: false, player: 'standard', postRule: 'tournament'},
    'swap2-pente': {replay: 'pente',    disableRatedOnReplay: false, add: 'pente',  goMove: false, player: 'standard', postRule: 'none'},
    'swap2-keryo': {replay: 'keryo',    disableRatedOnReplay: false, add: 'keryo',  goMove: false, player: 'standard', postRule: 'none'},
+   'renju':       {replay: 'renju',    disableRatedOnReplay: false, add: 'gomoku', goMove: false, player: 'renju',    postRule: 'none'},
 };
 
 export class Game {
@@ -79,7 +83,13 @@ export class Game {
       newGame.setGame(this.game);
       newGame.rated = this.rated;
       newGame.me = this.me;
-      newGame.gameState = {...this.gameState};
+      newGame.gameState = {
+         ...this.gameState,
+         renjuState: {
+            ...this.gameState.renjuState,
+            offered: [...this.gameState.renjuState.offered],
+         },
+      };
       // for (let i = 0; i < 19; i++) {
       //     for (let j = 0; j < 19; j++) {
       //         newGame.abstractBoard[i][j] = this.abstractBoard[i][j];
@@ -227,6 +237,11 @@ export class Game {
          if (p !== null) {
             return p;
          }
+      } else if (this.#isRenju()) {
+         const p = renjuOpeningPlayer(this.moves.length, this.gameState.renjuState);
+         if (p !== null) {
+            return p;
+         }
       } else if (this.isGo() && this.gameState.goState === GameState.GoState.MARK_STONES) {
          return this.mark_dead_stones_player;
       } else if (this.isGo() && this.gameState.goState === GameState.GoState.EVALUATE_STONES) {
@@ -237,6 +252,9 @@ export class Game {
    currentColor = () => {
       if (this.isConnect6()) {
          return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
+      }
+      if (this.#isRenju()) {
+         return 2 - (this.moves.length % 2); // black-first hover/ghost
       }
       // const currentColor = 1 + (this.moves.length % 2);
       return 1 + (this.moves.length % 2);
@@ -258,6 +276,12 @@ export class Game {
    #isSwap2 = () => {
       return this.game === 27 || this.game === 28 || this.game === 29 || this.game === 30;
    };
+   // Public so Task 6 reducers / the board can detect renju (#isRenju stays private as the
+   // single source for the in-class arms; later tasks call game.isRenjuGame()).
+   isRenjuGame = () => {
+      return this.game === 31 || this.game === 32 || this.game === 81;
+   };
+   #isRenju = () => this.isRenjuGame();
 
    #started = () => this.gameState.state === GameState.State.STARTED;
 
@@ -280,6 +304,13 @@ export class Game {
       this.gameState.swap2State = GameState.Swap2State.SWAP2PASS;
    }
 
+   renjuChoice = () => {
+      if (!this.#isRenju()) return false;
+      const started = this.gameState.state === GameState.State.STARTED;
+      return isRenjuSwapChoice(this.moves.length, this.gameState.renjuState, started)
+          || isRenjuBranchChoice(this.moves.length, this.gameState.renjuState, started);
+   };
+
    reset = () => {
       this.resetBoard();
 
@@ -287,7 +318,8 @@ export class Game {
          state: GameState.State.NOT_STARTED,
          dPenteState: GameState.DPenteState.NO_CHOICE,
          swap2State: GameState.Swap2State.NO_CHOICE,
-         goState: GameState.GoState.PLAY
+         goState: GameState.GoState.PLAY,
+         renjuState: freshRenjuTracking(),
       }
    };
    resetBoard = () => {
@@ -331,7 +363,7 @@ export class Game {
       const replay = {
          pente: this.#replayPenteGame, keryo: this.#replayKeryoPenteGame, gomoku: this.#replayGomokuGame,
          gPente: this.#replayGPenteGame, poof: this.#replayPoofPenteGame, connect6: this.#replayConnect6Game,
-         go: this.#replayGoGame, oPente: this.#replayOPenteGame,
+         go: this.#replayGoGame, oPente: this.#replayOPenteGame, renju: this.#replayRenjuGame,
       }[rules.replay];
       if (rules.disableRatedOnReplay) {
          // d-pente / dk-pente replay through the pente / keryo engine, which applies its own
@@ -352,7 +384,9 @@ export class Game {
       const rules = VARIANT_RULES[variantKey(this.game)];
       const player = rules.player === 'connect6'
          ? ((((i % 4) === 0) || ((i % 4) === 3)) ? 1 : 2)
-         : 1 + (i % 2);
+         : rules.player === 'renju'
+            ? 2 - (i % 2)
+            : 1 + (i % 2);
       this.#applyMove(rules, move, x, y, player);
    };
 
@@ -369,7 +403,9 @@ export class Game {
       const rules = VARIANT_RULES[variantKey(this.game)];
       const player = rules.player === 'connect6'
          ? ((((this.moves.length % 4) === 1) || ((this.moves.length % 4) === 0)) ? 1 : 2)
-         : 2 - (this.moves.length % 2);
+         : rules.player === 'renju'
+            ? 1 + (this.moves.length % 2)   // moves.length==1 -> 2 (black-first)
+            : 2 - (this.moves.length % 2);
       this.#applyMove(rules, move, x, y, player);
    };
 
@@ -465,6 +501,13 @@ export class Game {
       for (let i = 0; i < Math.min(this.moves.length, until); i++) {
          let color = 1 + (i % 2);
          let x = this.moves[i] % 19, y = Math.floor(this.moves[i] / 19);
+         this.#addGomokuMove(x, y, color);
+      }
+   };
+   #replayRenjuGame = (until) => {
+      for (let i = 0; i < Math.min(this.moves.length, until); i++) {
+         let color = 2 - (i % 2); // i=0 -> 2 (black-first); gomoku is white-first (1 + i%2)
+         let x = this.moves[i] % this.gridSize, y = Math.floor(this.moves[i] / this.gridSize);
          this.#addGomokuMove(x, y, color);
       }
    };
