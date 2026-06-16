@@ -8,9 +8,9 @@ import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
 import {selectCurrentTable} from '../../selectors';
 import {gridSizeForGame, boardStyleClass, boardSpecialPoints} from '../../game/boardGeometry';
-import {renjuTogglePick, renjuResetOpeningUi} from '../../ui/renjuOpeningUi';
+import {renjuTogglePick, renjuMarkPending} from '../../ui/renjuOpeningUi';
 import {RenjuPhase} from '../../game/openingPhase';
-import {isSymmetricDup} from '../../game/renjuSymmetry';
+import {renjuStabilizer, isOfferDup} from '../../game/renjuSymmetry';
 
 const mapStateToProps = state => {
    const table = selectCurrentTable(state);
@@ -28,29 +28,32 @@ const mapDispatchToProps = dispatch => {
          dispatch(send_message(message));
       },
       togglePick: move => dispatch(renjuTogglePick(move)),
-      resetRenjuUi: () => dispatch(renjuResetOpeningUi()),
+      markPending: () => dispatch(renjuMarkPending()),
    }
 };
 
 
 const UnconnectedBoard = (props) => {
 
-   const {game_id, game, table, send_message, renjuUi, togglePick, resetRenjuUi} = props;
+   const {game_id, game, table, send_message, renjuUi, togglePick, markPending} = props;
 
    const sendMove = (move) => {
       send_message(Commands.move({move: move, moves: [move], player: table.me, table: table.table}));
    };
 
+   // Each opening decision is SENT then the UI goes 'pending' — we do NOT mutate the board or
+   // re-open the modal locally; the stone/seat/phase only change when the server echoes back.
    const sendRenjuDecline = (move) => {
       send_message(Commands.renjuSwap({swap: false, move: move, player: table.me, table: table.table}));
-      resetRenjuUi();
+      markPending();
    };
    const sendRenjuSelect = (move) => {
       send_message(Commands.renjuSelect1({move: move, player: table.me, table: table.table}));
+      markPending();
    };
    const sendRenjuOffer10 = (moves) => {
       send_message(Commands.renjuOffer10({moves: moves, player: table.me, table: table.table}));
-      resetRenjuUi();
+      markPending();
    };
 
    // console.log(JSON.stringify(game.abstractBoard))
@@ -84,6 +87,11 @@ const UnconnectedBoard = (props) => {
       };
       const picks = (isRenju && renjuUi.mode === 'offering') ? renjuUi.picks : [];
       const offers = (isRenju && renjuPhaseNow === RenjuPhase.SELECTION) ? game.gameState.renjuState.offered : [];
+      // offer-symmetry pre-check: the stabilizer of the CURRENT placed position, computed once per
+      // render, mirroring the server/JSP — so only genuine symmetric (or exact) duplicates are
+      // blocked, never arbitrary rotations on an asymmetric board.
+      const valueAt = (q) => game.abstractBoard[q % 15][Math.floor(q / 15)];
+      const offerStab = (isRenju && renjuUi.mode === 'offering') ? renjuStabilizer(valueAt) : [];
       for (let j = 0; j < gridsize; j++) {
          for (let i = 0; i < gridsize; i++) {
             const m = j * gridsize + i;
@@ -116,7 +124,9 @@ const UnconnectedBoard = (props) => {
             const empty = game.abstractBoard[i][j] === 0;
             let clickHandler = undefined;
             if (myTurn) {
-               if (isRenju && renjuUi.mode === 'placing') {
+               if (isRenju && renjuUi.mode === 'pending') {
+                  // a decision was just sent; the board stays inert until the server echo arrives
+               } else if (isRenju && renjuUi.mode === 'placing') {
                   // decline + box-constrained Branch-A / window stone
                   if (empty && inBox(m)) clickHandler = () => sendRenjuDecline(m);
                } else if (isRenju && renjuUi.mode === 'offering') {
@@ -125,7 +135,7 @@ const UnconnectedBoard = (props) => {
                   // to the server (no separate submit) — so the count can never exceed 10.
                   if (renjuUi.picks.includes(m)) {
                      clickHandler = () => togglePick(m);
-                  } else if (empty && !isSymmetricDup(m, renjuUi.picks)) {
+                  } else if (empty && !isOfferDup(m, renjuUi.picks, offerStab)) {
                      clickHandler = renjuUi.picks.length >= 9
                         ? () => sendRenjuOffer10([...renjuUi.picks, m])
                         : () => togglePick(m);
@@ -184,15 +194,8 @@ const UnconnectedBoard = (props) => {
          const blackTranslucent = player_colors[2];
          picks.forEach((s) => { if (board[s]) board[s].deadStone = blackTranslucent; });
          offers.forEach((s) => { if (board[s]) board[s].deadStone = blackTranslucent; });
-         // highlight the legal placement box during a placing decline OR a box-constrained MOVE
-         const highlight = (renjuUi.mode === 'placing') ||
-            (renjuPhaseNow === RenjuPhase.MOVE && boxRadius > 0);
-         if (highlight) {
-            for (let s = 0; s < board.length; s++) {
-               const x = s % 15, y = Math.floor(s / 15);
-               if (Math.abs(x - center) <= boxRadius && Math.abs(y - center) <= boxRadius) board[s].renjuBox = true;
-            }
-         }
+         // NOTE: the legal placement box is still enforced via the clickHandler gating (inBox);
+         // we intentionally do NOT draw a visual box highlight (per UX preference).
       }
 
       return board.map(p => <BoardSquare {...p}/>);

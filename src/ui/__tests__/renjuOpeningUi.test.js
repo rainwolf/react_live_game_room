@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import {
-  renjuOpeningUiReducer, renjuBeginPlace, renjuBeginOffer, renjuTogglePick, renjuResetOpeningUi,
+  renjuOpeningUiReducer, renjuBeginPlace, renjuBeginOffer, renjuTogglePick, renjuMarkPending, renjuResetOpeningUi,
 } from '../renjuOpeningUi';
 
 const init = () => renjuOpeningUiReducer(undefined, { type: '@@INIT' });
@@ -31,6 +31,15 @@ describe('renjuOpeningUi slice', () => {
     expect(renjuOpeningUiReducer({ mode: 'offering', picks: [1, 2, 3] }, { type: 'dsgExitTableEvent' }))
       .toEqual({ mode: 'idle', picks: [] });
     expect(renjuOpeningUiReducer({ mode: 'placing', picks: [] }, { type: 'dsgBootTableEvent' }))
+      .toEqual({ mode: 'idle', picks: [] });
+  });
+  test('markPending -> pending; any phase-advancing server echo resets it to idle', () => {
+    const pending = renjuOpeningUiReducer(init(), renjuMarkPending());
+    expect(pending).toEqual({ mode: 'pending', picks: [] });
+    // the server echo (a move) is what returns the UI to idle — not the click
+    expect(renjuOpeningUiReducer(pending, { type: 'dsgMoveTableEvent' })).toEqual({ mode: 'idle', picks: [] });
+    // a swap / select echo clears any transient mode too
+    expect(renjuOpeningUiReducer({ mode: 'offering', picks: [1, 2] }, { type: 'dsgRenjuTaraguchi10Select1TableEvent' }))
       .toEqual({ mode: 'idle', picks: [] });
   });
 });

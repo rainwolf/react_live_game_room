@@ -1,22 +1,36 @@
 import { describe, test, expect } from 'vitest';
-import { d4Images, isSymmetricDup } from '../renjuSymmetry';
+import { renjuRotate, renjuStabilizer, isSymmetricDup } from '../renjuSymmetry';
 
-describe('renju D4 symmetry (15x15, center (7,7))', () => {
-  test('the 8 images of an off-axis point are distinct and include the point', () => {
-    const imgs = d4Images(40); // (10,2): dx=3, dy=-5
-    expect(new Set(imgs).size).toBe(8);
-    expect(imgs).toContain(40);
+// valueAt built from a {moveIndex: stoneValue} map (0 = empty elsewhere).
+const board = (occ) => (m) => occ[m] || 0;
+
+describe('renju symmetry — mirrors server isSymmetricDuplicate / JSP renjuStabilizer', () => {
+  test('renjuRotate: centre is fixed; r=4 is the 180° rotation', () => {
+    expect(renjuRotate(112, 0)).toBe(112); // identity, centre
+    expect(renjuRotate(112, 4)).toBe(112); // centre fixed under every op
+    // 40 = (10,2): dx=3,dy=-5 ; 180° -> (4,12) = 4 + 12*15 = 184
+    expect(renjuRotate(40, 4)).toBe(184);
+    expect(renjuRotate(184, 4)).toBe(40); // involution
   });
-  test('a center-symmetric counterpart is rejected against an accepted offer', () => {
-    // 40 = (10,2) dx=3,dy=-5 ; its 180-degree image (-3,5) = (4,12) = 4 + 12*15 = 184
-    expect(isSymmetricDup(184, [40])).toBe(true);
+
+  test('an asymmetric placed position has only the identity stabilizer', () => {
+    // centre (black) + a stone off EVERY axis and diagonal ((9,8)=129) breaks all symmetry
+    const valueAt = board({ 112: 2, 129: 1 });
+    expect(renjuStabilizer(valueAt)).toEqual([0]);
   });
-  test('a non-symmetric point is accepted', () => {
-    expect(isSymmetricDup(56, [40])).toBe(false); // (11,3) is not in the orbit of (10,2)
+
+  test('asymmetric position: only an EXACT duplicate offer is a dup (rotations are legal)', () => {
+    const valueAt = board({ 112: 2, 129: 1 });
+    // 184 is the 180° image of 40, but the position is asymmetric -> NOT a dup
+    expect(isSymmetricDup(184, [40], valueAt)).toBe(false);
+    // the exact same point IS a dup
+    expect(isSymmetricDup(40, [40], valueAt)).toBe(true);
   });
-  test('on-diagonal points have fewer than 8 distinct images but still self-consistent', () => {
-    const imgs = d4Images(112 + 16); // (8,8) on main diagonal: dx=dy=1
-    expect(imgs).toContain(112 + 16);
-    expect(isSymmetricDup(112 + 16, [112 + 16])).toBe(true);
+
+  test('a symmetric placed position (lone centre) rejects rotated offers', () => {
+    const valueAt = board({ 112: 2 }); // only the centre -> full D4 stabilizer
+    expect(renjuStabilizer(valueAt).length).toBe(8);
+    expect(isSymmetricDup(184, [40], valueAt)).toBe(true); // 184 is a rotation-image of 40
+    expect(isSymmetricDup(56, [40], valueAt)).toBe(false); // 56 is not in 40's orbit
   });
 });

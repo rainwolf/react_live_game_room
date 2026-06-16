@@ -11,7 +11,7 @@ import {Commands} from '../../protocol';
 import {selectCurrentTable} from '../../selectors';
 import {GameState} from '../../game/gameState';
 import {renjuModalButtons} from '../../game/openingPhase';
-import {renjuBeginPlace, renjuBeginOffer} from '../../ui/renjuOpeningUi';
+import {renjuBeginPlace, renjuBeginOffer, renjuMarkPending} from '../../ui/renjuOpeningUi';
 
 function getModalStyle() {
    const top = 70, left = 70;
@@ -25,6 +25,7 @@ const mapDispatchToProps = dispatch => ({
    send_message: m => dispatch(send_message(m)),
    beginPlace: () => dispatch(renjuBeginPlace()),
    beginOffer: () => dispatch(renjuBeginOffer()),
+   markPending: () => dispatch(renjuMarkPending()),
 });
 
 const UnconnectedRenjuChoiceModal = (props) => {
@@ -35,11 +36,15 @@ const UnconnectedRenjuChoiceModal = (props) => {
    // open only when it's my swap/branch choice AND no board interaction is armed
    const open = table.myRenjuChoice(game) && renjuUi.mode === 'idle';
 
-   const takeOver = () => props.send_message(Commands.renjuSwap({swap: true, move: 0, player: table.me, table: table.table}));
+   const takeOver = () => {
+      props.send_message(Commands.renjuSwap({swap: true, move: 0, player: table.me, table: table.table}));
+      props.markPending(); // wait for the server's swap-seats echo; don't re-open the modal meanwhile
+   };
    const decline = () => {
       if (n === 5) {
          // window-5 decline is BARE (no bundled stone); move 6 follows as a normal move
          props.send_message(Commands.renjuSwap({swap: false, move: 0, player: table.me, table: table.table}));
+         props.markPending();
       } else {
          props.beginPlace(); // arm the board for the box-constrained decline/Branch-A stone
       }
