@@ -43,6 +43,7 @@ describe('table_color — lobby card colour per variant (derived from variantKey
     [1, '#FDDEA3'], [3, '#BAFDA3'], [5, '#A3FDEB'], [7, '#A3CDFD'], [9, '#AEA3FD'],
     [11, '#EDA3FD'], [13, '#EDA3FD'], [15, '#25BAFF'], [17, '#FFA500'], [19, '#FAC832'],
     [24, '#FAC832'], [25, '#52BE80'], [27, '#E5AA70'], [29, '#50C878'], [30, '#50C878'],
+    [31, '#D98880'], [81, '#D98880'], // renju (live + TB): distinct rose, NOT gomoku aqua (#A3FDEB)
   ];
   test.each(cases)('game %i -> %s', (g, expected) => {
     expect(tableForGame(g).table_color()).toBe(expected);
