@@ -20,6 +20,8 @@ import Snack from '../Components/Table/Snack';
 import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
 import Swap2ChoiceModal from "../Components/Table/Swap2ChoiceModal";
+import RenjuChoiceModal from "../Components/Table/RenjuChoiceModal";
+import RenjuOfferPanel from "../Components/Table/RenjuOfferPanel";
 import JoinRequestComponent from "../Components/Arena/JoinRequestComponent";
 import {selectCurrentTable} from '../selectors';
 
@@ -99,6 +101,7 @@ const UnconnectedTable = (props) => {
                      <Grid item style={{height: '100%'}}>
                         <div style={{height: '100%', width: height}}>
                            <Board/>
+                           <RenjuOfferPanel/>
                         </div>
                      </Grid>
                      <Grid item style={{height: '100%', width: Math.min(500, width - height)}}>
@@ -125,6 +128,7 @@ const UnconnectedTable = (props) => {
                   <CancelModal/>
                   <DPenteChoiceModal/>
                   <Swap2ChoiceModal/>
+                  <RenjuChoiceModal/>
                   <SettingsModal/>
                   <EvaluateGoModal/>
                   <WaitPlayerReturnModal/>
