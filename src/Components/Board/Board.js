@@ -94,6 +94,9 @@ const UnconnectedBoard = (props) => {
       // blocked, never arbitrary rotations on an asymmetric board.
       const valueAt = (q) => game.abstractBoard[q % size][Math.floor(q / size)];
       const offerStab = (isRenju && renjuUi.mode === 'offering') ? renjuStabilizer(valueAt, size) : [];
+      // Build the already-picked Set ONCE per render (alongside offerStab) instead of letting
+      // isOfferDup rebuild it for every empty cell (~200 cells/render). Passed into isOfferDup below.
+      const picksSet = new Set(picks);
       for (let j = 0; j < gridsize; j++) {
          for (let i = 0; i < gridsize; i++) {
             const m = j * gridsize + i;
@@ -137,7 +140,7 @@ const UnconnectedBoard = (props) => {
                   // to the server (no separate submit) — so the count can never exceed 10.
                   if (renjuUi.picks.includes(m)) {
                      clickHandler = () => togglePick(m);
-                  } else if (empty && !isOfferDup(m, renjuUi.picks, offerStab, size)) {
+                  } else if (empty && !isOfferDup(m, picksSet, offerStab, size)) {
                      clickHandler = renjuUi.picks.length >= 9
                         ? () => sendRenjuOffer10([...renjuUi.picks, m])
                         : () => togglePick(m);
