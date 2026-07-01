@@ -10,6 +10,16 @@ function emit(state, notification) {
    state.pendingNotifications = [...(state.pendingNotifications || []), notification];
 }
 
+// Commit Renju "Branch A" for a resolved move-4 window (Taraguchi-10 take-over or swap=false
+// decline): the swapped-in player just places move 5, so the opening is fixed to phase MOVE — no
+// 3-way BRANCH re-prompt and no Offer-10 / Branch B. Shared by the three move-4 commit sites (the
+// live swapSeats take-over, the rejoin/state-sync replay, and the swap=false decision echo) so the
+// commit lives in exactly ONE place.
+function commitBranchA(r) {
+   r.branchChosen = true;
+   r.tenOffer = false;
+}
+
 export function processUser(userdata, state) {
    let user;
    if (state.users[userdata.name]) {
@@ -168,6 +178,15 @@ function advanceRenjuTrackingAfterMove(game, isRejoin) {
    const r = game.gameState.renjuState;
    const n = game.moves.length;
    if (!isRejoin) r.swapTaken = false; // incremental move opens a fresh window; consume the marker
+   // Rejoin/state-sync take-over: the silent seat-swap marker arrived BEFORE this bulk move list, so
+   // it could only stash swapTaken (game.moves was empty then — see swapSeats). Now that the moves
+   // are replayed, a take-over marker at the move-4 window commits Branch A (Taraguchi-10): the
+   // swapped-in player just places move 5, so branchChosen must be true (phase MOVE, not the 3-way
+   // BRANCH re-prompt). Mirrors backend RenjuRejoin.decode, which returns a MOVE take-over for a
+   // move-4 swap, and the live swapSeats take-over above.
+   if (isRejoin && r.swapTaken && n === 4) {
+      commitBranchA(r);
+   }
    // current swap window is RESOLVED (not open) if a decision for it already arrived:
    const windowResolved = r.swapTaken ||
       (n === 4 && (r.branchChosen || r.tenOffer || r.selected != null));
@@ -326,17 +345,28 @@ export function swapSeats(data, state) {
       const game = state.game.newInstance();
       game.gameState.dPenteState = data.swapped ? GameState.DPenteState.SWAPPED : GameState.DPenteState.NOT_SWAPPED;
       game.gameState.swap2State = data.swapped ? GameState.Swap2State.SWAPPED : GameState.Swap2State.NOT_SWAPPED;
-      // Renju: a swap-seats event resolves the CURRENT swap window by a take-over. The live
-      // take-over is a non-silent DSGSwapSeatsTableEvent (server emits it exactly like
-      // swap2/dPente) — the visual seat swap is done by the !silent && swap branch above; the
-      // rejoin marker is a silent one (seats come from sendPlayingPlayers). EITHER way clear
-      // awaitingSwap so the phase advances: n<4/5 -> MOVE, n==4 -> BRANCH (branchChosen stays
-      // false). Also set swapTaken = true so the bulk rejoin replay does not REOPEN this
-      // resolved window. The branch is chosen via offer10 or the swap=false move-4 decline, NOT
-      // by a take-over, so do NOT touch branchChosen/tenOffer here.
+      // Renju: a seat-swap event is the LIVE delivery of a TAKE-OVER. The server broadcasts a
+      // (non-silent) DSGSwapSeatsTableEvent after renjuSwapDecisionMade(true); the renju swap event
+      // (dsgRenjuTaraguchiSwapTableEvent -> renjuSwap) stays a decision-only echo used for swap=false
+      // declines + Branch A move 5. The visual seat swap is done by the !silent && swap branch above;
+      // the rejoin marker is a silent one (seats come from sendPlayingPlayers). EITHER way clear
+      // awaitingSwap so the phase advances, and set swapTaken = true so the bulk rejoin replay does
+      // not REOPEN this resolved window.
+      //
+      // A seat swap ONLY ever happens on a take-over (a decline changes no seats), so at the move-4
+      // window (game.moves.length === 4) this unambiguously means "took over move 4 -> Branch A"
+      // (Taraguchi-10): commit Branch A here so the swapped-in player just places move 5 and the
+      // Offer-10 / Branch-B affordance is unreachable (phase MOVE, not the 3-way BRANCH re-prompt).
+      // At earlier windows (n<4) or the Branch-A move-5 window (n==5) a take-over resolves the
+      // window WITHOUT choosing a branch. The silent rejoin marker arrives BEFORE its bulk move list
+      // (game.moves is still empty here), so that path commits Branch A in advanceRenjuTrackingAfterMove.
       if (game.isRenjuGame && game.isRenjuGame()) {
-         game.gameState.renjuState.awaitingSwap = false;
-         game.gameState.renjuState.swapTaken = true;
+         const r = game.gameState.renjuState;
+         r.awaitingSwap = false;
+         r.swapTaken = true;
+         if (game.moves.length === 4) {
+            commitBranchA(r);
+         }
       }
       state.game = game;
    }
@@ -470,12 +500,15 @@ export function renjuSwap(data, state) {
       const game = state.game.newInstance();
       const r = game.gameState.renjuState;
       r.awaitingSwap = false;
-      // A swap=false at the move-4 window (or the standalone branch-choice state) continues
-      // Branch A; the bundled stone arrives via the following DSGMoveTableEvent. The visual
-      // seat swap for swap=true is handled by swapSeats/table.swap(), NOT here.
+      // The renju swap event is a DECISION-ONLY echo (backend renjuSwapDecisionMade). A swap=false
+      // at the move-4 window (or the standalone branch-choice state) continues Branch A; the bundled
+      // stone arrives via the following DSGMoveTableEvent. A TAKEN swap is NOT delivered here — the
+      // live server broadcasts a take-over as a seat-swap event (DSGSwapSeatsTableEvent -> swapSeats),
+      // which is where Branch A is committed and the visual seat swap (table.swap()) happens. So this
+      // handler only ever commits Branch A on the swap=false decline; it never touches branchChosen on
+      // a swap=true.
       if (data.swap === false && game.moves.length === 4) {
-         r.branchChosen = true;
-         r.tenOffer = false;
+         commitBranchA(r);
       }
       state.game = game;
    }
