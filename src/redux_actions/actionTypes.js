@@ -14,6 +14,9 @@ export const REMOVE_SNACK = 'REMOVE_SNACK';
 export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS';
 export const REPLIED_INVITATION = 'REPLIED_INVITATION';
 export const REMOVE_ARENA_JOIN_REQUEST = 'REMOVE_ARENA_JOIN_REQUEST';
+export const ARM_DRAW_OFFER = 'ARM_DRAW_OFFER';
+export const DISARM_DRAW_OFFER = 'DISARM_DRAW_OFFER';
+export const DISMISS_DRAW_MODAL = 'DISMISS_DRAW_MODAL';
 
 export function connectServer(server) {
    return {

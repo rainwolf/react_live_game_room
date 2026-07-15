@@ -1,7 +1,10 @@
 import '../redux_actions/actionTypes';
 import {
+   ARM_DRAW_OFFER,
    CONNECT_SERVER,
    CLEAR_NOTIFICATIONS,
+   DISARM_DRAW_OFFER,
+   DISMISS_DRAW_MODAL,
    DISMISS_WAITING_MODAL,
    MOVE_BACK,
    MOVE_FORWARD,
@@ -40,7 +43,9 @@ import {
    mute,
    processUser,
    rejectGoState,
+   renjuAcceptDraw,
    renjuOffer10,
+   renjuRejectDraw,
    renjuSelect1,
    renjuSwap,
    resignOrCancel,
@@ -119,6 +124,8 @@ const EVENT_HANDLERS = {
    dsgRenjuTaraguchiSwapTableEvent:     (p, s) => renjuSwap(p, s),
    dsgRenjuTaraguchiOffer10TableEvent:  (p, s) => renjuOffer10(p, s),
    dsgRenjuTaraguchi10Select1TableEvent:(p, s) => renjuSelect1(p, s),
+   dsgRenjuAcceptDrawTableEvent:        (p, s) => renjuAcceptDraw(p, s),
+   dsgRenjuRejectDrawTableEvent:        (p, s) => renjuRejectDraw(p, s),
    dsgArenaRequestJoinTableEvent: (p, s) => arenaJoinRequest(p, s),
    dsgArenaRejectTableJoinEvent: (p, s) => arenaRejectRequest(p, s),
 };
@@ -142,6 +149,15 @@ function liveGameApp(state = initialState, action) {
          break;
       case PRESSED_PLAY:
          newState.pressed_play = true;
+         break;
+      case ARM_DRAW_OFFER:
+         newState.draw_armed = true;
+         break;
+      case DISARM_DRAW_OFFER:
+         delete newState.draw_armed;
+         break;
+      case DISMISS_DRAW_MODAL:
+         delete newState.draw_requested;
          break;
       case DISMISS_WAITING_MODAL:
          newState.waiting_modal = true;
