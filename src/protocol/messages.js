@@ -47,6 +47,8 @@ export const MESSAGES = {
   dsgRenjuTaraguchiSwapTableEvent:      { dir: 'both', cmd: 'renjuSwap',    out: ['swap', 'move', 'player', 'table'], req: TBL },
   dsgRenjuTaraguchiOffer10TableEvent:   { dir: 'both', cmd: 'renjuOffer10', out: ['moves', 'player', 'table'],        req: TBL },
   dsgRenjuTaraguchi10Select1TableEvent: { dir: 'both', cmd: 'renjuSelect1', out: ['move', 'player', 'table'],         req: TBL },
+  dsgRenjuAcceptDrawTableEvent:         { dir: 'both', cmd: 'renjuAcceptDraw', out: ['player', 'table'], req: TBL },
+  dsgRenjuRejectDrawTableEvent:         { dir: 'both', cmd: 'renjuRejectDraw', out: ['player', 'table'], req: TBL },
   dsgRejectGoStateEvent:    { dir: 'both', cmd: 'rejectGoState', out: ['player', 'table'], req: TBL },
   dsgResignTableEvent:      { dir: 'out', cmd: 'resign',    out: ['player', 'table'] },
   dsgForceCancelResignTableEvent: { dir: 'out', cmd: 'forceCancelResign', out: ['action', 'player', 'table'] },
@@ -83,6 +85,7 @@ export const ERROR_EVENTS = [
   'dsgTextTableErrorEvent',
   'dsgStandTableErrorEvent',
   'dsgCancelRequestTableErrorEvent',
+  'dsgRenjuDrawTableErrorEvent',
 ];
 
 // The pinger message — answered by middleware, but a valid inbound type.

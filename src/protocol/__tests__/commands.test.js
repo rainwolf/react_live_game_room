@@ -57,3 +57,18 @@ describe('renju outbound commands', () => {
       .toEqual({ dsgRenjuTaraguchi10Select1TableEvent: { move: 57, player: 'bob', table: 5, time: 0 } });
   });
 });
+
+describe('renju draw-offer commands', () => {
+  test('renjuAcceptDraw frame', () => {
+    expect(Commands.renjuAcceptDraw({ player: 'alice', table: 5 }))
+      .toEqual({ dsgRenjuAcceptDrawTableEvent: { player: 'alice', table: 5, time: 0 } });
+  });
+  test('renjuRejectDraw frame', () => {
+    expect(Commands.renjuRejectDraw({ player: 'bob', table: 5 }))
+      .toEqual({ dsgRenjuRejectDrawTableEvent: { player: 'bob', table: 5, time: 0 } });
+  });
+  test('move passes drawOffer through', () => {
+    expect(Commands.move({ move: 225, moves: [225], player: 'alice', table: 5, drawOffer: true }))
+      .toEqual({ dsgMoveTableEvent: { move: 225, moves: [225], player: 'alice', table: 5, drawOffer: true, time: 0 } });
+  });
+});
