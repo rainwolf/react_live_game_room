@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {PRESSED_PLAY, send_message} from "../../redux_actions/actionTypes";
+import {ARM_DRAW_OFFER, DISARM_DRAW_OFFER, PRESSED_PLAY, send_message} from "../../redux_actions/actionTypes";
 import {MODALS, toggleModal} from '../../ui/modals';
 import Grid from '@mui/material/Grid';
 import Seat from './Seat';
@@ -15,6 +15,7 @@ import MovesListPanel from './MovesListPanel';
 import InviteModal from './InviteModal';
 import {Commands} from '../../protocol';
 import {selectCurrentTable} from '../../selectors';
+import {RenjuPhase} from '../../game/openingPhase';
 
 const styles = theme => ({
    root: {
@@ -36,6 +37,8 @@ const mapStateToProps = state => {
       admin: state.admin,
       tournament: state.tournament,
       arena: state.arena,
+      draw_armed: state.draw_armed,
+      draw_pending: state.draw_pending,
    }
 };
 
@@ -50,6 +53,8 @@ const mapDispatchToProps = dispatch => {
       play_pressed: () => {
          dispatch({type: PRESSED_PLAY})
       },
+      arm_draw: () => dispatch({type: ARM_DRAW_OFFER}),
+      disarm_draw: () => dispatch({type: DISARM_DRAW_OFFER}),
    }
 };
 
@@ -69,14 +74,20 @@ const UnconnectedGameInfoPanel = (props) => {
    const leave = () => {
       props.send_message(Commands.exitTable({forced: false, booted: false, table: table.table}));
    };
+   const renjuPostOpening = game.isRenjuGame()
+      && game.renjuPhaseNow() === RenjuPhase.COMPLETE;
    const pass = () => {
       const pass_move = game.gridSize * game.gridSize;
       props.send_message(Commands.move({
          move: pass_move,
          moves: [pass_move],
          player: table.me,
-         table: table.table
+         table: table.table,
+         ...(props.draw_armed ? {drawOffer: true} : {}),
       }));
+   };
+   const toggleDraw = () => {
+      props.draw_armed ? props.disarm_draw() : props.arm_draw();
    };
    const play = () => {
       props.send_message(Commands.play({table: table.table}));
@@ -161,11 +172,24 @@ const UnconnectedGameInfoPanel = (props) => {
                            </div>
                         </Grid>
                      }
-                     {(table.isMyTurn(game) && game.isGo() && game.gameState.state === GameState.State.STARTED) &&
+                     {(table.isMyTurn(game) && (game.isGo() || renjuPostOpening)
+                           && game.gameState.state === GameState.State.STARTED) &&
                         <Grid item xs>
                            <div style={{display: 'table', margin: '0 auto'}}>
                               <Button variant="outlined" color="primary" onClick={pass}>
                                  PASS
+                              </Button>
+                           </div>
+                        </Grid>
+                     }
+                     {(table.isMyTurn(game) && renjuPostOpening
+                           && game.gameState.state === GameState.State.STARTED && !props.draw_pending) &&
+                        <Grid item xs>
+                           <div style={{display: 'table', margin: '0 auto'}}>
+                              <Button variant={props.draw_armed ? 'contained' : 'outlined'}
+                                      color={props.draw_armed ? 'success' : 'primary'}
+                                      onClick={toggleDraw}>
+                                 DRAW?
                               </Button>
                            </div>
                         </Grid>

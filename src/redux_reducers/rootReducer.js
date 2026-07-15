@@ -152,6 +152,7 @@ function liveGameApp(state = initialState, action) {
          break;
       case ARM_DRAW_OFFER:
          newState.draw_armed = true;
+         newState.notification = {kind: 'info', message: 'Draw offer will be sent with your move'};
          break;
       case DISARM_DRAW_OFFER:
          delete newState.draw_armed;
