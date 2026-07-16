@@ -3,6 +3,8 @@ import { pluginReact } from '@rsbuild/plugin-react';
 
 const { publicVars, rawPublicVars } = loadEnv({ prefixes: ['REACT_APP_'] });
 
+const LOCAL = process.env.LOCAL_BACKEND === '1';
+
 export default defineConfig({
   plugins: [pluginReact()],
   html: {
@@ -17,13 +19,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/websocketServer': {
-        target: 'wss://pente.org',
+        target: LOCAL ? 'wss://localhost' : 'wss://pente.org',
         ws: true,
         changeOrigin: true,
+        ...(LOCAL ? { secure: false } : {}),
       },
       '/gameServer': {
-        target: 'https://pente.org',
+        target: LOCAL ? 'https://localhost' : 'https://pente.org',
         changeOrigin: true,
+        ...(LOCAL ? { secure: false } : {}),
       },
     },
   },
