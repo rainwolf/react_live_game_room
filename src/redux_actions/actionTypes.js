@@ -14,6 +14,9 @@ export const REMOVE_SNACK = 'REMOVE_SNACK';
 export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS';
 export const REPLIED_INVITATION = 'REPLIED_INVITATION';
 export const REMOVE_ARENA_JOIN_REQUEST = 'REMOVE_ARENA_JOIN_REQUEST';
+export const ARM_DRAW_OFFER = 'ARM_DRAW_OFFER';
+export const DISARM_DRAW_OFFER = 'DISARM_DRAW_OFFER';
+export const DISMISS_DRAW_MODAL = 'DISMISS_DRAW_MODAL';
 
 export function connectServer(server) {
    return {
@@ -22,13 +25,24 @@ export function connectServer(server) {
    }
 }
 
-export function connectSocket(server) {
-   let host = window.location.hostname;
-   if (host === 'localhost' || host === 'machine.local') {
-      // host = 'development.pente.org';
-      host = 'localhost';
-      host = 'pente.org';
+// Production-first backend selection: running on localhost/machine.local connects to
+// the PRODUCTION backend by default (matches the deployed behavior). Set
+// PUBLIC_LOCAL_BACKEND=1 in an env file rsbuild loads (see rsbuild.config.ts) to opt
+// into the local backend while developing locally. Deployed (non-local) hosts are
+// untouched. `localBackend` defaults to a lazy read so tests can inject it directly.
+export function resolveSocketHost(hostname, localBackend = readLocalBackendFlag()) {
+   if (hostname !== 'localhost' && hostname !== 'machine.local') {
+      return hostname;
    }
+   return localBackend === '1' ? 'localhost' : 'pente.org';
+}
+
+function readLocalBackendFlag() {
+   return import.meta.env.PUBLIC_LOCAL_BACKEND;
+}
+
+export function connectSocket(server) {
+   const host = resolveSocketHost(window.location.hostname);
    // return {
    //     type: WEBSOCKET_CONNECT,
    //     payload: {

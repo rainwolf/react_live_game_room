@@ -18,7 +18,8 @@ const mapStateToProps = state => {
       game_id: table.game,
       game: state.game,
       table: table,
-      renjuUi: state.renjuOpeningUi
+      renjuUi: state.renjuOpeningUi,
+      draw_armed: state.draw_armed
    }
 };
 
@@ -38,7 +39,7 @@ const UnconnectedBoard = (props) => {
    const {game_id, game, table, send_message, renjuUi, togglePick, markPending} = props;
 
    const sendMove = (move) => {
-      send_message(Commands.move({move: move, moves: [move], player: table.me, table: table.table}));
+      send_message(Commands.move({move: move, moves: [move], player: table.me, table: table.table, ...(props.draw_armed ? {drawOffer: true} : {})}));
    };
 
    // Each opening decision is SENT then the UI goes 'pending' — we do NOT mutate the board or

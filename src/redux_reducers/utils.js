@@ -214,6 +214,19 @@ export function addMove(data, state) {
       if (data.player !== state.me) {
          emit(state, {sound: 'move'});
       }
+      // Renju draw-offer piggybacks on the move event.
+      if (data.drawOffer && data.player !== state.me) {
+         state.draw_requested = data.player;
+         addTableMessage({player: 'game server', text: 'draw offered'}, state);
+      }
+      if (data.player === state.me) {
+         delete state.draw_requested; // my move implicitly declines a pending offer
+         if (data.drawOffer) {
+            delete state.draw_armed;
+            state.draw_pending = true; // my offer is now out, awaiting opponent
+            addTableMessage({player: 'game server', text: 'draw offer sent'}, state);
+         }
+      }
    }
    state.game = game;
 }
@@ -228,6 +241,9 @@ export function changeGameState(data, state) {
          delete state.undo_requested;
          delete state.waiting_modal;
          delete state.time_up_resign_cancel;
+         delete state.draw_requested;
+         delete state.draw_armed;
+         delete state.draw_pending;
       }
       // if (data.state !== GameState.State.PAUSED) {
       //     delete state.waiting_modal;
@@ -246,11 +262,27 @@ export function changeGameState(data, state) {
       game.gameState = Object.assign(game.gameState, {state: data.state});
       state.game = game;
       // console.log(JSON.stringify(state.game))
-      if (data.winner && data.winner !== '') {
+      // Draw endings (double-pass or accepted draw offer) still carry a non-empty `data.winner`
+      // from the backend (DSGGameStateTableEvent has no structural draw flag — only
+      // state/changeText/winner/gameInSet/drawOfferedBy — see dsg_src's DSGGameStateTableEvent.java
+      // and ServerTable.java's endGame()). The only draw signal on the wire is changeText ===
+      // "game over, game is a draw" (set in ServerTable.java), so detect the draw off changeText
+      // and post the existing info-snack pattern (cf. renjuRejectDraw above) instead of gameResult.
+      if (data.changeText && data.changeText.includes('game is a draw')) {
+         state.notification = {kind: 'info', message: 'Game over — draw'};
+      } else if (data.winner && data.winner !== '') {
          state.notification = {kind: 'gameResult', winner: data.winner};
       }
       if (data.changeText) {
          addTableMessage({player: 'game server', text: data.changeText}, state);
+      }
+      // (Re)join / state-sync may carry a live draw offer; restore its owning side.
+      if (data.drawOfferedBy) {
+         if (data.drawOfferedBy === state.me) {
+            state.draw_pending = true;
+         } else {
+            state.draw_requested = data.drawOfferedBy;
+         }
       }
    }
 }
@@ -309,6 +341,31 @@ export function undoReply(data, state) {
          state.game = game;
       }
       addTableMessage({player: 'game server', text: 'undo ' + (data.accepted ? 'accepted' : 'denied')}, state);
+   }
+}
+
+export function renjuAcceptDraw(data, state) {
+   if (data.table === state.table) {
+      delete state.draw_requested;
+      delete state.draw_pending;
+      delete state.draw_armed;
+      addTableMessage({player: 'game server', text: 'draw offer accepted'}, state);
+   }
+}
+
+export function renjuRejectDraw(data, state) {
+   if (data.table === state.table) {
+      // Notify the offerer (my UI) only if I was the one waiting on the offer.
+      // No SET_NOTIFICATION action exists in this codebase — notifications are written
+      // reducer-side directly (cf. arenaRejectRequest), so we set state.notification here.
+      const wasMine = state.draw_pending;
+      delete state.draw_requested;
+      delete state.draw_pending;
+      delete state.draw_armed;
+      if (wasMine) {
+         state.notification = {kind: 'info', message: 'Draw offer declined'};
+      }
+      addTableMessage({player: 'game server', text: 'draw offer declined'}, state);
    }
 }
 

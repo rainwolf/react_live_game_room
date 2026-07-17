@@ -73,6 +73,21 @@ describe('notifications are pure intents (no Audio touched)', () => {
     expect(started.notification).toEqual({ kind: 'gameResult', winner: 'bob' });
   });
 
+  // Draw endings (double-pass or accepted draw offer): the backend's DSGGameStateTableEvent
+  // carries no structural draw flag (checked dsg_src/.../event/DSGGameStateTableEvent.java —
+  // only state/changeText/winner/gameInSet/drawOfferedBy exist on the wire), and it still sends
+  // a non-empty `winner` name even on a draw. The only draw signal is changeText === "game over,
+  // game is a draw" (dsg_src/.../server/ServerTable.java). So detection here is a changeText match.
+  test('game-over draw sets an info notification, not gameResult (even though winner is present)', () => {
+    const base = init();
+    const started = dispatch(
+      { ...base, table: 1, tables: { 1: makeTable(1) }, game: makeGame() },
+      'dsgGameStateTableEvent',
+      { state: 2, winner: 'bob', changeText: 'game over, game is a draw', table: 1 }
+    );
+    expect(started.notification).toEqual({ kind: 'info', message: 'Game over — draw' });
+  });
+
   test('CLEAR_NOTIFICATIONS empties the queue', () => {
     const s = dispatch({ pendingNotifications: [{ sound: 'move' }] }, 'CLEAR_NOTIFICATIONS');
     expect(s.pendingNotifications).toEqual([]);
@@ -125,3 +140,117 @@ function makeGame() {
 function makeTable(num) {
   return new Table({ table: num });
 }
+
+// --- renju draw-offer lifecycle (Task 2) ---
+// Brief's harness used reduce(baseRenjuState(...), action); adapted here to the file's
+// real liveGameApp reducer + Game/Table fixtures. Renju game type is 31 (isRenjuGame),
+// game starts NOT_STARTED so a state:2 event is a real transition. Assertions are the
+// brief's intent, unchanged.
+const reduce = (state, action) => liveGameApp(state, action);
+function makeRenjuGame() {
+  const g = new Game();
+  g.setGame(31); // 31/32/81 => isRenjuGame()
+  return g;
+}
+function baseRenjuState(me) {
+  return {
+    ...init(),
+    me,
+    table: 1,
+    tables: { 1: makeTable(1) },
+    game: makeRenjuGame(),
+    table_messages: [],
+  };
+}
+
+describe('renju draw offers', () => {
+  test('opponent move drawOffer sets draw_requested', () => {
+    const s = reduce(baseRenjuState('bob'), {
+      type: 'dsgMoveTableEvent',
+      payload: { move: 100, moves: [100], player: 'alice', table: 1, drawOffer: true },
+    });
+    expect(s.draw_requested).toBe('alice');
+  });
+
+  test('own move echo drawOffer flips armed -> pending', () => {
+    const s0 = { ...baseRenjuState('bob'), draw_armed: true };
+    const s = reduce(s0, {
+      type: 'dsgMoveTableEvent',
+      payload: { move: 100, moves: [100], player: 'bob', table: 1, drawOffer: true },
+    });
+    expect(s.draw_armed).toBeUndefined();
+    expect(s.draw_pending).toBe(true);
+  });
+
+  test('own move without drawOffer implicitly declines a pending request', () => {
+    const s0 = { ...baseRenjuState('bob'), draw_requested: 'alice' };
+    const s = reduce(s0, {
+      type: 'dsgMoveTableEvent',
+      payload: { move: 100, moves: [100], player: 'bob', table: 1 },
+    });
+    expect(s.draw_requested).toBeUndefined();
+  });
+
+  test('renjuAcceptDraw clears all three draw flags', () => {
+    const s0 = { ...baseRenjuState('bob'), draw_requested: 'alice', draw_armed: true, draw_pending: true };
+    const s = reduce(s0, {
+      type: 'dsgRenjuAcceptDrawTableEvent',
+      payload: { player: 'alice', table: 1 },
+    });
+    expect(s.draw_requested).toBeUndefined();
+    expect(s.draw_pending).toBeUndefined();
+    expect(s.draw_armed).toBeUndefined();
+  });
+
+  test('renjuRejectDraw notifies the offerer only when draw_pending was set', () => {
+    const pending = reduce({ ...baseRenjuState('bob'), draw_pending: true }, {
+      type: 'dsgRenjuRejectDrawTableEvent',
+      payload: { player: 'alice', table: 1 },
+    });
+    expect(pending.notification).toEqual({ kind: 'info', message: 'Draw offer declined' });
+    expect(pending.draw_pending).toBeUndefined();
+
+    const asOpponent = reduce({ ...baseRenjuState('bob'), draw_requested: 'alice' }, {
+      type: 'dsgRenjuRejectDrawTableEvent',
+      payload: { player: 'bob', table: 1 },
+    });
+    expect(asOpponent.notification).toBeUndefined();
+    expect(asOpponent.draw_requested).toBeUndefined();
+  });
+
+  test('changeGameState restores draw state from drawOfferedBy on rejoin', () => {
+    const s = reduce(baseRenjuState('bob'), {
+      type: 'dsgGameStateTableEvent',
+      payload: { table: 1, state: 2, drawOfferedBy: 'alice' },
+    });
+    expect(s.draw_requested).toBe('alice');
+    const s2 = reduce(baseRenjuState('bob'), {
+      type: 'dsgGameStateTableEvent',
+      payload: { table: 1, state: 2, drawOfferedBy: 'bob' },
+    });
+    expect(s2.draw_pending).toBe(true);
+  });
+
+  test('changeGameState clears stale draw flags on a state transition', () => {
+    const s0 = { ...baseRenjuState('bob'), draw_requested: 'alice', draw_armed: true, draw_pending: true };
+    const s = reduce(s0, {
+      type: 'dsgGameStateTableEvent',
+      payload: { table: 1, state: 2 },
+    });
+    expect(s.draw_requested).toBeUndefined();
+    expect(s.draw_armed).toBeUndefined();
+    expect(s.draw_pending).toBeUndefined();
+  });
+
+  test('ARM_DRAW_OFFER / DISARM_DRAW_OFFER toggle draw_armed', () => {
+    const armed = reduce(baseRenjuState('bob'), { type: 'ARM_DRAW_OFFER' });
+    expect(armed.draw_armed).toBe(true);
+    const disarmed = reduce(armed, { type: 'DISARM_DRAW_OFFER' });
+    expect(disarmed.draw_armed).toBeUndefined();
+  });
+
+  test('DISMISS_DRAW_MODAL clears draw_requested', () => {
+    const s = reduce({ ...baseRenjuState('bob'), draw_requested: 'alice' }, { type: 'DISMISS_DRAW_MODAL' });
+    expect(s.draw_requested).toBeUndefined();
+  });
+});
