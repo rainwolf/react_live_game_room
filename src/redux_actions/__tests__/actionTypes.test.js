@@ -1,20 +1,20 @@
 import { describe, test, expect } from 'vitest';
 import { resolveSocketHost } from '../actionTypes';
 
-describe('resolveSocketHost (local-first backend selection)', () => {
-  test('local host with PUBLIC_PROD_BACKEND unset resolves to localhost', () => {
-    expect(resolveSocketHost('localhost')).toBe('localhost');
-    expect(resolveSocketHost('machine.local')).toBe('localhost');
+describe('resolveSocketHost (production-first backend selection)', () => {
+  test('local host with PUBLIC_LOCAL_BACKEND unset resolves to pente.org', () => {
+    expect(resolveSocketHost('localhost')).toBe('pente.org');
+    expect(resolveSocketHost('machine.local')).toBe('pente.org');
   });
 
-  test('local host with PUBLIC_PROD_BACKEND injected as anything but "1" still resolves to localhost', () => {
-    expect(resolveSocketHost('localhost', '0')).toBe('localhost');
-    expect(resolveSocketHost('localhost', 'true')).toBe('localhost');
+  test('local host with PUBLIC_LOCAL_BACKEND injected as anything but "1" still resolves to pente.org', () => {
+    expect(resolveSocketHost('localhost', '0')).toBe('pente.org');
+    expect(resolveSocketHost('localhost', 'true')).toBe('pente.org');
   });
 
-  test('local host with PUBLIC_PROD_BACKEND injected as "1" resolves to pente.org', () => {
-    expect(resolveSocketHost('localhost', '1')).toBe('pente.org');
-    expect(resolveSocketHost('machine.local', '1')).toBe('pente.org');
+  test('local host with PUBLIC_LOCAL_BACKEND injected as "1" resolves to localhost', () => {
+    expect(resolveSocketHost('localhost', '1')).toBe('localhost');
+    expect(resolveSocketHost('machine.local', '1')).toBe('localhost');
   });
 
   test('non-local hostnames pass through unchanged regardless of the flag', () => {

@@ -25,19 +25,20 @@ export function connectServer(server) {
    }
 }
 
-// Local-first backend selection: running on localhost/machine.local connects to the
-// LOCAL backend by default. Set PUBLIC_PROD_BACKEND=1 (see rsbuild.config.ts) to opt
-// into the production backend while developing locally. Deployed (non-local) hosts are
-// untouched. `prodBackend` defaults to a lazy read so tests can inject it directly.
-export function resolveSocketHost(hostname, prodBackend = readProdBackendFlag()) {
+// Production-first backend selection: running on localhost/machine.local connects to
+// the PRODUCTION backend by default (matches the deployed behavior). Set
+// PUBLIC_LOCAL_BACKEND=1 in an env file rsbuild loads (see rsbuild.config.ts) to opt
+// into the local backend while developing locally. Deployed (non-local) hosts are
+// untouched. `localBackend` defaults to a lazy read so tests can inject it directly.
+export function resolveSocketHost(hostname, localBackend = readLocalBackendFlag()) {
    if (hostname !== 'localhost' && hostname !== 'machine.local') {
       return hostname;
    }
-   return prodBackend === '1' ? 'pente.org' : 'localhost';
+   return localBackend === '1' ? 'localhost' : 'pente.org';
 }
 
-function readProdBackendFlag() {
-   return import.meta.env.PUBLIC_PROD_BACKEND;
+function readLocalBackendFlag() {
+   return import.meta.env.PUBLIC_LOCAL_BACKEND;
 }
 
 export function connectSocket(server) {
