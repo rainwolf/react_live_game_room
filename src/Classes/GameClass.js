@@ -216,7 +216,9 @@ export class Game {
             movestrs.push(str);
          }
          return movestrs;
-      } else if (this.isGo()) {
+      } else if (this.isGo() || this.isRenjuGame()) {
+         // renju shares Go's pass sentinel (gridSize*gridSize) — render it as PASS,
+         // not as the bogus coordinate getMoveCoord would produce.
          const passMove = this.gridSize * this.gridSize;
          return this.moves.map(move => move === passMove ? 'PASS' : this.getMoveCoord(move));
       } else {

@@ -234,4 +234,16 @@ describe('last_move guards a renju pass the same way it already guards a Go pass
     const g = renjuGameAfter([112, 113, 97, 128, 142]);
     expect(g.last_move()).toEqual([142]);
   });
+
+  // Same sentinel, sibling consumer: MovesListPanel renders moves_strings(), whose
+  // pass special-case also lived only in the Go arm — a renju pass fell through to
+  // getMoveCoord(225) and showed up as a bogus coordinate instead of 'PASS'.
+  test('moves_strings renders a renju pass as PASS, like Go', () => {
+    const g = renjuGameAfter([112, 113, 97, 128, 142]);
+    g.addMove(g.gridSize * g.gridSize); // pass
+    const strs = g.moves_strings();
+    expect(strs[strs.length - 1]).toBe('PASS');
+    expect(strs).toHaveLength(6);
+    expect(strs[4]).toBe(g.getMoveCoord(142)); // normal moves untouched
+  });
 });
