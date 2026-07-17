@@ -135,7 +135,10 @@ export class Game {
          } else {
             return [this.moves[l - 1], this.moves[l]];
          }
-      } else if (this.isGo() && l > -1) {
+      } else if ((this.isGo() || this.isRenjuGame()) && l > -1) {
+         // Go pass and renju pass share the same sentinel (gridSize*gridSize, see
+         // GameInfoPanel.pass()) — never surface it as a board index (Board.js:200
+         // does board[move].last_move = true against a gridSize*gridSize-length array).
          const move = this.moves[l];
          if (move !== this.gridSize * this.gridSize) {
             return [move];
@@ -213,7 +216,9 @@ export class Game {
             movestrs.push(str);
          }
          return movestrs;
-      } else if (this.isGo()) {
+      } else if (this.isGo() || this.isRenjuGame()) {
+         // renju shares Go's pass sentinel (gridSize*gridSize) — render it as PASS,
+         // not as the bogus coordinate getMoveCoord would produce.
          const passMove = this.gridSize * this.gridSize;
          return this.moves.map(move => move === passMove ? 'PASS' : this.getMoveCoord(move));
       } else {

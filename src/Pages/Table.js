@@ -9,6 +9,7 @@ import Board from '../Components/Board/Board';
 import Grid from '@mui/material/Grid';
 import ChatComponent from '../Components/Chat/ChatComponent';
 import UndoModal from '../Components/Table/UndoModal';
+import DrawOfferModal from '../Components/Table/DrawOfferModal';
 import CancelModal from '../Components/Table/CancelModal';
 import DPenteChoiceModal from '../Components/Table/DPenteChoiceModal';
 import SettingsModal from '../Components/Table/SettingsModal';
@@ -17,6 +18,7 @@ import EvaluateGoModal from '../Components/Table/EvaluateGoModal';
 import WaitPlayerReturnModal from "../Components/Table/WaitPlayerReturnModal";
 import ResignCancelLostPlayerModal from "../Components/Table/ResignCancelLostPlayerModal";
 import Snack from '../Components/Table/Snack';
+import MessageSnack from '../Components/MessageSnack';
 import BootModal from '../Components/Table/BootModal';
 import InvitationResponseModal from '../Components/Room/InvitationResponseModal';
 import Swap2ChoiceModal from "../Components/Table/Swap2ChoiceModal";
@@ -125,6 +127,7 @@ const UnconnectedTable = (props) => {
                   </Grid>
 
                   <UndoModal/>
+                  <DrawOfferModal/>
                   <CancelModal/>
                   <DPenteChoiceModal/>
                   <Swap2ChoiceModal/>
@@ -134,6 +137,7 @@ const UnconnectedTable = (props) => {
                   <WaitPlayerReturnModal/>
                   <ResignCancelLostPlayerModal/>
                   <Snack/>
+                  <MessageSnack/>
                   <BootModal/>
                   <InvitationResponseModal/>
                </div>
