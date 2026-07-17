@@ -262,7 +262,15 @@ export function changeGameState(data, state) {
       game.gameState = Object.assign(game.gameState, {state: data.state});
       state.game = game;
       // console.log(JSON.stringify(state.game))
-      if (data.winner && data.winner !== '') {
+      // Draw endings (double-pass or accepted draw offer) still carry a non-empty `data.winner`
+      // from the backend (DSGGameStateTableEvent has no structural draw flag — only
+      // state/changeText/winner/gameInSet/drawOfferedBy — see dsg_src's DSGGameStateTableEvent.java
+      // and ServerTable.java's endGame()). The only draw signal on the wire is changeText ===
+      // "game over, game is a draw" (set in ServerTable.java), so detect the draw off changeText
+      // and post the existing info-snack pattern (cf. renjuRejectDraw above) instead of gameResult.
+      if (data.changeText && data.changeText.includes('game is a draw')) {
+         state.notification = {kind: 'info', message: 'Game over — draw'};
+      } else if (data.winner && data.winner !== '') {
          state.notification = {kind: 'gameResult', winner: data.winner};
       }
       if (data.changeText) {

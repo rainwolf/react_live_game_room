@@ -73,6 +73,21 @@ describe('notifications are pure intents (no Audio touched)', () => {
     expect(started.notification).toEqual({ kind: 'gameResult', winner: 'bob' });
   });
 
+  // Draw endings (double-pass or accepted draw offer): the backend's DSGGameStateTableEvent
+  // carries no structural draw flag (checked dsg_src/.../event/DSGGameStateTableEvent.java —
+  // only state/changeText/winner/gameInSet/drawOfferedBy exist on the wire), and it still sends
+  // a non-empty `winner` name even on a draw. The only draw signal is changeText === "game over,
+  // game is a draw" (dsg_src/.../server/ServerTable.java). So detection here is a changeText match.
+  test('game-over draw sets an info notification, not gameResult (even though winner is present)', () => {
+    const base = init();
+    const started = dispatch(
+      { ...base, table: 1, tables: { 1: makeTable(1) }, game: makeGame() },
+      'dsgGameStateTableEvent',
+      { state: 2, winner: 'bob', changeText: 'game over, game is a draw', table: 1 }
+    );
+    expect(started.notification).toEqual({ kind: 'info', message: 'Game over — draw' });
+  });
+
   test('CLEAR_NOTIFICATIONS empties the queue', () => {
     const s = dispatch({ pendingNotifications: [{ sound: 'move' }] }, 'CLEAR_NOTIFICATIONS');
     expect(s.pendingNotifications).toEqual([]);
