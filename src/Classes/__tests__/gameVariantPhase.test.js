@@ -198,3 +198,40 @@ describe('renju newInstance deep-copies renjuState (reducers mutate the copy)', 
     expect(g.gameState.renjuState.tenOffer).toBe(false);
   });
 });
+
+// Regression for the live-play crash: a renju PASS (GameInfoPanel.pass() sends
+// move = gridSize*gridSize, the same sentinel Go uses) went through last_move()'s
+// generic branch — which has no pass guard — and came back out as move 225 on a
+// 15x15 board. Board.js:200 then does `board[225].last_move = true` against a
+// 225-length array (valid indices 0..224) and throws, blanking the app on both
+// clients. The Go arm of last_move() already special-cases this sentinel; renju
+// needs the same guard.
+describe('last_move guards a renju pass the same way it already guards a Go pass', () => {
+  test('a renju pass never comes back as an out-of-board index', () => {
+    const g = renjuGameAfter([112, 113, 97, 128, 142]); // 5 in-board opening moves
+    const passMove = g.gridSize * g.gridSize; // 225 on the 15x15 renju board
+    g.addMove(passMove);
+
+    const lastMoves = g.last_move();
+
+    lastMoves.forEach((move) => {
+      expect(move).toBeGreaterThanOrEqual(0);
+      expect(move).toBeLessThan(g.gridSize * g.gridSize);
+    });
+
+    // Reproduce Board.js:200's exact consumption against a real gridSize*gridSize board.
+    const board = new Array(g.gridSize * g.gridSize).fill(null).map(() => ({}));
+    expect(() => {
+      lastMoves.forEach((move) => {
+        if (move !== undefined) {
+          board[move].last_move = true;
+        }
+      });
+    }).not.toThrow();
+  });
+
+  test('a normal renju move (not a pass) is still reported as the last move', () => {
+    const g = renjuGameAfter([112, 113, 97, 128, 142]);
+    expect(g.last_move()).toEqual([142]);
+  });
+});
