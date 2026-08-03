@@ -98,9 +98,21 @@ const dispatch = (apply) => act(() => {
    store.dispatch(apply);
 });
 
-// The face only advances on the 20ms interval, so let at least one tick land.
+// The face only advances on the interval, so let the anchor tick and one paint tick land.
+//
+// SETTLE_MS is load-bearing in BOTH directions, which is why it is a named constant with a
+// self-check below rather than a literal. A running seat accrues (SETTLE_MS - TICK_MS) of fake time
+// per settle, and remainingTenths() rounds that to tenths, so at >= 50ms every exact-string face
+// here rounds down a tenth and the assertions go red against perfectly correct code. Widening this
+// to "harden against flakes" is the wrong move -- fake timers are deterministic, nothing flakes.
+//
+// Freezing Date.now() instead would be worse: it passes at any settle value and still fails against
+// the pre-fix Timer.js, but it lets a `clock.time`-keyed episode survive, silently deleting the
+// coverage this file exists to provide.
+const TICK_MS = 20;   // must match useInterval(ticktock, 20) in Timer.js
+const SETTLE_MS = 40; // >= 2 * TICK_MS so the anchor tick lands, and SETTLE_MS - TICK_MS < 50
 const settle = () => act(() => {
-   vi.advanceTimersByTime(40);
+   vi.advanceTimersByTime(SETTLE_MS);
 });
 
 const faceOf = (seat) => container.querySelector(`[data-seat="${seat}"]`).textContent.trim();
@@ -114,6 +126,15 @@ function applyTakeOver() {
    dispatch((s) => swapSeats({table: TABLE, silent: false, swap: true, player: 'bob'}, s));
    settle();
 }
+
+// Fails with a readable reason if either constant is edited, instead of four bogus clock-face
+// diffs that look exactly like the seat-attribution regression this file is here to catch.
+describe('the settle window the exact-string faces assume', () => {
+   test('one settle lands the anchor tick and accrues less than a tenth of a second', () => {
+      expect(SETTLE_MS).toBeGreaterThanOrEqual(2 * TICK_MS);
+      expect(SETTLE_MS - TICK_MS).toBeLessThan(50);
+   });
+});
 
 describe('<Timer/> pair across a renju take-over', () => {
    test('both faces start at the table time', () => {
