@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useRef, useState} from 'react';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Game, useInterval} from "../../Classes/GameClass";
@@ -7,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import {AudioService} from '../../notifications/audio'
 import {selectCurrentTable} from '../../selectors';
+import {remainingTenths, splitTenths, tickClock} from './clockDisplay';
 
 const mapStateToProps = state => {
    return {
@@ -19,70 +20,33 @@ const Timer = (props) => {
    const {game, table, seat} = props;
    const clock = table.clocks[seat];
 
-   const [state, setState] = useState({
-      running: false,
-      ...clock,
-      time_left: (clock.minutes * 60 + clock.seconds) * 10
-   });
+   // The component owns no copy of the clock VALUE -- only the interpolation anchor, keyed on the
+   // clock object, which changes whenever the server sends a new value AND whenever seats swap
+   // (TableClass.swap() hands each seat the other's clock object). A countdown therefore cannot be
+   // stranded on the wrong player. See clockDisplay.js for why `clock.time` is not a usable key.
+   const episode = useRef(null);
+   const shown = useRef(remainingTenths(clock, 0));
+   const [tenthsLeft, setTenthsLeft] = useState(shown.current);
 
    const ticktock = () => {
-      setState((prevState) => {
-         let newState = {...prevState};
-         if (!table.clockRunning(game, seat)) {
-            if (newState.running) {
-               // Fold the time spent so far this turn into time_left, so resuming after a
-               // mid-turn pause (e.g. a seat was vacated) continues from where it stopped
-               // instead of snapping back to the turn's start time. (When the pause is a
-               // turn/state change the server re-syncs time_left anyway via clock.time.)
-               const passed = Math.round((new Date().getTime() - newState.start_time.getTime()) / 100);
-               newState.time_left = Math.max(0, newState.time_left - passed);
-               newState.running = false;
-               setState(newState);
-            }
-            return prevState;
-         }
-         if (!newState.running) {
-            newState.running = true;
-            newState.start_time = new Date();
-         }
-         const now = new Date();
-         const passed_tenth_seconds = Math.round((now.getTime() - newState.start_time.getTime()) / 100);
-         if (newState.time_left > passed_tenth_seconds) {
-            const new_time = newState.time_left - passed_tenth_seconds;
-            newState.tenth_seconds = new_time % 600;
-            newState.minutes = Math.floor(new_time / 600);
-         } else {
-            newState.tenth_seconds = 0;
-            newState.minutes = 0;
-         }
-         if (newState.minutes === 0 && newState.tenth_seconds < 120 && state.tenth_seconds >= 120 && table.isMySeat(seat)) {
-            AudioService.play('lowTime');
-         }
-         return newState;
-      });
+      const {episode: next, tenthsLeft: left, chime} =
+         tickClock(episode.current, {
+            clock,
+            running: table.clockRunning(game, seat),
+            now: Date.now(),
+            prevTenths: shown.current,
+         });
+      episode.current = next;
+      shown.current = left;
+      if (chime && table.isMySeat(seat)) {
+         AudioService.play('lowTime');
+      }
+      setTenthsLeft(left);
    };
-
-   useEffect(() => {
-      setState((prevState) => {
-         const newState = {...prevState, ...clock};
-         if (clock.millis) {
-            newState.running = false;
-            newState.time_left = Math.floor((clock.millis) / 100);
-            newState.tenth_seconds = Math.floor(clock.millis / 100) % 600;
-            newState.minutes = Math.floor(clock.millis / 60000);
-            newState.seconds = Math.floor(clock.millis / 1000) % 60;
-         } else {
-            newState.time_left = (clock.minutes * 60 + clock.seconds) * 10;
-            newState.tenth_seconds = clock.seconds * 10;
-         }
-         return newState;
-      });
-   }, [clock.time]);
 
    useInterval(ticktock, 20);
 
-   const {minutes, tenth_seconds} = state;
-   const seconds = Math.floor(tenth_seconds / 10), tenths = tenth_seconds % 10
+   const {minutes, seconds, tenths} = splitTenths(tenthsLeft);
 
    return (
       <Paper style={{textAlign: 'center'}}>
