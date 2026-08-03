@@ -106,3 +106,49 @@ describe('why the clock OBJECT, and not `clock.time`, is the resync key', () => 
       expect(state.tables[TABLE].clocks[2]).toBe(before[2]);
    });
 });
+
+describe('changeTimer resolves the seat by player name', () => {
+   test('a timer for a player who is not seated, with both seats full, is dropped cleanly', () => {
+      const state = stateAtTakeOver();
+      const before = [...state.tables[TABLE].clocks];
+
+      changeTimer(timerEvent('carol', 120000), state);
+
+      const {clocks} = state.tables[TABLE];
+      expect(clocks[1]).toBe(before[1]);
+      expect(clocks[2]).toBe(before[2]);
+      // The old code wrote clocks[-1] here: an array property nobody reads, so the update vanished
+      // while the seats looked untouched.
+      expect(clocks[-1]).toBeUndefined();
+      expect(clocks.length).toBe(3);
+   });
+
+   test('a timer arriving before the sit event lands on the free seat (rejoin race)', () => {
+      const state = stateAtTakeOver();
+      state.tables[TABLE].seats = [undefined, 'alice', ''];
+
+      changeTimer(timerEvent('bob', 480000), state);
+
+      expect(state.tables[TABLE].clocks[2].millis).toBe(480000);
+   });
+
+   test('an event carrying no player name does not match the seats[0] placeholder', () => {
+      const state = stateAtTakeOver();
+      const before = [...state.tables[TABLE].clocks];
+
+      changeTimer({table: TABLE, millis: 1000, minutes: 0, seconds: 1, time: STAMP}, state);
+
+      expect(state.tables[TABLE].clocks[0]).toBe(before[0]);
+      expect(state.tables[TABLE].clocks[1]).toBe(before[1]);
+      expect(state.tables[TABLE].clocks[2]).toBe(before[2]);
+   });
+
+   test('a timer for another table is ignored', () => {
+      const state = stateAtTakeOver();
+      const before = state.tables[TABLE].clocks;
+
+      changeTimer({...timerEvent('bob', 1000), table: TABLE + 1}, state);
+
+      expect(state.tables[TABLE].clocks).toBe(before);
+   });
+});
