@@ -287,20 +287,37 @@ export function changeGameState(data, state) {
    }
 }
 
+// Timer events are keyed by player NAME -- the wire carries no seat index -- which is what makes
+// them land on the right seat either side of a seat swap.
 export function changeTimer(data, state) {
-   if (data.table === state.table) {
-      // console.log('timer 1', JSON.stringify(state.game.abstractBoard))
-
-      const tables = {...state.tables};
-      const table = tables[data.table].newInstance();
-      let idx = table.seats.indexOf(data.player);
-      if (idx < 0) {
-         idx = table.seats.indexOf('');
-      }
-      table.clocks[idx] = {millis: data.millis, minutes: data.minutes, seconds: data.seconds, time: data.time};
-      tables[data.table] = table;
-      state.tables = tables;
+   if (data.table !== state.table) {
+      return;
    }
+   const seat = timerSeat(state.tables[data.table], data.player);
+   if (seat < 0) {
+      // Neither the named player nor a free seat: there is nothing to update. Dropping the event
+      // is right, but it has to be an explicit no-op -- writing clocks[-1] sets an array property
+      // nobody reads, so the clock would silently stop tracking the server.
+      return;
+   }
+   const tables = {...state.tables};
+   const table = tables[data.table].newInstance();
+   table.clocks[seat] = {millis: data.millis, minutes: data.minutes, seconds: data.seconds, time: data.time};
+   tables[data.table] = table;
+   state.tables = tables;
+}
+
+// The seat a timer event belongs to, or -1. The empty-seat fallback covers the rejoin race: the
+// server sends a returning player's timers before the sit event that puts them back in a seat.
+// Only seats 1 and 2 are real -- seats[0] is a permanent undefined placeholder, which an event
+// carrying no player name would otherwise match.
+function timerSeat(table, player) {
+   const seated = table.seats.indexOf(player);
+   if (seated === 1 || seated === 2) {
+      return seated;
+   }
+   const empty = table.seats.indexOf('');
+   return empty === 1 || empty === 2 ? empty : -1;
 }
 
 export function serverTableMessage(data, state) {
