@@ -443,6 +443,13 @@ export function swapSeats(data, state) {
          }
       }
       state.game = game;
+      // A swap hands the turn over without placing a stone, so no move event follows and the
+      // move sound at addMove never fires. Cue it here instead. Unlike the move sound this is
+      // NOT filtered to `data.player !== state.me` -- everyone at the table hears it.
+      // silent=true is a rejoin/state-sync replay marker, not a live choice.
+      if (!data.silent) {
+         emit(state, {sound: 'move'});
+      }
    }
 }
 
@@ -597,6 +604,12 @@ export function renjuOffer10(data, state) {
       r.offered = [...data.moves];
       r.awaitingSwap = false;
       state.game = game;
+      // The offer hands SELECTION to the opponent with no move event. This frame carries no
+      // `silent` flag, so the rejoin replay is recognisable only by its missing `player`
+      // (ServerTable.java:649 constructs it with player=null, and Gson omits null fields).
+      if (data.player != null) {
+         emit(state, {sound: 'move'});
+      }
    }
 }
 
