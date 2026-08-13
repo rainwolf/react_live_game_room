@@ -544,10 +544,6 @@ export function swap2Pass(data, state) {
       const game = state.game.newInstance();
       game.swap2Pass();
       state.game = game;
-      // "Let p1 decide": the turn returns to p1 with no stone placed. See swapSeats above.
-      if (!data.silent) {
-         emit(state, {sound: 'move'});
-      }
    }
 }
 
