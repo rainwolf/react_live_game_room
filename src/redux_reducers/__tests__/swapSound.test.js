@@ -95,6 +95,15 @@ describe('swap choices emit the move sound', () => {
       expect(sounds(state)).toEqual([]);
    });
 
+   // Pins the table guard itself: swap frames are broadcast to the whole lobby, so the emit must
+   // stay inside `if (data.table === state.table)` -- hoisting it out would sound a ten-stone
+   // offer made at someone else's table.
+   test('a ten-stone offer at another table is quiet', () => {
+      const state = stateAtTable();
+      renjuOffer10({table: OTHER_TABLE, moves: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], player: 'bob'}, state);
+      expect(sounds(state)).toEqual([]);
+   });
+
    // The "never sound" list is otherwise enforced only by the absence of code in the two
    // functions adjacent to the ones we edited. Pin it.
    test('renju swap and select-1 never emit -- a move event follows each of them', () => {
