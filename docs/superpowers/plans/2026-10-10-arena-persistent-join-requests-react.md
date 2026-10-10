@@ -18,9 +18,9 @@
 - C→S, existing, shape unchanged: `dsgArenaRequestJoinTableEvent {table}`, `dsgArenaAcceptTableJoinEvent {table, playerToAccept}`, `dsgArenaRejectTableJoinEvent {table, playerToReject}`.
 - C→S, new: `dsgArenaWithdrawJoinRequestEvent {table}`.
 - S→C, new: `dsgArenaJoinRequestsEvent {table, requests: [{player, seq}]}` (owner; full pending list, `seq` ascending, server-assigned, never reused); `dsgArenaMyRequestsEvent {tables: [int]}` (requester; full set); `dsgArenaRequestEndedEvent {table, player, owner, reason}`.
-- Reasons, verbatim: `DECLINED`, `TABLE_FULL`, `TABLE_CLOSED`, `DUPLICATE`, `BLOCKED`, `NOT_AVAILABLE`, `GUEST_RATED`, `NO_LONGER_AVAILABLE`.
+- Reasons, verbatim: `DECLINED`, `TABLE_FULL`, `TABLE_CLOSED`, `DUPLICATE`, `BLOCKED`, `NOT_AVAILABLE`, `GUEST_RATED`, `BOOTED`, `NO_LONGER_AVAILABLE`. `BOOTED` means the requester was booted from that table less than 5 minutes ago (R2).
 - No longer sent S→C: `dsgArenaRequestJoinTableEvent` and `dsgArenaRejectTableJoinEvent`.
-- Notice texts, verbatim (C4): `DECLINED`: "<owner> declined your request"; `TABLE_FULL`: "Table <n> is no longer available"; `TABLE_CLOSED`: "Table <n> was closed"; `DUPLICATE`: "You already requested table <n>"; `BLOCKED`: "You can't request table <n> again until its next game"; `NOT_AVAILABLE`: "You can't join table <n> right now"; `GUEST_RATED`: "Guests can't join rated tables"; `NO_LONGER_AVAILABLE`: "<player> is no longer available".
+- Notice texts, verbatim (C4): `DECLINED`: "<owner> declined your request"; `TABLE_FULL`: "Table <n> is no longer available"; `TABLE_CLOSED`: "Table <n> was closed"; `DUPLICATE`: "You already sent a request to <owner>"; `BOOTED`: "<owner> removed you from table <n>, try again in a few minutes"; `BLOCKED`: "You can't request table <n> again until its next game"; `NOT_AVAILABLE`: "You can't join table <n> right now"; `GUEST_RATED`: "Guests can't join rated tables"; `NO_LONGER_AVAILABLE`: "<player> is no longer available".
 - Withdraw confirm text, verbatim (C3): "Withdraw your request to table <n>? You won't be able to request it again until its next game."
 - Freeze is 400 ms (milliseconds); the minimum interactive window is 1000 ms. These are the only arena timers allowed in the client. No request expiry, no countdown (C1).
 - No optimistic removal on accept or decline (C2).
@@ -133,6 +133,13 @@ describe('arena join-request events (spec 2026-10-10)', () => {
     const r = frame({ dsgArenaRequestEndedEvent: { table: 4, player: 'carol', reason: 'TABLE_CLOSED', time: 1 } });
     expect(r.ok).toBe(true);
     expect(r.event.payload.reason).toBe('TABLE_CLOSED');
+  });
+
+  test('request-ended BOOTED decodes and carries the owner it names', () => {
+    const r = frame({ dsgArenaRequestEndedEvent: { table: 4, player: 'carol', owner: 'olga', reason: 'BOOTED', time: 1 } });
+    expect(r.ok).toBe(true);
+    expect(r.event.payload.reason).toBe('BOOTED');
+    expect(r.event.payload.owner).toBe('olga');
   });
 
   test('the retired server->client request/reject frames are dropped as unknown', () => {
@@ -1325,7 +1332,8 @@ describe('dsgArenaRequestEndedEvent — one short notice per reason (C4)', () =>
     ['DECLINED', 'olga declined your request'],
     ['TABLE_FULL', 'Table 6 is no longer available'],
     ['TABLE_CLOSED', 'Table 6 was closed'],
-    ['DUPLICATE', 'You already requested table 6'],
+    ['DUPLICATE', 'You already sent a request to olga'],
+    ['BOOTED', 'olga removed you from table 6, try again in a few minutes'],
     ['BLOCKED', "You can't request table 6 again until its next game"],
     ['NOT_AVAILABLE', "You can't join table 6 right now"],
     ['GUEST_RATED', "Guests can't join rated tables"],
@@ -1337,6 +1345,20 @@ describe('dsgArenaRequestEndedEvent — one short notice per reason (C4)', () =>
   test('DECLINED without an owner name (null omitted by the server) still reads well', () => {
     const s = dispatch(init(), 'dsgArenaRequestEndedEvent', { table: 6, player: 'carol', reason: 'DECLINED' });
     expect(s.notification).toEqual({ kind: 'info', message: 'The table owner declined your request' });
+  });
+
+  test('DUPLICATE and BOOTED without an owner name still read well', () => {
+    const noOwner = (reason) =>
+      dispatch(init(), 'dsgArenaRequestEndedEvent', { table: 6, player: 'carol', reason }).notification;
+    expect(noOwner('DUPLICATE')).toEqual({ kind: 'info', message: 'You already sent a request to the table owner' });
+    expect(noOwner('BOOTED')).toEqual({ kind: 'info', message: 'The table owner removed you from table 6, try again in a few minutes' });
+  });
+
+  test('the owner named in a notice comes from the event, not from my table model', () => {
+    // table 6 in my model is seated by zed; the event names olga, who owned it when the server refused
+    const s = dispatch(atTable(6, 'zed'), 'dsgArenaRequestEndedEvent',
+      { table: 6, player: 'carol', owner: 'olga', reason: 'DUPLICATE' });
+    expect(s.notification).toEqual({ kind: 'info', message: 'You already sent a request to olga' });
   });
 
   test('an unknown or missing reason shows nothing', () => {
@@ -1410,12 +1432,15 @@ export function arenaRequestSent(data, state) {
    }
 }
 
-// Spec C4 notice texts, keyed by dsgArenaRequestEndedEvent.reason.
+// Spec C4 notice texts, keyed by dsgArenaRequestEndedEvent.reason. Owner names come from the
+// event's own `owner` field, never from state.tables: the server names the owner it refused for.
 const ARENA_ENDED_MESSAGES = {
    DECLINED: (d) => (d.owner || 'The table owner') + ' declined your request',
    TABLE_FULL: (d) => 'Table ' + d.table + ' is no longer available',
    TABLE_CLOSED: (d) => 'Table ' + d.table + ' was closed',
-   DUPLICATE: (d) => 'You already requested table ' + d.table,
+   DUPLICATE: (d) => 'You already sent a request to ' + (d.owner || 'the table owner'),
+   BOOTED: (d) => (d.owner || 'The table owner') + ' removed you from table ' + d.table
+      + ', try again in a few minutes',
    BLOCKED: (d) => 'You can\'t request table ' + d.table + ' again until its next game',
    NOT_AVAILABLE: (d) => 'You can\'t join table ' + d.table + ' right now',
    GUEST_RATED: () => 'Guests can\'t join rated tables',
@@ -1524,7 +1549,7 @@ After the `ARENA_OWNER_ACTION_SENT` case added in Task 3, add:
 - [ ] **Step 6: Run the tests to verify they pass**
 
 Run: `cd $RX && TMPDIR=/private/tmp/claude-501/arena-react npx vitest run src/redux_reducers`
-Expected: PASS (arenaRequests now 35 tests; the other reducer files unchanged and green).
+Expected: PASS (arenaRequests now 38 tests; the other reducer files unchanged and green).
 
 - [ ] **Step 7: Run the full suite and check for stale references**
 
