@@ -28,8 +28,9 @@ export function processUser(userdata, state) {
    } else {
       user = new User(userdata);
       // In an arena room, don't play the new-player sound when other players
-      // join the room. The sound is played instead when you receive a join
-      // request (arenaJoinRequest) and when a player joins your table (joinTable).
+      // join the room. The sound is played instead when a join-request snapshot
+      // names a new requester (arenaJoinRequests) and when a player joins your
+      // table (joinTable).
       if (state.table === undefined && !state.arena) {
          emit(state, {sound: 'newPlayer'});
       }
@@ -121,6 +122,9 @@ export function exitTable(exitEvent, state) {
       state.table = undefined;
       state.game = undefined;
       state.table_messages = [];
+      // table numbers are reused: never carry an arena request list to my next table
+      delete state.arenaJoinRequests;
+      delete state.arenaOwnerPending;
    }
    state.tables = tables;
 }
@@ -547,27 +551,49 @@ export function swap2Pass(data, state) {
    }
 }
 
-export function arenaJoinRequest(data, state) {
-   if (data.table === state.table) {
-      const tables = {...state.tables};
-      const table = tables[state.table].newInstance();
-      table.addArenaPlayerRequest(data.player);
-      tables[data.table] = table;
-      state.tables = tables;
-      // Arena join request for my table; play the sound and nudge the tab.
-      emit(state, {sound: 'newPlayer', tab: data.player + ' wants to join your table'});
+// ---- arena join requests (server-driven, spec 2026-10-10) ----
+
+// Order the owner's pending list by the server's seq and keep one row per player, so rows can
+// be keyed by player name. A missing list (Gson omits null fields) is an empty list.
+function normalizeJoinRequests(requests) {
+   const list = Array.isArray(requests) ? [...requests] : [];
+   list.sort((a, b) => a.seq - b.seq);
+   const seen = new Set();
+   return list.filter(r => {
+      if (!r || typeof r.player !== 'string' || seen.has(r.player)) {
+         return false;
+      }
+      seen.add(r.player);
+      return true;
+   });
+}
+
+// dsgArenaJoinRequestsEvent: the full pending list for a table I own. Stored as received
+// (selectArenaJoinRequests filters by my current table). The first snapshot for that table
+// after my accept/decline answers it: it clears the in-flight marker and is flagged so the
+// owner list freezes on it at once. Players absent from the previous snapshot get the cue.
+export function arenaJoinRequests(data, state) {
+   const requests = normalizeJoinRequests(data.requests);
+   const previous = state.arenaJoinRequests && state.arenaJoinRequests.table === data.table
+      ? state.arenaJoinRequests.requests : [];
+   const pending = state.arenaOwnerPending;
+   const answersAction = !!pending && pending.table === data.table;
+   state.arenaJoinRequests = {table: data.table, requests, answersAction};
+   if (answersAction) {
+      delete state.arenaOwnerPending;
+   }
+   const before = new Set(previous.map(r => r.player));
+   const added = requests.filter(r => !before.has(r.player)).map(r => r.player);
+   if (added.length > 0 && data.table === state.table) {
+      const verb = added.length === 1 ? ' wants' : ' want';
+      emit(state, {sound: 'newPlayer', tab: added.join(', ') + verb + ' to join your table'});
    }
 }
 
-
-export function arenaRemoveJoinRequest(data, state) {
-   if (data.table === state.table) {
-      const tables = {...state.tables};
-      const table = tables[state.table].newInstance();
-      table.removeArenaPlayerRequest(data.player);
-      tables[data.table] = table;
-      state.tables = tables;
-   }
+// ARENA_OWNER_ACTION_SENT: I tapped Accept/Decline on `player`; the list ignores taps until
+// the server's next snapshot for that table (guaranteed by spec R11). No optimistic removal.
+export function arenaOwnerActionSent(data, state) {
+   state.arenaOwnerPending = {table: data.table, player: data.player};
 }
 
 export function arenaRejectRequest(data, state) {

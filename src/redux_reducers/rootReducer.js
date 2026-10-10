@@ -1,5 +1,6 @@
 import '../redux_actions/actionTypes';
 import {
+   ARENA_OWNER_ACTION_SENT,
    ARM_DRAW_OFFER,
    CONNECT_SERVER,
    CLEAR_NOTIFICATIONS,
@@ -11,7 +12,6 @@ import {
    MOVE_GOTO,
    MUTE,
    PRESSED_PLAY,
-   REMOVE_ARENA_JOIN_REQUEST,
    REMOVE_SNACK,
    REPLIED_INVITATION,
    UNMUTE
@@ -24,8 +24,8 @@ import {
    addMove,
    addRoomMessage,
    addTableMessage,
-   arenaJoinRequest,
-   arenaRemoveJoinRequest,
+   arenaJoinRequests,
+   arenaOwnerActionSent,
    arenaRejectRequest,
    bootEvent,
    cancelReply,
@@ -126,7 +126,7 @@ const EVENT_HANDLERS = {
    dsgRenjuTaraguchi10Select1TableEvent:(p, s) => renjuSelect1(p, s),
    dsgRenjuAcceptDrawTableEvent:        (p, s) => renjuAcceptDraw(p, s),
    dsgRenjuRejectDrawTableEvent:        (p, s) => renjuRejectDraw(p, s),
-   dsgArenaRequestJoinTableEvent: (p, s) => arenaJoinRequest(p, s),
+   dsgArenaJoinRequestsEvent: (p, s) => arenaJoinRequests(p, s),
    dsgArenaRejectTableJoinEvent: (p, s) => arenaRejectRequest(p, s),
 };
 
@@ -144,8 +144,8 @@ function liveGameApp(state = initialState, action) {
       case "REDUX_WEBSOCKET::CLOSED":
          console.log('socket closed');
          return initialState;
-      case REMOVE_ARENA_JOIN_REQUEST:
-         arenaRemoveJoinRequest(action.payload, newState);
+      case ARENA_OWNER_ACTION_SENT:
+         arenaOwnerActionSent(action.payload, newState);
          break;
       case PRESSED_PLAY:
          newState.pressed_play = true;

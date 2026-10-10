@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { selectCurrentTable, isGuestName, tableVisibleToGuest } from '../index';
+import { selectCurrentTable, isGuestName, tableVisibleToGuest, selectArenaJoinRequests, selectArenaOwnerPending } from '../index';
 
 describe('selectCurrentTable — the current-table reach, in one place', () => {
   test('returns the table object keyed by the current table id', () => {
@@ -58,5 +58,24 @@ describe('tableVisibleToGuest — guests must not see rated tables', () => {
     expect(tableVisibleToGuest({}, true)).toBe(true); // no rated field → visible
     expect(tableVisibleToGuest({ rated: 0 }, true)).toBe(true); // falsy → visible
     expect(tableVisibleToGuest({ rated: 1 }, true)).toBe(false); // truthy → hidden
+  });
+});
+
+describe('arena owner selectors — only the current table counts', () => {
+  const record = { table: 3, requests: [{ player: 'bob', seq: 1 }], answersAction: false };
+
+  test('selectArenaJoinRequests returns the record for my table', () => {
+    expect(selectArenaJoinRequests({ table: 3, arenaJoinRequests: record })).toBe(record);
+  });
+
+  test('selectArenaJoinRequests is undefined for another table or none', () => {
+    expect(selectArenaJoinRequests({ table: 4, arenaJoinRequests: record })).toBeUndefined();
+    expect(selectArenaJoinRequests({ table: 3 })).toBeUndefined();
+  });
+
+  test('selectArenaOwnerPending returns the marker only for my table', () => {
+    const pending = { table: 3, player: 'bob' };
+    expect(selectArenaOwnerPending({ table: 3, arenaOwnerPending: pending })).toBe(pending);
+    expect(selectArenaOwnerPending({ table: 4, arenaOwnerPending: pending })).toBeUndefined();
   });
 });
