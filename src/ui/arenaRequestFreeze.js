@@ -9,8 +9,9 @@
 //     window ends, so a burst of updates cannot lock the owner out;
 //   - URGENT: the snapshot answering the owner's own accept/decline freezes at once, even
 //     inside the window, so a just-declined row never sits there interactive;
-//   - HIDDEN: with no rows shown there is nothing under the pointer, so a snapshot applies
-//     at once and opens a window.
+//   - FIRST: rows appearing while none are shown (the list was hidden) also freeze,
+//     so a click aimed elsewhere cannot land on a row that just appeared; the spinner
+//     shows with zero rows, then the tick applies them and opens the window.
 //
 // freezeReducer is pure; createFreezeController owns the one timer; useFrozenRequests (a
 // thin hook) wires the controller to React. `epoch` changes exactly when a new timer must
@@ -31,7 +32,12 @@ export function freezeReducer(state, event) {
         return { ...state, held: requests };
       }
       if (state.shown.length === 0) {
-        return { phase: PHASE.WINDOW, shown: requests, held: null, epoch: state.epoch + 1 };
+        // Nothing shown and nothing to show: no change (drop any held snapshot).
+        if (requests.length === 0) return state.held === null ? state : { ...state, held: null };
+        // Rows that newly appear get the freeze too, so a click aimed elsewhere cannot
+        // land on a row that has just appeared under the pointer (the spinner shows
+        // with zero rows meanwhile).
+        return { phase: PHASE.FROZEN, shown: [], held: requests, epoch: state.epoch + 1 };
       }
       if (state.phase === PHASE.WINDOW && !urgent) {
         return { ...state, held: requests };

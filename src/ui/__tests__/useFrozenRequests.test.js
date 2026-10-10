@@ -57,15 +57,18 @@ describe('useFrozenRequests', () => {
     expect(seen.frozen).toBe(false);
   });
 
-  test('the first record is shown at once and is interactive', () => {
+  test('the first record opens frozen with zero rows (spinner), then shows interactive', () => {
     render(rec('a'));
+    expect(names()).toEqual([]);
+    expect(seen.frozen).toBe(true);
+    advance(FREEZE_MS);
     expect(names()).toEqual(['a']);
     expect(seen.frozen).toBe(false);
   });
 
   test('a new record while rows are shown freezes for FREEZE_MS, then applies', () => {
     render(rec('a'));
-    advance(MIN_WINDOW_MS);
+    advance(FREEZE_MS + MIN_WINDOW_MS);
     render(rec('a', 'b'));
     expect(seen.frozen).toBe(true);
     expect(names()).toEqual(['a']);
@@ -84,6 +87,7 @@ describe('useFrozenRequests', () => {
 
   test('an answersAction record freezes at once inside the window', () => {
     render(rec('a', 'b'));
+    advance(FREEZE_MS);
     render({...rec('b'), answersAction: true});
     expect(seen.frozen).toBe(true);
   });
@@ -94,7 +98,7 @@ describe('useFrozenRequests', () => {
     // hook reported unfrozen until its effect ran, the old rows would show enabled
     // Accept/Decline for a frame.
     render(rec('a', 'b'));
-    advance(MIN_WINDOW_MS);
+    advance(FREEZE_MS + MIN_WINDOW_MS);
     renders = [];
     render({...rec('b'), answersAction: true});
     expect(renders.length).toBeGreaterThan(0);
@@ -104,7 +108,7 @@ describe('useFrozenRequests', () => {
 
   test('unmount cancels the pending freeze timer', () => {
     render(rec('a'));
-    advance(MIN_WINDOW_MS);
+    advance(FREEZE_MS + MIN_WINDOW_MS);
     render(rec('a', 'b'));
     const before = vi.getTimerCount();
     act(() => root.unmount());

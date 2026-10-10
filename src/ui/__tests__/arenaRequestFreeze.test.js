@@ -14,7 +14,8 @@ const snapshot = (requests, urgent = false) => ({ type: 'snapshot', requests, ur
 const tick = (s) => freezeReducer(s, { type: 'tick', epoch: s.epoch });
 const names = (s) => s.shown.map((r) => r.player);
 // a visible list, idle (its first minimum window has ended)
-const idleShowing = (...players) => tick(freezeReducer(initialFreezeState, snapshot(rows(...players))));
+const idleShowing = (...players) =>
+  tick(tick(freezeReducer(initialFreezeState, snapshot(rows(...players)))));
 
 describe('freezeReducer — the pure C2 state machine', () => {
   test('starts idle with nothing shown and no timer', () => {
@@ -23,11 +24,19 @@ describe('freezeReducer — the pure C2 state machine', () => {
     expect(timerFor(initialFreezeState)).toBeNull();
   });
 
-  test('a snapshot while no rows are shown applies at once and opens the interactive window', () => {
-    const s = freezeReducer(initialFreezeState, snapshot(rows('a')));
+  test('a snapshot while no rows are shown freezes with zero rows, then the tick shows them and opens the window', () => {
+    let s = freezeReducer(initialFreezeState, snapshot(rows('a')));
+    expect(s.phase).toBe(PHASE.FROZEN);
+    expect(s.shown).toEqual([]);
+    expect(timerFor(s)).toBe(FREEZE_MS);
+    s = tick(s);
     expect(names(s)).toEqual(['a']);
     expect(s.phase).toBe(PHASE.WINDOW);
     expect(timerFor(s)).toBe(MIN_WINDOW_MS);
+  });
+
+  test('an empty snapshot while no rows are shown changes nothing', () => {
+    expect(freezeReducer(initialFreezeState, snapshot([]))).toBe(initialFreezeState);
   });
 
   test('the window ending with nothing held goes idle', () => {
@@ -104,18 +113,21 @@ describe('createFreezeController — owns the single timer (fake timers)', () =>
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  test('applies the first snapshot synchronously and reports each change', () => {
+  test('the first snapshot freezes with zero rows, then shows after FREEZE_MS; each change is reported', () => {
     const phases = [];
     const c = createFreezeController((s) => phases.push(s.phase));
     c.push(rows('a'));
+    expect(c.getState().shown).toEqual([]);
+    expect(phases).toEqual([PHASE.FROZEN]);
+    vi.advanceTimersByTime(FREEZE_MS);
     expect(names(c.getState())).toEqual(['a']);
-    expect(phases).toEqual([PHASE.WINDOW]);
+    expect(phases).toEqual([PHASE.FROZEN, PHASE.WINDOW]);
   });
 
   test('a freeze lasts FREEZE_MS, then the newest snapshot shows', () => {
     const c = createFreezeController(() => {});
     c.push(rows('a'));
-    vi.advanceTimersByTime(MIN_WINDOW_MS);
+    vi.advanceTimersByTime(FREEZE_MS + MIN_WINDOW_MS);
     expect(c.getState().phase).toBe(PHASE.IDLE);
     c.push(rows('a', 'b'));
     vi.advanceTimersByTime(FREEZE_MS - 1);
@@ -129,6 +141,7 @@ describe('createFreezeController — owns the single timer (fake timers)', () =>
   test('a burst of snapshots never locks the owner out: every unfreeze gives >= MIN_WINDOW_MS of interactivity', () => {
     const c = createFreezeController(() => {});
     c.push(rows('a'));
+    vi.advanceTimersByTime(FREEZE_MS);
     const runs = [];
     let interactive = 0;
     for (let t = 0; t < 6000; t++) {
