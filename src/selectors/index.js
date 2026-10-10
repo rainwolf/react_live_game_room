@@ -40,3 +40,14 @@ export const selectArenaOwnerPending = (state) => {
   const pending = state.arenaOwnerPending;
   return pending && pending.table === state.table ? pending : undefined;
 };
+
+// Requester lobby card state (spec C3). 'busy': a request or withdraw for this table
+// ({table, op} in state.arenaRequestsInFlight) awaits the server's answer, so taps are
+// ignored. 'requested': the latest snapshot lists it, so a tap offers withdraw. The lobby
+// keys tables by Object.keys (strings) while the server sends ints, hence the Number().
+export const arenaTableStatus = (tableId, myRequests, inFlight) => {
+  const id = Number(tableId);
+  if ((inFlight || []).some((e) => e.table === id)) return 'busy';
+  if ((myRequests || []).includes(id)) return 'requested';
+  return 'none';
+};

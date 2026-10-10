@@ -6,6 +6,7 @@ import liveGameApp from '../rootReducer';
 import Table from '../../Classes/TableClass';
 import { ARENA_OWNER_ACTION_SENT, ARENA_REQUEST_SENT } from '../../redux_actions/actionTypes';
 import { selectArenaJoinRequests, selectArenaOwnerPending } from '../../selectors';
+import { MODALS, openModal, modalProps } from '../../ui/modals';
 
 const init = () => liveGameApp(undefined, { type: '@@INIT' });
 const dispatch = (state, type, payload) => liveGameApp(state, { type, payload });
@@ -241,5 +242,23 @@ describe('dsgArenaRequestEndedEvent — one short notice per reason (C4)', () =>
     const s = dispatch({ ...init(), me: 'carol' }, 'dsgArenaRejectTableJoinEvent',
       { playerToReject: 'carol', message: 'old', player: 'olga', table: 6 });
     expect(s.notification).toBeUndefined();
+  });
+});
+
+describe('withdraw confirm goes through the modal seam', () => {
+  test('MODALS.ARENA_WITHDRAW opens carrying the table number', () => {
+    expect(MODALS.ARENA_WITHDRAW).toBe('arenaWithdraw');
+    const s = liveGameApp(init(), openModal(MODALS.ARENA_WITHDRAW, 7));
+    expect(s.modals).toEqual({ arenaWithdraw: 7 });
+    expect(modalProps(s, MODALS.ARENA_WITHDRAW)).toBe(7);
+  });
+
+  test('a request that ends while its dialog is open closes the dialog (no stray withdraw)', () => {
+    let s = dispatch(init(), 'dsgArenaMyRequestsEvent', { tables: [7, 9] });
+    s = liveGameApp(s, openModal(MODALS.ARENA_WITHDRAW, 7));
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [7] }); // another table changed
+    expect(modalProps(s, MODALS.ARENA_WITHDRAW)).toBe(7);
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [] }); // 7 declined / full / closed
+    expect(s.modals).toEqual({});
   });
 });

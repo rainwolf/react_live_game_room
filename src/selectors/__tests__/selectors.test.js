@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { selectCurrentTable, isGuestName, tableVisibleToGuest, selectArenaJoinRequests, selectArenaOwnerPending } from '../index';
+import { selectCurrentTable, isGuestName, tableVisibleToGuest, selectArenaJoinRequests, selectArenaOwnerPending, arenaTableStatus } from '../index';
 
 describe('selectCurrentTable — the current-table reach, in one place', () => {
   test('returns the table object keyed by the current table id', () => {
@@ -77,5 +77,31 @@ describe('arena owner selectors — only the current table counts', () => {
     const pending = { table: 3, player: 'bob' };
     expect(selectArenaOwnerPending({ table: 3, arenaOwnerPending: pending })).toBe(pending);
     expect(selectArenaOwnerPending({ table: 4, arenaOwnerPending: pending })).toBeUndefined();
+  });
+});
+
+describe('arenaTableStatus — the requester lobby card state', () => {
+  const req = (table) => ({ table, op: 'request' });
+  const wd = (table) => ({ table, op: 'withdraw' });
+
+  test('a table awaiting the server answer is busy, even if it is also requested', () => {
+    expect(arenaTableStatus(3, [3], [wd(3)])).toBe('busy');
+  });
+
+  test('a table in my latest request set is requested', () => {
+    expect(arenaTableStatus(3, [3, 5], [])).toBe('requested');
+  });
+
+  test('any other table is none', () => {
+    expect(arenaTableStatus(4, [3], [req(5)])).toBe('none');
+  });
+
+  test('a string id from Object.keys(tables) matches the server ints', () => {
+    expect(arenaTableStatus('3', [3], [])).toBe('requested');
+    expect(arenaTableStatus('5', [], [req(5)])).toBe('busy');
+  });
+
+  test('missing lists count as empty', () => {
+    expect(arenaTableStatus(3, undefined, undefined)).toBe('none');
   });
 });

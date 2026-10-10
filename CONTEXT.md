@@ -76,7 +76,7 @@ The app shows two *kinds* of modal, and the distinction is load-bearing:
     action creators, a pure `modalsReducer(modals, action)` (delegated to from `rootReducer`),
     and selectors `isModalOpen(state, name)` / `modalProps(state, name)`. `modalProps`
     returns `undefined` when closed, preserving the `open={value !== undefined}` render gate.
-  - **MODALS** — the name registry (`SETTINGS`, `CREATE_ARENA`, `BOOT`); a new discretionary
+  - **MODALS** — the name registry (`SETTINGS`, `CREATE_ARENA`, `BOOT`, `ARENA_WITHDRAW`); a new discretionary
     modal is one `MODALS` entry + one `openModal` call + one selector, no new action type
     and no new reducer case.
 

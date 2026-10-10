@@ -1,6 +1,7 @@
 import Table from '../Classes/TableClass';
 import User from '../Classes/UserClass';
 import {Game, GameState} from '../Classes/GameClass';
+import {MODALS, closeModal, modalProps, modalsReducer} from '../ui/modals';
 
 // These reducer helpers are PURE state transforms. Side effects (sound, tab nudge) are
 // emitted as notification intents onto state.pendingNotifications; the notification
@@ -606,6 +607,13 @@ export function arenaMyRequests(data, state) {
    state.arenaMyRequests = tables;
    const answered = e => (e.op === 'withdraw') !== tables.includes(e.table);
    state.arenaRequestsInFlight = (state.arenaRequestsInFlight || []).filter(e => !answered(e));
+   // A request that ended while its withdraw confirm is open (DECLINED, TABLE_FULL,
+   // TABLE_CLOSED) closes the dialog, so Withdraw is never sent for a request that no
+   // longer exists, and the dialog cannot pop up again if the table is requested later.
+   const withdrawTable = modalProps(state, MODALS.ARENA_WITHDRAW);
+   if (withdrawTable !== undefined && !tables.includes(withdrawTable)) {
+      state.modals = modalsReducer(state.modals, closeModal(MODALS.ARENA_WITHDRAW));
+   }
 }
 
 // ARENA_REQUEST_SENT ({table, op}): a request or withdraw for `table` awaits the server's
