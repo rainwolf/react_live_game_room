@@ -73,6 +73,15 @@ function UnconnectedArenJoinRequests(props) {
    const tableId = table && table.table;
 
    if (rows.length === 0) {
+      // First rows arriving freeze with nothing shown (arenaRequestFreeze): spinner, then rows.
+      // An empty record never paints this: its push leaves the reducer idle before paint.
+      if (frozen) {
+         return (
+            <Box sx={{display: 'flex', justifyContent: 'center', padding: 2}} aria-busy={true}>
+               <CircularProgress/>
+            </Box>
+         );
+      }
       return (
          <Typography variant="body2" color="textSecondary" style={{padding: 16}}>
             No join requests yet
