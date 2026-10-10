@@ -378,7 +378,7 @@ export function renjuRejectDraw(data, state) {
    if (data.table === state.table) {
       // Notify the offerer (my UI) only if I was the one waiting on the offer.
       // No SET_NOTIFICATION action exists in this codebase — notifications are written
-      // reducer-side directly (cf. arenaRejectRequest), so we set state.notification here.
+      // reducer-side directly (cf. arenaRequestEnded), so we set state.notification here.
       const wasMine = state.draw_pending;
       delete state.draw_requested;
       delete state.draw_pending;
@@ -596,9 +596,59 @@ export function arenaOwnerActionSent(data, state) {
    state.arenaOwnerPending = {table: data.table, player: data.player};
 }
 
-export function arenaRejectRequest(data, state) {
-   if (data.playerToReject === state.me) {
-      state.notification = {kind: 'info', message: data.message};
+// dsgArenaMyRequestsEvent: the full set of tables I have pending requests at. It also ends
+// the in-flight taps it answers (spec C3): a request once its table is listed, a withdraw
+// once its table is gone. Clearing every in-flight table on any snapshot would let the
+// answer for table 3 unlock table 5 before table 5's own answer, and a second tap on 5
+// would then come back DUPLICATE.
+export function arenaMyRequests(data, state) {
+   const tables = Array.isArray(data.tables) ? [...data.tables] : [];
+   state.arenaMyRequests = tables;
+   const answered = e => (e.op === 'withdraw') !== tables.includes(e.table);
+   state.arenaRequestsInFlight = (state.arenaRequestsInFlight || []).filter(e => !answered(e));
+}
+
+// ARENA_REQUEST_SENT ({table, op}): a request or withdraw for `table` awaits the server's
+// answer. One entry per table; the card ignores taps while it is there.
+export function arenaRequestSent(data, state) {
+   const inFlight = state.arenaRequestsInFlight || [];
+   if (!inFlight.some(e => e.table === data.table)) {
+      state.arenaRequestsInFlight = [...inFlight, {table: data.table, op: data.op}];
+   }
+}
+
+// Spec C4 notice texts, keyed by dsgArenaRequestEndedEvent.reason. Owner names come from the
+// event's own `owner` field, never from state.tables: the server names the owner it refused for.
+const ARENA_ENDED_MESSAGES = {
+   DECLINED: (d) => (d.owner || 'The table owner') + ' declined your request',
+   TABLE_FULL: (d) => 'Table ' + d.table + ' is no longer available',
+   TABLE_CLOSED: (d) => 'Table ' + d.table + ' was closed',
+   DUPLICATE: (d) => 'You already sent a request to ' + (d.owner || 'the table owner'),
+   BOOTED: (d) => (d.owner || 'The table owner') + ' removed you from table ' + d.table
+      + ', try again in a few minutes',
+   BLOCKED: (d) => 'You can\'t request table ' + d.table + ' again until its next game',
+   NOT_AVAILABLE: (d) => 'You can\'t join table ' + d.table + ' right now',
+   GUEST_RATED: () => 'Guests can\'t join rated tables',
+   NO_LONGER_AVAILABLE: (d) => d.player + ' is no longer available',
+};
+
+export function arenaEndedMessage(data) {
+   const build = ARENA_ENDED_MESSAGES[data.reason];
+   return build ? build(data) : undefined;
+}
+
+// dsgArenaRequestEndedEvent: the server addresses it to whoever needs the notice (requester,
+// or the owner for NO_LONGER_AVAILABLE), so show it as is. Unknown reasons are ignored. It
+// also ends any in-flight tap on that table: a refused request (BLOCKED, DUPLICATE, ...)
+// never enters my request set, so the snapshot alone would never unlock its card.
+export function arenaRequestEnded(data, state) {
+   const message = arenaEndedMessage(data);
+   if (message) {
+      state.notification = {kind: 'info', message};
+   }
+   const inFlight = state.arenaRequestsInFlight || [];
+   if (inFlight.some(e => e.table === data.table)) {
+      state.arenaRequestsInFlight = inFlight.filter(e => e.table !== data.table);
    }
 }
 

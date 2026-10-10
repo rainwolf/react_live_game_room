@@ -1,6 +1,7 @@
 import '../redux_actions/actionTypes';
 import {
    ARENA_OWNER_ACTION_SENT,
+   ARENA_REQUEST_SENT,
    ARM_DRAW_OFFER,
    CONNECT_SERVER,
    CLEAR_NOTIFICATIONS,
@@ -25,8 +26,10 @@ import {
    addRoomMessage,
    addTableMessage,
    arenaJoinRequests,
+   arenaMyRequests,
    arenaOwnerActionSent,
-   arenaRejectRequest,
+   arenaRequestEnded,
+   arenaRequestSent,
    bootEvent,
    cancelReply,
    cancelRequested,
@@ -79,6 +82,8 @@ const initialState = {
    modals: {},
    renjuOpeningUi: RENJU_UI_INITIAL,
    pendingNotifications: [],
+   arenaMyRequests: [],
+   arenaRequestsInFlight: [],
 };
 
 // Inbound protocol events — the protocol middleware decodes each wss frame into a
@@ -127,7 +132,8 @@ const EVENT_HANDLERS = {
    dsgRenjuAcceptDrawTableEvent:        (p, s) => renjuAcceptDraw(p, s),
    dsgRenjuRejectDrawTableEvent:        (p, s) => renjuRejectDraw(p, s),
    dsgArenaJoinRequestsEvent: (p, s) => arenaJoinRequests(p, s),
-   dsgArenaRejectTableJoinEvent: (p, s) => arenaRejectRequest(p, s),
+   dsgArenaMyRequestsEvent: (p, s) => arenaMyRequests(p, s),
+   dsgArenaRequestEndedEvent: (p, s) => arenaRequestEnded(p, s),
 };
 
 function liveGameApp(state = initialState, action) {
@@ -146,6 +152,9 @@ function liveGameApp(state = initialState, action) {
          return initialState;
       case ARENA_OWNER_ACTION_SENT:
          arenaOwnerActionSent(action.payload, newState);
+         break;
+      case ARENA_REQUEST_SENT:
+         arenaRequestSent(action.payload, newState);
          break;
       case PRESSED_PLAY:
          newState.pressed_play = true;

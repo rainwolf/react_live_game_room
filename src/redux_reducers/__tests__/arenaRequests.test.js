@@ -4,7 +4,7 @@
 import { describe, test, expect } from 'vitest';
 import liveGameApp from '../rootReducer';
 import Table from '../../Classes/TableClass';
-import { ARENA_OWNER_ACTION_SENT } from '../../redux_actions/actionTypes';
+import { ARENA_OWNER_ACTION_SENT, ARENA_REQUEST_SENT } from '../../redux_actions/actionTypes';
 import { selectArenaJoinRequests, selectArenaOwnerPending } from '../../selectors';
 
 const init = () => liveGameApp(undefined, { type: '@@INIT' });
@@ -119,5 +119,127 @@ describe('owner state lifetime', () => {
     expect(s.arenaJoinRequests).toBeUndefined();
     expect(s.pendingNotifications).toEqual([]);
     expect(new Table().addArenaPlayerRequest).toBeUndefined();
+  });
+});
+
+describe('requester — dsgArenaMyRequestsEvent and in-flight taps', () => {
+  test('initial state has no requests and nothing in flight', () => {
+    const s = init();
+    expect(s.arenaMyRequests).toEqual([]);
+    expect(s.arenaRequestsInFlight).toEqual([]);
+  });
+
+  const req = (table) => ({ table, op: 'request' });
+  const wd = (table) => ({ table, op: 'withdraw' });
+  const inFlightTables = (s) => s.arenaRequestsInFlight.map((e) => e.table);
+
+  test('ARENA_REQUEST_SENT marks a table in flight once', () => {
+    let s = dispatch(init(), ARENA_REQUEST_SENT, req(4));
+    s = dispatch(s, ARENA_REQUEST_SENT, req(4));
+    s = dispatch(s, ARENA_REQUEST_SENT, wd(7));
+    expect(s.arenaRequestsInFlight).toEqual([req(4), wd(7)]);
+  });
+
+  test('the snapshot replaces my request set and ends the requests it now lists', () => {
+    let s = dispatch(init(), ARENA_REQUEST_SENT, req(4));
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [4, 2] });
+    expect(s.arenaMyRequests).toEqual([4, 2]);
+    expect(s.arenaRequestsInFlight).toEqual([]);
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [2] });
+    expect(s.arenaMyRequests).toEqual([2]);
+  });
+
+  test('the answer to one table does not unlock another table still in flight (no DUPLICATE across tables)', () => {
+    let s = dispatch(init(), ARENA_REQUEST_SENT, req(3));
+    s = dispatch(s, ARENA_REQUEST_SENT, req(5));
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [3] }); // answers table 3 only
+    expect(inFlightTables(s)).toEqual([5]);
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [3, 5] });
+    expect(s.arenaRequestsInFlight).toEqual([]);
+  });
+
+  test('a withdraw ends when a snapshot no longer lists its table', () => {
+    let s = dispatch(init(), 'dsgArenaMyRequestsEvent', { tables: [4, 6] });
+    s = dispatch(s, ARENA_REQUEST_SENT, wd(4));
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [4, 6] }); // an older change, still lists 4
+    expect(inFlightTables(s)).toEqual([4]);
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', { tables: [6] });
+    expect(s.arenaRequestsInFlight).toEqual([]);
+  });
+
+  test('a refused request ends on its end notice (the table never enters the set)', () => {
+    let s = dispatch(init(), ARENA_REQUEST_SENT, req(4));
+    s = dispatch(s, ARENA_REQUEST_SENT, req(7));
+    s = dispatch(s, 'dsgArenaRequestEndedEvent', { table: 4, reason: 'BLOCKED' });
+    expect(inFlightTables(s)).toEqual([7]);
+  });
+
+  test('a snapshot without tables (field omitted by the server) is an empty set', () => {
+    let s = dispatch(init(), 'dsgArenaMyRequestsEvent', { tables: [4] });
+    s = dispatch(s, 'dsgArenaMyRequestsEvent', {});
+    expect(s.arenaMyRequests).toEqual([]);
+  });
+
+  test('socket close resets the requester state', () => {
+    let s = dispatch(init(), 'dsgArenaMyRequestsEvent', { tables: [4] });
+    s = dispatch(s, ARENA_REQUEST_SENT, req(5));
+    s = dispatch(s, 'REDUX_WEBSOCKET::CLOSED');
+    expect(s.arenaMyRequests).toEqual([]);
+    expect(s.arenaRequestsInFlight).toEqual([]);
+  });
+});
+
+describe('dsgArenaRequestEndedEvent — one short notice per reason (C4)', () => {
+  const ended = (reason, extra = {}) =>
+    dispatch(init(), 'dsgArenaRequestEndedEvent', { table: 6, player: 'carol', owner: 'olga', reason, ...extra });
+
+  test.each([
+    ['DECLINED', 'olga declined your request'],
+    ['TABLE_FULL', 'Table 6 is no longer available'],
+    ['TABLE_CLOSED', 'Table 6 was closed'],
+    ['DUPLICATE', 'You already sent a request to olga'],
+    ['BOOTED', 'olga removed you from table 6, try again in a few minutes'],
+    ['BLOCKED', "You can't request table 6 again until its next game"],
+    ['NOT_AVAILABLE', "You can't join table 6 right now"],
+    ['GUEST_RATED', "Guests can't join rated tables"],
+    ['NO_LONGER_AVAILABLE', 'carol is no longer available'],
+  ])('%s -> "%s"', (reason, message) => {
+    expect(ended(reason).notification).toEqual({ kind: 'info', message });
+  });
+
+  test('DECLINED without an owner name (null omitted by the server) still reads well', () => {
+    const s = dispatch(init(), 'dsgArenaRequestEndedEvent', { table: 6, player: 'carol', reason: 'DECLINED' });
+    expect(s.notification).toEqual({ kind: 'info', message: 'The table owner declined your request' });
+  });
+
+  test('DUPLICATE and BOOTED without an owner name still read well', () => {
+    const noOwner = (reason) =>
+      dispatch(init(), 'dsgArenaRequestEndedEvent', { table: 6, player: 'carol', reason }).notification;
+    expect(noOwner('DUPLICATE')).toEqual({ kind: 'info', message: 'You already sent a request to the table owner' });
+    expect(noOwner('BOOTED')).toEqual({ kind: 'info', message: 'The table owner removed you from table 6, try again in a few minutes' });
+  });
+
+  test('the owner named in a notice comes from the event, not from my table model', () => {
+    // table 6 in my model is seated by zed; the event names olga, who owned it when the server refused
+    const s = dispatch(atTable(6, 'zed'), 'dsgArenaRequestEndedEvent',
+      { table: 6, player: 'carol', owner: 'olga', reason: 'DUPLICATE' });
+    expect(s.notification).toEqual({ kind: 'info', message: 'You already sent a request to olga' });
+  });
+
+  test('an unknown or missing reason shows nothing', () => {
+    expect(ended('SOMETHING_NEW').notification).toBeUndefined();
+    expect(dispatch(init(), 'dsgArenaRequestEndedEvent', { table: 6 }).notification).toBeUndefined();
+  });
+
+  test('an end notice does not change my request set (the server sends a snapshot for that)', () => {
+    let s = dispatch(init(), 'dsgArenaMyRequestsEvent', { tables: [6] });
+    s = dispatch(s, 'dsgArenaRequestEndedEvent', { table: 6, owner: 'olga', reason: 'DECLINED' });
+    expect(s.arenaMyRequests).toEqual([6]);
+  });
+
+  test('the retired free-text reject event no longer shows a notice', () => {
+    const s = dispatch({ ...init(), me: 'carol' }, 'dsgArenaRejectTableJoinEvent',
+      { playerToReject: 'carol', message: 'old', player: 'olga', table: 6 });
+    expect(s.notification).toBeUndefined();
   });
 });
