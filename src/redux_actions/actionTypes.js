@@ -13,7 +13,6 @@ export const UNMUTE = 'UNMUTE';
 export const REMOVE_SNACK = 'REMOVE_SNACK';
 export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS';
 export const REPLIED_INVITATION = 'REPLIED_INVITATION';
-export const REMOVE_ARENA_JOIN_REQUEST = 'REMOVE_ARENA_JOIN_REQUEST'; // removed in Task 5 with its last importer
 // Arena (spec 2026-10-10): the owner tapped Accept/Decline; payload {table, player}.
 export const ARENA_OWNER_ACTION_SENT = 'ARENA_OWNER_ACTION_SENT';
 // Arena (spec 2026-10-10): I sent a join request or withdraw for a table;
