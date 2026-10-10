@@ -65,10 +65,18 @@ export const MESSAGES = {
   dsgInviteResponseTableEvent: { dir: 'both', cmd: 'inviteResponse', out: ['toPlayer', 'responseText', 'accept', 'ignore', 'table'], req: TBL },
 
   // ---- arena ----
+  // Join requests are server-driven (spec 2026-10-10): the server pushes full snapshots
+  // and reason-coded end notices; request/accept/reject/withdraw travel client->server only.
   dsgArenaCreateTableEvent:      { dir: 'out', cmd: 'arenaCreate', out: ['timed', 'initialMinutes', 'incrementalSeconds', 'rated', 'game', 'playAs', 'player', 'table'] },
-  dsgArenaRequestJoinTableEvent: { dir: 'both', cmd: 'arenaRequestJoin', out: ['table'], req: TBL },
+  dsgArenaRequestJoinTableEvent: { dir: 'out', cmd: 'arenaRequestJoin', out: ['table'] },
   dsgArenaAcceptTableJoinEvent:  { dir: 'out', cmd: 'arenaAccept', out: ['playerToAccept', 'table'] },
-  dsgArenaRejectTableJoinEvent:  { dir: 'both', cmd: 'arenaReject', out: ['playerToReject', 'table'], req: TBL },
+  dsgArenaRejectTableJoinEvent:  { dir: 'out', cmd: 'arenaReject', out: ['playerToReject', 'table'] },
+  dsgArenaWithdrawJoinRequestEvent: { dir: 'out', cmd: 'arenaWithdraw', out: ['table'] },
+  // Inbound `req` is kept minimal on purpose: the server's Gson omits null fields, so only
+  // the primitive `table` is guaranteed. Reducers default the missing lists.
+  dsgArenaJoinRequestsEvent:     { dir: 'in', req: TBL },
+  dsgArenaMyRequestsEvent:       { dir: 'in', req: [] },
+  dsgArenaRequestEndedEvent:     { dir: 'in', req: TBL },
 };
 
 // Inbound *Error events the server emits (decode must recognize, not reject as unknown).

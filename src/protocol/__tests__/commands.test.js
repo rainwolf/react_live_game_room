@@ -72,3 +72,19 @@ describe('renju draw-offer commands', () => {
       .toEqual({ dsgMoveTableEvent: { move: 225, moves: [225], player: 'alice', table: 5, drawOffer: true, time: 0 } });
   });
 });
+
+describe('arena join-request commands (spec 2026-10-10)', () => {
+  test('arenaWithdraw frame', () => {
+    expect(Commands.arenaWithdraw({ table: 4 }))
+      .toEqual({ dsgArenaWithdrawJoinRequestEvent: { table: 4, time: 0 } });
+  });
+
+  test('arenaWithdraw requires table', () => {
+    expect(() => Commands.arenaWithdraw({})).toThrow(/missing required field "table"/);
+  });
+
+  test('arenaReject sends the lowercase key the server decodes', () => {
+    expect(Object.keys(Commands.arenaReject({ playerToReject: 'bob', table: 4 })))
+      .toEqual(['dsgArenaRejectTableJoinEvent']);
+  });
+});

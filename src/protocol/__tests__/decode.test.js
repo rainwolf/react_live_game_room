@@ -117,3 +117,51 @@ describe('renju inbound decode', () => {
     expect(r.ok).toBe(true);
   });
 });
+
+describe('arena join-request events (spec 2026-10-10)', () => {
+  const frame = (obj) => decode({ type: 'REDUX_WEBSOCKET::MESSAGE', payload: { message: JSON.stringify(obj) } });
+
+  test('owner snapshot decodes with its requests', () => {
+    const r = frame({ dsgArenaJoinRequestsEvent: { table: 3, requests: [{ player: 'bob', seq: 7 }], time: 1 } });
+    expect(r.ok).toBe(true);
+    expect(r.event.type).toBe('dsgArenaJoinRequestsEvent');
+    expect(r.event.payload.requests).toEqual([{ player: 'bob', seq: 7 }]);
+  });
+
+  test('owner snapshot whose requests field the server omitted still decodes', () => {
+    const r = frame({ dsgArenaJoinRequestsEvent: { table: 3, time: 1 } });
+    expect(r.ok).toBe(true);
+  });
+
+  test('owner snapshot without a table id is rejected', () => {
+    const r = frame({ dsgArenaJoinRequestsEvent: { requests: [] } });
+    expect(r.ok).toBe(false);
+    expect(r.error.kind).toBe('field');
+  });
+
+  test('my-requests decodes, also when tables was omitted', () => {
+    expect(frame({ dsgArenaMyRequestsEvent: { tables: [2, 5], time: 1 } }).ok).toBe(true);
+    expect(frame({ dsgArenaMyRequestsEvent: { time: 1 } }).ok).toBe(true);
+  });
+
+  test('request-ended decodes without an owner (null field omitted by the server)', () => {
+    const r = frame({ dsgArenaRequestEndedEvent: { table: 4, player: 'carol', reason: 'TABLE_CLOSED', time: 1 } });
+    expect(r.ok).toBe(true);
+    expect(r.event.payload.reason).toBe('TABLE_CLOSED');
+  });
+
+  test('request-ended BOOTED decodes and carries the owner it names', () => {
+    const r = frame({ dsgArenaRequestEndedEvent: { table: 4, player: 'carol', owner: 'olga', reason: 'BOOTED', time: 1 } });
+    expect(r.ok).toBe(true);
+    expect(r.event.payload.reason).toBe('BOOTED');
+    expect(r.event.payload.owner).toBe('olga');
+  });
+
+  test('the retired server->client request/reject frames are dropped as unknown', () => {
+    for (const type of ['dsgArenaRequestJoinTableEvent', 'dsgArenaRejectTableJoinEvent']) {
+      const r = frame({ [type]: { player: 'x', table: 1, time: 1 } });
+      expect(r.ok).toBe(false);
+      expect(r.error.kind).toBe('unknown');
+    }
+  });
+});
