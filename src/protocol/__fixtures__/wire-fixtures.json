@@ -49,13 +49,6 @@
       }
     },
     "dsgArenaRejectTableJoinEvent": {
-      "in": {
-        "playerToReject": "guest39",
-        "message": "Wait one minute after rejection before requesting again.",
-        "player": "guest38",
-        "table": 1,
-        "time": 1781359114553
-      },
       "out": {
         "playerToReject": "guest39",
         "table": 1,
@@ -63,11 +56,6 @@
       }
     },
     "dsgArenaRequestJoinTableEvent": {
-      "in": {
-        "player": "guest39",
-        "table": 1,
-        "time": 1781359113637
-      },
       "out": {
         "table": 1,
         "time": 0

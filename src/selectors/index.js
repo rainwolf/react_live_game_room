@@ -25,3 +25,29 @@ export const isGuestName = (name) => (name || '').toLowerCase().startsWith('gues
 // users see everything. Pure over (table, isGuest) so it runs in render without churning
 // mapStateToProps references.
 export const tableVisibleToGuest = (table, isGuest) => !isGuest || !table.rated;
+
+// Arena owner's join-request snapshot ({table, requests, answersAction}), but only when it is
+// for the table I am at: the record is stored as received, and a snapshot for another table
+// (or one left over from a table I just left) must never render.
+export const selectArenaJoinRequests = (state) => {
+  const record = state.arenaJoinRequests;
+  return record && record.table === state.table ? record : undefined;
+};
+
+// The accept/decline I sent and still await the server's snapshot for ({table, player}),
+// only for the table I am at.
+export const selectArenaOwnerPending = (state) => {
+  const pending = state.arenaOwnerPending;
+  return pending && pending.table === state.table ? pending : undefined;
+};
+
+// Requester lobby card state (spec C3). 'busy': a request or withdraw for this table
+// ({table, op} in state.arenaRequestsInFlight) awaits the server's answer, so taps are
+// ignored. 'requested': the latest snapshot lists it, so a tap offers withdraw. The lobby
+// keys tables by Object.keys (strings) while the server sends ints, hence the Number().
+export const arenaTableStatus = (tableId, myRequests, inFlight) => {
+  const id = Number(tableId);
+  if ((inFlight || []).some((e) => e.table === id)) return 'busy';
+  if ((myRequests || []).includes(id)) return 'requested';
+  return 'none';
+};

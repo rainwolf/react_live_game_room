@@ -1,6 +1,7 @@
 import Table from '../Classes/TableClass';
 import User from '../Classes/UserClass';
 import {Game, GameState} from '../Classes/GameClass';
+import {MODALS, closeModal, modalProps, modalsReducer} from '../ui/modals';
 
 // These reducer helpers are PURE state transforms. Side effects (sound, tab nudge) are
 // emitted as notification intents onto state.pendingNotifications; the notification
@@ -28,8 +29,9 @@ export function processUser(userdata, state) {
    } else {
       user = new User(userdata);
       // In an arena room, don't play the new-player sound when other players
-      // join the room. The sound is played instead when you receive a join
-      // request (arenaJoinRequest) and when a player joins your table (joinTable).
+      // join the room. The sound is played instead when a join-request snapshot
+      // names a new requester (arenaJoinRequests) and when a player joins your
+      // table (joinTable).
       if (state.table === undefined && !state.arena) {
          emit(state, {sound: 'newPlayer'});
       }
@@ -121,6 +123,9 @@ export function exitTable(exitEvent, state) {
       state.table = undefined;
       state.game = undefined;
       state.table_messages = [];
+      // table numbers are reused: never carry an arena request list to my next table
+      delete state.arenaJoinRequests;
+      delete state.arenaOwnerPending;
    }
    state.tables = tables;
 }
@@ -374,7 +379,7 @@ export function renjuRejectDraw(data, state) {
    if (data.table === state.table) {
       // Notify the offerer (my UI) only if I was the one waiting on the offer.
       // No SET_NOTIFICATION action exists in this codebase — notifications are written
-      // reducer-side directly (cf. arenaRejectRequest), so we set state.notification here.
+      // reducer-side directly (cf. arenaRequestEnded), so we set state.notification here.
       const wasMine = state.draw_pending;
       delete state.draw_requested;
       delete state.draw_pending;
@@ -547,32 +552,111 @@ export function swap2Pass(data, state) {
    }
 }
 
-export function arenaJoinRequest(data, state) {
-   if (data.table === state.table) {
-      const tables = {...state.tables};
-      const table = tables[state.table].newInstance();
-      table.addArenaPlayerRequest(data.player);
-      tables[data.table] = table;
-      state.tables = tables;
-      // Arena join request for my table; play the sound and nudge the tab.
-      emit(state, {sound: 'newPlayer', tab: data.player + ' wants to join your table'});
+// ---- arena join requests (server-driven, spec 2026-10-10) ----
+
+// Order the owner's pending list by the server's seq and keep one row per player, so rows can
+// be keyed by player name. A missing list (Gson omits null fields) is an empty list.
+function normalizeJoinRequests(requests) {
+   const list = Array.isArray(requests) ? [...requests] : [];
+   list.sort((a, b) => a.seq - b.seq);
+   const seen = new Set();
+   return list.filter(r => {
+      if (!r || typeof r.player !== 'string' || seen.has(r.player)) {
+         return false;
+      }
+      seen.add(r.player);
+      return true;
+   });
+}
+
+// dsgArenaJoinRequestsEvent: the full pending list for a table I own. Stored as received
+// (selectArenaJoinRequests filters by my current table). The first snapshot for that table
+// after my accept/decline answers it: it clears the in-flight marker and is flagged so the
+// owner list freezes on it at once. Players absent from the previous snapshot get the cue.
+export function arenaJoinRequests(data, state) {
+   const requests = normalizeJoinRequests(data.requests);
+   const previous = state.arenaJoinRequests && state.arenaJoinRequests.table === data.table
+      ? state.arenaJoinRequests.requests : [];
+   const pending = state.arenaOwnerPending;
+   const answersAction = !!pending && pending.table === data.table;
+   state.arenaJoinRequests = {table: data.table, requests, answersAction};
+   if (answersAction) {
+      delete state.arenaOwnerPending;
+   }
+   const before = new Set(previous.map(r => r.player));
+   const added = requests.filter(r => !before.has(r.player)).map(r => r.player);
+   if (added.length > 0 && data.table === state.table) {
+      const verb = added.length === 1 ? ' wants' : ' want';
+      emit(state, {sound: 'newPlayer', tab: added.join(', ') + verb + ' to join your table'});
    }
 }
 
+// ARENA_OWNER_ACTION_SENT: I tapped Accept/Decline on `player`; the list ignores taps until
+// the server's next snapshot for that table (guaranteed by spec R11). No optimistic removal.
+export function arenaOwnerActionSent(data, state) {
+   state.arenaOwnerPending = {table: data.table, player: data.player};
+}
 
-export function arenaRemoveJoinRequest(data, state) {
-   if (data.table === state.table) {
-      const tables = {...state.tables};
-      const table = tables[state.table].newInstance();
-      table.removeArenaPlayerRequest(data.player);
-      tables[data.table] = table;
-      state.tables = tables;
+// dsgArenaMyRequestsEvent: the full set of tables I have pending requests at. It also ends
+// the in-flight taps it answers (spec C3): a request once its table is listed, a withdraw
+// once its table is gone. Clearing every in-flight table on any snapshot would let the
+// answer for table 3 unlock table 5 before table 5's own answer, and a second tap on 5
+// would then come back DUPLICATE.
+export function arenaMyRequests(data, state) {
+   const tables = Array.isArray(data.tables) ? [...data.tables] : [];
+   state.arenaMyRequests = tables;
+   const answered = e => (e.op === 'withdraw') !== tables.includes(e.table);
+   state.arenaRequestsInFlight = (state.arenaRequestsInFlight || []).filter(e => !answered(e));
+   // A request that ended while its withdraw confirm is open (DECLINED, TABLE_FULL,
+   // TABLE_CLOSED) closes the dialog, so Withdraw is never sent for a request that no
+   // longer exists, and the dialog cannot pop up again if the table is requested later.
+   const withdrawTable = modalProps(state, MODALS.ARENA_WITHDRAW);
+   if (withdrawTable !== undefined && !tables.includes(withdrawTable)) {
+      state.modals = modalsReducer(state.modals, closeModal(MODALS.ARENA_WITHDRAW));
    }
 }
 
-export function arenaRejectRequest(data, state) {
-   if (data.playerToReject === state.me) {
-      state.notification = {kind: 'info', message: data.message};
+// ARENA_REQUEST_SENT ({table, op}): a request or withdraw for `table` awaits the server's
+// answer. One entry per table; the card ignores taps while it is there.
+export function arenaRequestSent(data, state) {
+   const inFlight = state.arenaRequestsInFlight || [];
+   if (!inFlight.some(e => e.table === data.table)) {
+      state.arenaRequestsInFlight = [...inFlight, {table: data.table, op: data.op}];
+   }
+}
+
+// Spec C4 notice texts, keyed by dsgArenaRequestEndedEvent.reason. Owner names come from the
+// event's own `owner` field, never from state.tables: the server names the owner it refused for.
+const ARENA_ENDED_MESSAGES = {
+   DECLINED: (d) => (d.owner || 'The table owner') + ' declined your request',
+   TABLE_FULL: (d) => 'Table ' + d.table + ' is no longer available',
+   TABLE_CLOSED: (d) => 'Table ' + d.table + ' was closed',
+   DUPLICATE: (d) => 'You already sent a request to ' + (d.owner || 'the table owner'),
+   BOOTED: (d) => (d.owner || 'The table owner') + ' removed you from table ' + d.table
+      + ', try again in a few minutes',
+   BLOCKED: (d) => 'You can\'t request table ' + d.table + ' again until its next game',
+   NOT_AVAILABLE: (d) => 'You can\'t join table ' + d.table + ' right now',
+   GUEST_RATED: () => 'Guests can\'t join rated tables',
+   NO_LONGER_AVAILABLE: (d) => d.player + ' is no longer available',
+};
+
+export function arenaEndedMessage(data) {
+   const build = ARENA_ENDED_MESSAGES[data.reason];
+   return build ? build(data) : undefined;
+}
+
+// dsgArenaRequestEndedEvent: the server addresses it to whoever needs the notice (requester,
+// or the owner for NO_LONGER_AVAILABLE), so show it as is. Unknown reasons are ignored. It
+// also ends any in-flight tap on that table: a refused request (BLOCKED, DUPLICATE, ...)
+// never enters my request set, so the snapshot alone would never unlock its card.
+export function arenaRequestEnded(data, state) {
+   const message = arenaEndedMessage(data);
+   if (message) {
+      state.notification = {kind: 'info', message};
+   }
+   const inFlight = state.arenaRequestsInFlight || [];
+   if (inFlight.some(e => e.table === data.table)) {
+      state.arenaRequestsInFlight = inFlight.filter(e => e.table !== data.table);
    }
 }
 

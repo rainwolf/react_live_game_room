@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Table from '../../Classes/TableClass';
 import User from '../../Classes/UserClass';
@@ -7,11 +7,10 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import SimpleStone from '../Board/SimpleStone';
 import HttpsIcon from '@mui/icons-material/Https';
 import {withStyles} from '@mui/styles';
-
-const COUNTDOWN_SECONDS = 6;
 
 
 const styles = theme => ({
@@ -36,39 +35,23 @@ const styles = theme => ({
 });
 
 const TableCard = (props) => {
-   const {classes, table, users, countdown} = props;
+   const {classes, table, users, requested, busy} = props;
    const seated = table.seats[1] !== "" || table.seats[2] !== "";
    const game = table.game;
 
-   const [remaining, setRemaining] = useState(0);
-   const intervalRef = useRef(null);
-
-   useEffect(() => () => clearInterval(intervalRef.current), []);
-
-   const counting = remaining > 0;
-
+   // Arena lobby (spec C3): `busy` while a request or withdraw for this table awaits the
+   // server's next dsgArenaMyRequestsEvent (taps ignored, spinner); `requested` while the
+   // latest snapshot lists the table. Both come from the server; there are no timers.
    const handleClick = () => {
-      if (counting) return;
+      if (busy) return;
       props.joinRoom(table.table);
-      if (!countdown) return;
-      const start = Date.now();
-      setRemaining(COUNTDOWN_SECONDS);
-      intervalRef.current = setInterval(() => {
-         const left = COUNTDOWN_SECONDS - (Date.now() - start) / 1000;
-         if (left <= 0) {
-            clearInterval(intervalRef.current);
-            setRemaining(0);
-         } else {
-            setRemaining(left);
-         }
-      }, 100);
    };
 
    return (
       <Card className={classes.card}
-            style={{backgroundColor: table.table_color(), position: 'relative', cursor: counting ? 'default' : 'pointer'}}
+            style={{backgroundColor: table.table_color(), position: 'relative', cursor: busy ? 'default' : 'pointer'}}
             onClick={handleClick}>
-         {counting &&
+         {busy &&
             <Box sx={{
                position: 'absolute',
                inset: 0,
@@ -78,22 +61,7 @@ const TableCard = (props) => {
                backgroundColor: 'rgba(0, 0, 0, 0.35)',
                zIndex: 1
             }}>
-               <Box sx={{position: 'relative', display: 'inline-flex'}}>
-                  <CircularProgress variant="determinate"
-                                    value={(remaining / COUNTDOWN_SECONDS) * 100}
-                                    size={56}/>
-                  <Box sx={{
-                     position: 'absolute',
-                     inset: 0,
-                     display: 'flex',
-                     alignItems: 'center',
-                     justifyContent: 'center'
-                  }}>
-                     <Typography variant="h6" component="div" sx={{color: '#fff'}}>
-                        {Math.ceil(remaining)}
-                     </Typography>
-                  </Box>
-               </Box>
+               <CircularProgress size={40}/>
             </Box>
          }
          <CardContent>
@@ -104,6 +72,9 @@ const TableCard = (props) => {
                {table.private() ? (
                   <span><HttpsIcon className={classes.icon}/> {table.game_name()}</span>) : table.game_name()}
             </Typography>
+            {requested &&
+               <Chip label="Requested" color="primary" size="small" style={{marginTop: 4}}/>
+            }
             {/*<Typography className={classes.pos} color="textSecondary">*/}
             {/*adjective*/}
             {/*</Typography>*/}
@@ -150,7 +121,8 @@ TableCard.propTypes = {
    users: PropTypes.objectOf(
       PropTypes.instanceOf(User).isRequired
    ).isRequired,
-   countdown: PropTypes.bool
+   requested: PropTypes.bool,
+   busy: PropTypes.bool
 };
 
 export default withStyles(styles)(TableCard);

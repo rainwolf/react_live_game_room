@@ -99,19 +99,6 @@ class Table {
 
    table_color = () => VARIANT_COLORS[variantKey(this.game)];
 
-   addArenaPlayerRequest = (player) => {
-      if (!this.arenaPlayerRequests) {
-         this.arenaPlayerRequests = [];
-      }
-      this.arenaPlayerRequests.push(player);
-   }
-
-   removeArenaPlayerRequest = (player) => {
-      if (this.arenaPlayerRequests) {
-         this.arenaPlayerRequests = this.arenaPlayerRequests.filter(p => p !== player);
-      }
-   }
-
    showChat = (arena) => {
       if (arena) {
          return this.players.length > 1;

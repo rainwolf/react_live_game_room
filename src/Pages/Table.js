@@ -119,7 +119,7 @@ const UnconnectedTable = (props) => {
                                  <ChatComponent messages={messages} game={table.game} players={table.players}
                                                 sendText={sendTableText}/>
                                  :
-                                 <JoinRequestComponent players={table.arenaPlayerRequests} game={table.game}/>
+                                 <JoinRequestComponent game={table.game}/>
                               }
                            </Grid>
                         </Grid>

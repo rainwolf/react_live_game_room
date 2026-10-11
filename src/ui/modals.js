@@ -25,6 +25,7 @@ export const MODALS = {
   SETTINGS: 'settings',
   CREATE_ARENA: 'createArena',
   BOOT: 'boot',
+  ARENA_WITHDRAW: 'arenaWithdraw', // payload: the table number to withdraw from
 };
 
 export const OPEN_MODAL = 'OPEN_MODAL';
