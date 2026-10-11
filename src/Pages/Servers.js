@@ -24,14 +24,25 @@ class UnconnectedServers extends Component {
       }
    }
 
+   // StrictMode (dev) mounts, unmounts and remounts: drop the first mount's server list so
+   // the ?guest auto-connect fires once. A second connect closes the first socket, whose
+   // close resets the store, remounting Servers into another auto-connect — a login loop.
    componentDidMount() {
-      this.reloadServers();
+      this.abortController = new AbortController();
+      this.reloadServers(this.abortController.signal);
    }
 
-   reloadServers() {
+   componentWillUnmount() {
+      this.abortController.abort();
+   }
+
+   reloadServers(signal) {
       fetch('/gameServer/activeServers')
          .then(response => response.text())
          .then(res => {
+            if (signal.aborted) {
+               return;
+            }
             const splt = res.split('\n');
             let servers = [];
             for (let i = 0; i < splt.length; i++) {
