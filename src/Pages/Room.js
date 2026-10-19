@@ -24,7 +24,8 @@ const mapStateToProps = state => {
       me: state.me,
       freeloader: state.freeloader,
       admin: state.admin,
-      tournament: state.tournament
+      tournament: state.tournament,
+      isKid: state.isKid
    }
 };
 
@@ -75,7 +76,7 @@ class UnconnectedRoom extends Component {
    };
 
    render() {
-      const {users, connected, logged_in, messages, tables, me, freeloader, tournament} = this.props;
+      const {users, connected, logged_in, messages, tables, me, freeloader, tournament, isKid} = this.props;
       // Guest users should not see rated tables.
       const isGuest = isGuestName(me);
       if (logged_in) {
@@ -99,7 +100,7 @@ class UnconnectedRoom extends Component {
                            style={{width: '100%', height: '100%'}}>
                         <Grid item style={{height: '100%', flex: '1', minWidth: '0px'}}>
                            <ChatComponent messages={messages} players={Object.keys(users)}
-                                          sendText={this.sendRoomText}/>
+                                          sendText={this.sendRoomText} kidMode={isKid}/>
                         </Grid>
                         <Grid item style={{height: '100%', overflow: 'auto', alignCenter: true}}>
                            {!tournament &&
