@@ -36,7 +36,8 @@ const mapStateToProps = state => {
    return {
       me: state.me,
       users: state.users,
-      table: state.table
+      table: state.table,
+      isKid: state.isKid
    }
 };
 
@@ -51,7 +52,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedInviteModal = (props) => {
 
-   const {classes, me, table, users, send_message, dismiss, open} = props;
+   const {classes, me, table, users, send_message, dismiss, open, isKid} = props;
 
    const [player, selectPlayer] = useState('');
    const [message, setMessage] = useState('');
@@ -81,21 +82,23 @@ const UnconnectedInviteModal = (props) => {
                   <InviteList selectHandler={selectPlayer}/>
                </div>
 
-               <TextField
-                  id="filled-full-width"
-                  label="add message"
-                  // style={{ margin: 8}}
-                  placeholder="optional message"
-                  // helperText="Full width!"
-                  fullWidth
-                  margin="normal"
-                  variant="filled"
-                  InputLabelProps={{
-                     shrink: true,
-                  }}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-               />
+               {!isKid &&
+                  <TextField
+                     id="filled-full-width"
+                     label="add message"
+                     // style={{ margin: 8}}
+                     placeholder="optional message"
+                     // helperText="Full width!"
+                     fullWidth
+                     margin="normal"
+                     variant="filled"
+                     InputLabelProps={{
+                        shrink: true,
+                     }}
+                     value={message}
+                     onChange={(e) => setMessage(e.target.value)}
+                  />
+               }
                <Button
                   onClick={invite}>invite &nbsp; {(player !== '' && users[player]) && users[player].userhtml}</Button>
                <Button onClick={dismiss}>cancel</Button>

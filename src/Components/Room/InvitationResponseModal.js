@@ -36,7 +36,8 @@ const mapStateToProps = state => {
       me: state.me,
       users: state.users,
       invitation: state.received_invitation,
-      table: state.table
+      table: state.table,
+      isKid: state.isKid
    }
 };
 
@@ -54,7 +55,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedInvitationResponseModal = (props) => {
 
-   const {classes, invitation, table, users, send_message, dismiss} = props;
+   const {classes, invitation, table, users, send_message, dismiss, isKid} = props;
 
    const [message, setMessage] = useState('');
 
@@ -98,21 +99,23 @@ const UnconnectedInvitationResponseModal = (props) => {
                      </Typography>
                   }
 
-                  <TextField
-                     id="filled-full-width"
-                     label="add message"
-                     // style={{ margin: 8}}
-                     placeholder="optional reply message"
-                     // helperText="Full width!"
-                     fullWidth
-                     margin="normal"
-                     variant="filled"
-                     InputLabelProps={{
-                        shrink: true,
-                     }}
-                     value={message}
-                     onChange={(e) => setMessage(e.target.value)}
-                  />
+                  {!isKid &&
+                     <TextField
+                        id="filled-full-width"
+                        label="add message"
+                        // style={{ margin: 8}}
+                        placeholder="optional reply message"
+                        // helperText="Full width!"
+                        fullWidth
+                        margin="normal"
+                        variant="filled"
+                        InputLabelProps={{
+                           shrink: true,
+                        }}
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                     />
+                  }
                   <Button onClick={() => reply(true, false)}>Accept</Button>
                   <Button onClick={() => reply(false, false)}>Decline</Button>
                   <Button onClick={() => reply(false, true)}>Ignore future invitations/messages</Button>
