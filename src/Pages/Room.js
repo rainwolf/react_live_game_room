@@ -9,10 +9,12 @@ import TableCard from '../Components/Table/TableCard';
 // import Board from '../Components/Board/Board';
 import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
+import Link from '@mui/material/Link';
 import Cookies from 'js-cookie';
 import InvitationResponseModal from "../Components/Room/InvitationResponseModal";
 import {Commands} from '../protocol';
 import {isGuestName, tableVisibleToGuest} from '../selectors';
+import {KIDS_PAGE_URL, KIDS_LINK_TEXT} from '../ui/kidMode';
 
 const mapStateToProps = state => {
    return {
@@ -111,6 +113,11 @@ class UnconnectedRoom extends Component {
                               </Fab>
                            }
                            <br/>
+                           {!isKid && !isGuest &&
+                              <Link href={KIDS_PAGE_URL} target="_blank" rel="noopener noreferrer">
+                                 {KIDS_LINK_TEXT}
+                              </Link>
+                           }
                            {Object.keys(tables)
                               .filter(table => tableVisibleToGuest(tables[table], isGuest))
                               .map(table => <TableCard
