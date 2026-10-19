@@ -526,7 +526,7 @@ export function bootEvent(data, state) {
 export function invitationReceived(data, state) {
    const user = state.users[data.player];
    if (data.toInvite === state.me && !user.muted) {
-      state.received_invitation = {by: data.player, message: data.inviteText, table: data.table};
+      state.received_invitation = {by: data.player, message: data.inviteText || '', table: data.table};
    }
 }
 
