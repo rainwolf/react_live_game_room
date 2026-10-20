@@ -11,7 +11,6 @@
     "@mui/material": "^5.15.0",
     "@mui/styles": "^6.4.8",
     "classnames": "^2.3.2",
-    "http-proxy-middleware": "^2.0.6",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
     "react": "^18.3.0",
@@ -38,7 +37,6 @@
   "devDependencies": {
     "@rsbuild/core": "^1.7.4",
     "@rsbuild/plugin-react": "^1.4.6",
-    "@rspack/core": "^1.7.10",
     "jsdom": "^30.0.1",
     "vitest": "4.1.11"
   }
