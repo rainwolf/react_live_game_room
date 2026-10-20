@@ -1,3 +1,4 @@
+import { isKidLogin } from '../ui/kidMode';
 import '../redux_actions/actionTypes';
 import {
    ARENA_OWNER_ACTION_SENT,
@@ -75,6 +76,7 @@ const initialState = {
    }],
    connected: false,
    logged_in: false,
+   isKid: false,
    table: undefined,
    game: undefined,
    table_messages: [],
@@ -97,6 +99,7 @@ const EVENT_HANDLERS = {
       s.admin = p.me.admin;
       s.freeloader = p.me.subscriberLevel === 0;
       s.logged_in = true;
+      s.isKid = isKidLogin(p.me);
       s.tournament = p.serverData.tournament;
       s.arena = p.serverData.arena;
    },

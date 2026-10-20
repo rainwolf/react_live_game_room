@@ -34,6 +34,7 @@ const mapStateToProps = state => {
       table: selectCurrentTable(state),
       freeloader: state.freeloader,
       arena: state.arena,
+      isKid: state.isKid,
    }
 };
 
@@ -48,7 +49,7 @@ const mapDispatchToProps = dispatch => {
 
 const UnconnectedTable = (props) => {
 
-   const {messages, table, arena} = props;
+   const {messages, table, arena, isKid} = props;
    ;
    const [height, setHeight] = useState(0);
    const [width, setWidth] = useState(0);
@@ -117,7 +118,7 @@ const UnconnectedTable = (props) => {
                            <Grid item style={{height: '40%', borderWidth: '1px', borderStyle: 'solid'}}>
                               {table.showChat(arena) ?
                                  <ChatComponent messages={messages} game={table.game} players={table.players}
-                                                sendText={sendTableText}/>
+                                                sendText={sendTableText} kidMode={isKid}/>
                                  :
                                  <JoinRequestComponent game={table.game}/>
                               }

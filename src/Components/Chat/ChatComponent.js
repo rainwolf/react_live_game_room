@@ -15,7 +15,7 @@ function ChatComponent(props) {
       element.scrollTop = element.scrollHeight;
    });
 
-   const {players, sendText, messages} = props;
+   const {players, sendText, messages, kidMode} = props;
 
    return (
       <Grid container direction={'row'} alignItems={'stretch'} wrap={'nowrap'} style={{width: '100%', height: '100%'}}>
@@ -32,7 +32,7 @@ function ChatComponent(props) {
                   <ChatPanel messages={messages}/>
                </Grid>
                <Grid item>
-                  <ChatInput sendHandler={sendText}/>
+                  <ChatInput sendHandler={sendText} kidMode={kidMode}/>
                </Grid>
             </Grid>
          </Grid>
@@ -51,6 +51,7 @@ ChatComponent.propTypes = {
       }).isRequired
    ).isRequired,
    sendText: PropTypes.func.isRequired,
+   kidMode: PropTypes.bool,
 };
 
 

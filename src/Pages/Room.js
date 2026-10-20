@@ -9,10 +9,12 @@ import TableCard from '../Components/Table/TableCard';
 // import Board from '../Components/Board/Board';
 import Grid from '@mui/material/Grid';
 import Fab from '@mui/material/Fab';
+import Link from '@mui/material/Link';
 import Cookies from 'js-cookie';
 import InvitationResponseModal from "../Components/Room/InvitationResponseModal";
 import {Commands} from '../protocol';
 import {isGuestName, tableVisibleToGuest} from '../selectors';
+import {KIDS_PAGE_URL, KIDS_LINK_TEXT} from '../ui/kidMode';
 
 const mapStateToProps = state => {
    return {
@@ -24,7 +26,8 @@ const mapStateToProps = state => {
       me: state.me,
       freeloader: state.freeloader,
       admin: state.admin,
-      tournament: state.tournament
+      tournament: state.tournament,
+      isKid: state.isKid
    }
 };
 
@@ -75,7 +78,7 @@ class UnconnectedRoom extends Component {
    };
 
    render() {
-      const {users, connected, logged_in, messages, tables, me, freeloader, tournament} = this.props;
+      const {users, connected, logged_in, messages, tables, me, freeloader, tournament, isKid} = this.props;
       // Guest users should not see rated tables.
       const isGuest = isGuestName(me);
       if (logged_in) {
@@ -99,7 +102,7 @@ class UnconnectedRoom extends Component {
                            style={{width: '100%', height: '100%'}}>
                         <Grid item style={{height: '100%', flex: '1', minWidth: '0px'}}>
                            <ChatComponent messages={messages} players={Object.keys(users)}
-                                          sendText={this.sendRoomText}/>
+                                          sendText={this.sendRoomText} kidMode={isKid}/>
                         </Grid>
                         <Grid item style={{height: '100%', overflow: 'auto', alignCenter: true}}>
                            {!tournament &&
@@ -110,6 +113,11 @@ class UnconnectedRoom extends Component {
                               </Fab>
                            }
                            <br/>
+                           {!isKid && !isGuest &&
+                              <Link href={KIDS_PAGE_URL} target="_blank" rel="noopener noreferrer">
+                                 {KIDS_LINK_TEXT}
+                              </Link>
+                           }
                            {Object.keys(tables)
                               .filter(table => tableVisibleToGuest(tables[table], isGuest))
                               .map(table => <TableCard
