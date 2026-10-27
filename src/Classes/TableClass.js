@@ -22,6 +22,7 @@ const VARIANT_COLORS = {
    'swap2-pente': '#E5AA70',
    'swap2-keryo': '#50C878',
    'renju': '#D98880',
+   'tombstone-pente': '#D7BDE2',
 };
 
 class Table {

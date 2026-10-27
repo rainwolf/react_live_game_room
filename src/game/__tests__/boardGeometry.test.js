@@ -1,15 +1,15 @@
 import { describe, test, expect } from 'vitest';
-import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard, variantKey, STANDARD_GAME_IDS } from '../boardGeometry';
+import { gridSizeForGame, boardStyleClass, boardSpecialPoints, isGoBoard, variantKey, STANDARD_GAME_IDS, isTombstone, selectableGameIds } from '../boardGeometry';
 
 describe('STANDARD_GAME_IDS — the selectable variant ids', () => {
-  test('is the 16 standard (odd) ids 1..31, including renju (31)', () => {
-    expect(STANDARD_GAME_IDS).toEqual([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31]);
-    expect(STANDARD_GAME_IDS).toHaveLength(16);
+  test('is the 17 standard (odd) ids 1..31 plus tombstone (33), including renju (31)', () => {
+    expect(STANDARD_GAME_IDS).toEqual([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33]);
+    expect(STANDARD_GAME_IDS).toHaveLength(17);
     expect(STANDARD_GAME_IDS.every((id) => id % 2 === 1)).toBe(true);
     expect(STANDARD_GAME_IDS).toContain(31);
   });
-  test('maps to 14 distinct variant keys (Go 19/21/23 share the go key but are distinct boards)', () => {
-    expect(new Set(STANDARD_GAME_IDS.map(variantKey)).size).toBe(14);
+  test('maps to 15 distinct variant keys (Go 19/21/23 share the go key but are distinct boards)', () => {
+    expect(new Set(STANDARD_GAME_IDS.map(variantKey)).size).toBe(15);
   });
 });
 
@@ -136,5 +136,48 @@ describe('renju geometry (ids 31 / 32 / 81)', () => {
     expect(variantKey(1)).toBe('pente');
     expect(variantKey(29)).toBe('swap2-keryo');
     expect(gridSizeForGame(21)).toBe(9);
+  });
+});
+
+describe('Tombstone identity', () => {
+  test('isTombstone is true exactly for 33, 34, 83', () => {
+    expect([33, 34, 83].every(isTombstone)).toBe(true);
+    expect([1, 31, 32, 35, 81, 82, 84, undefined].some(isTombstone)).toBe(false);
+  });
+  test('variantKey maps 33/34/83 to tombstone-pente, renju and swap2-keryo unchanged', () => {
+    expect(variantKey(33)).toBe('tombstone-pente');
+    expect(variantKey(34)).toBe('tombstone-pente');
+    expect(variantKey(83)).toBe('tombstone-pente');
+    expect(variantKey(31)).toBe('renju');
+    expect(variantKey(30)).toBe('swap2-keryo');
+  });
+  test('Tombstone is 19x19 with the non-go circles', () => {
+    expect(gridSizeForGame(33)).toBe(19);
+    expect(boardSpecialPoints(33)).toEqual(boardSpecialPoints(1));
+  });
+});
+
+describe('selectableGameIds — only the games the current server offers', () => {
+  const OLD_16 = STANDARD_GAME_IDS.filter((g) => g !== 33);
+  const MAIN_ROOM = [];
+  for (let g = 1; g <= 32; g++) MAIN_ROOM.push(g);
+  test('Experimental (33, 34) -> only Tombstone', () => {
+    expect(selectableGameIds([33, 34])).toEqual([33]);
+  });
+  test('a speed id alone still offers its standard id', () => {
+    expect(selectableGameIds([34])).toEqual([33]);
+  });
+  test('Main Room / Beginners / KOTH / Arena (1..32) -> the 16 old ids, no Tombstone', () => {
+    expect(selectableGameIds(MAIN_ROOM)).toEqual(OLD_16);
+  });
+  test('Go server -> only the three Go boards', () => {
+    expect(selectableGameIds([19, 20, 21, 22, 23, 24])).toEqual([19, 21, 23]);
+  });
+  test('no server list -> the 16 old ids, no Tombstone', () => {
+    expect(selectableGameIds(undefined)).toEqual(OLD_16);
+  });
+  test('same server list -> same array reference (no modal re-render per action)', () => {
+    const ids = [33, 34];
+    expect(selectableGameIds(ids)).toBe(selectableGameIds(ids));
   });
 });

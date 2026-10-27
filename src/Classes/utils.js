@@ -18,6 +18,7 @@ const VARIANT_NAMES = {
    'swap2-pente': 'Swap2-Pente',
    'swap2-keryo': 'Swap2-Keryo',
    'renju': 'Renju',
+   'tombstone-pente': 'Tombstone Pente',
 };
 
 const GO_NAMES = {

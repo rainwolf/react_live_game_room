@@ -21,6 +21,7 @@ const EXPECTED = {
   25: 'O-Pente', 26: 'Speed O-Pente',
   27: 'Swap2-Pente', 28: 'Speed Swap2-Pente',
   29: 'Swap2-Keryo', 30: 'Speed Swap2-Keryo',
+  33: 'Tombstone Pente', 34: 'Speed Tombstone Pente',
 };
 
 describe('game_name — every real game id', () => {

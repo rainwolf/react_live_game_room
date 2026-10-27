@@ -44,6 +44,7 @@ describe('table_color — lobby card colour per variant (derived from variantKey
     [11, '#EDA3FD'], [13, '#EDA3FD'], [15, '#25BAFF'], [17, '#FFA500'], [19, '#FAC832'],
     [24, '#FAC832'], [25, '#52BE80'], [27, '#E5AA70'], [29, '#50C878'], [30, '#50C878'],
     [31, '#D98880'], [81, '#D98880'], // renju (live + TB): distinct rose, NOT gomoku aqua (#A3FDEB)
+    [33, '#D7BDE2'], [34, '#D7BDE2'], [83, '#D7BDE2'],
   ];
   test.each(cases)('game %i -> %s', (g, expected) => {
     expect(tableForGame(g).table_color()).toBe(expected);
@@ -52,7 +53,7 @@ describe('table_color — lobby card colour per variant (derived from variantKey
     expect(tableForGame(11).table_color()).toBe(tableForGame(13).table_color());
   });
   test('VARIANT_COLORS covers every variant key (no undefined colour) + unset-game fallback', () => {
-    for (let g = 1; g <= 32; g++) {
+    for (let g = 1; g <= 34; g++) {
       expect(typeof tableForGame(g).table_color()).toBe('string'); // missing key -> undefined would fail
     }
     expect(new Table().table_color()).toBe('#50C878'); // default-constructed table, this.game unset
@@ -66,6 +67,7 @@ describe('gameHasCaptures derives from variantKey (gomoku is the only no-capture
     expect(tableForGame(1).gameHasCaptures()).toBe(true);
     expect(tableForGame(7).gameHasCaptures()).toBe(true);
     expect(tableForGame(19).gameHasCaptures()).toBe(true);
+    expect(tableForGame(33).gameHasCaptures()).toBe(true);
   });
 });
 
