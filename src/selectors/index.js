@@ -1,3 +1,5 @@
+import { selectableGameIds } from '../game/boardGeometry';
+
 // Selectors — the read seam for the normalized Redux state. Components ask these named
 // questions instead of re-deriving them by reaching into the state shape, so the shape
 // (normalized {tables, table, ...}) stays private and each derivation is tested once.
@@ -51,3 +53,6 @@ export const arenaTableStatus = (tableId, myRequests, inFlight) => {
   if ((myRequests || []).includes(id)) return 'requested';
   return 'none';
 };
+
+// Standard game ids the picker offers on the connected server (Task 1 rule; see boardGeometry).
+export const selectSelectableGameIds = (state) => selectableGameIds(state.serverGameIds);
