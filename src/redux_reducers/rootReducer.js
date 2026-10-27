@@ -19,6 +19,7 @@ import {
    UNMUTE
 } from "../redux_actions/actionTypes";
 import {modalsReducer} from "../ui/modals";
+import {tombstoneUiReducer, INITIAL as TOMBSTONE_UI_INITIAL} from "../ui/tombstoneUi";
 import {renjuOpeningUiReducer, INITIAL as RENJU_UI_INITIAL} from "../ui/renjuOpeningUi";
 import './utils';
 import User from '../Classes/UserClass';
@@ -58,6 +59,7 @@ import {
    standTable,
    swap2Pass,
    swapSeats,
+   tombstoneSkipDead,
    tableOwner,
    undoReply,
    undoRequested,
@@ -83,6 +85,7 @@ const initialState = {
    tournament: false,
    modals: {},
    renjuOpeningUi: RENJU_UI_INITIAL,
+   tombstoneUi: TOMBSTONE_UI_INITIAL,
    pendingNotifications: [],
    arenaMyRequests: [],
    arenaRequestsInFlight: [],
@@ -102,6 +105,9 @@ const EVENT_HANDLERS = {
       s.isKid = isKidLogin(p.me);
       s.tournament = p.serverData.tournament;
       s.arena = p.serverData.arena;
+      s.serverGameIds = Array.isArray(p.serverData.gameEvents)
+         ? p.serverData.gameEvents.map((e) => e.game)
+         : undefined;
    },
    dsgJoinMainRoomEvent: (p, s) => processUser(p.dsgPlayerData, s),
    dsgUpdatePlayerDataEvent: (p, s) => processUser(p.data, s),
@@ -115,6 +121,7 @@ const EVENT_HANDLERS = {
    dsgOwnerTableEvent: (p, s) => tableOwner(p, s),
    dsgTextTableEvent: (p, s) => addTableMessage(p, s),
    dsgMoveTableEvent: (p, s) => addMove(p, s),
+   dsgTombstoneSkipDeadTableEvent: (p, s) => tombstoneSkipDead(p, s),
    dsgGameStateTableEvent: (p, s) => changeGameState(p, s),
    dsgTimerChangeTableEvent: (p, s) => changeTimer(p, s),
    dsgSystemMessageTableEvent: (p, s) => serverTableMessage(p, s),
@@ -215,6 +222,7 @@ function liveGameApp(state = initialState, action) {
    // else, so this is a no-op for non-modal actions.
    newState.modals = modalsReducer(newState.modals, action);
    newState.renjuOpeningUi = renjuOpeningUiReducer(newState.renjuOpeningUi, action);
+   newState.tombstoneUi = tombstoneUiReducer(newState.tombstoneUi, action);
    return newState;
 }
 

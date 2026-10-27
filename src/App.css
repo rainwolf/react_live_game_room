@@ -69,6 +69,11 @@
     --color2: red;
 }
 
+#gray-stone-gradient {
+    --color1: #c8c8c8;
+    --color2: #6e6e6e;
+}
+
 .pente {
     fill: #FDDEA3;
 }
@@ -123,4 +128,8 @@
 
 .renju {
     fill: #D98880
+}
+
+.tombstone-pente {
+    fill: #D7BDE2
 }

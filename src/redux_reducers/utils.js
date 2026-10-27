@@ -1,6 +1,7 @@
 import Table from '../Classes/TableClass';
 import User from '../Classes/UserClass';
 import {Game, GameState} from '../Classes/GameClass';
+import {isOwnEntry} from '../game/tombstoneTurn';
 import {MODALS, closeModal, modalProps, modalsReducer} from '../ui/modals';
 
 // These reducer helpers are PURE state transforms. Side effects (sound, tab nudge) are
@@ -216,6 +217,12 @@ export function addMove(data, state) {
          }
          advanceRenjuTrackingAfterMove(game, true);
       }
+      if (game.isTombstoneGame()) {
+         // an own entry beyond the centre opens the DEAD phase; a dead entry or the centre closes it
+         const last = game.moves[game.moves.length - 1];
+         game.gameState.tombstone = {...game.gameState.tombstone,
+            trailingClosed: !(isOwnEntry(last) && game.moves.length > 1)};
+      }
       if (data.player !== state.me) {
          emit(state, {sound: 'move'});
       }
@@ -341,6 +348,17 @@ export function serverTableMessage(data, state) {
 //     state.tables = tables;
 // }
 
+export function tombstoneSkipDead(data, state) {
+   if (data.table === state.table && state.game && state.game.isTombstoneGame()) {
+      const game = state.game.newInstance();
+      game.gameState.tombstone = {...game.gameState.tombstone, trailingClosed: true};
+      state.game = game;
+      if (!data.silent && data.player !== state.me) {
+         emit(state, {sound: 'move'});
+      }
+   }
+}
+
 export function undoRequested(data, state) {
    if (data.table === state.table) {
       const table = state.tables[data.table];
@@ -359,7 +377,7 @@ export function undoReply(data, state) {
       delete state.undo_requested;
       if (data.accepted) {
          const game = state.game.newInstance();
-         game.undoMove();
+         if (game.isTombstoneGame()) game.undoTurn(); else game.undoMove();
          state.game = game;
       }
       addTableMessage({player: 'game server', text: 'undo ' + (data.accepted ? 'accepted' : 'denied')}, state);

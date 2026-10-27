@@ -1,6 +1,7 @@
 import {GameState} from "./GameClass";
 import {game_name} from "./Utils";
-import {isGoBoard, variantKey} from "../game/boardGeometry";
+import {isGoBoard, isTombstone, variantKey} from "../game/boardGeometry";
+import {tombstoneUndoSeat} from "../game/tombstoneTurn";
 
 const PRIVATE_TABLE = 2;
 
@@ -22,6 +23,7 @@ const VARIANT_COLORS = {
    'swap2-pente': '#E5AA70',
    'swap2-keryo': '#50C878',
    'renju': '#D98880',
+   'tombstone-pente': '#D7BDE2',
 };
 
 class Table {
@@ -56,6 +58,10 @@ class Table {
    };
 
    canUndo = (game) => {
+      if (isTombstone(this.game)) {
+         const seat = tombstoneUndoSeat(game.moves, game.tombstoneTrailingClosed());
+         return game.gameState.state === GameState.State.STARTED && seat > 0 && this.me === this.seats[seat];
+      }
       if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
          return this.isMyTurn(game);
       } else if (game.isConnect6()) {

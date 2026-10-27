@@ -58,7 +58,15 @@ const UnconnectedMovesListPanel = (props) => {
 
    const move_strs = game.moves_strings();
    let move_cells;
-   if (game.isConnect6()) {
+   if (game.isTombstoneGame()) {
+      move_cells = game.tombstone_turn_cells().map((c, i) => (
+         <TableCell key={i} align='center' onClick={() => props.goto_move(c.until)} padding={'none'}>
+            <Typography variant={(game.until === c.until) ? 'h5' : 'h6'}
+                        color={(game.until === c.until) ? 'error' : 'textPrimary'}>
+               {c.label}
+            </Typography>
+         </TableCell>));
+   } else if (game.isConnect6()) {
       move_cells = [];
       if (move_strs.length > 0) {
          move_cells.push(

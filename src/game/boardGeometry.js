@@ -24,6 +24,10 @@ export function gridSizeForGame(gameId) {
 // class IS this key (boardStyleClass), and TableClass looks up the lobby table-card colour
 // (table_color) and the capture check (gameHasCaptures) from it — so style/colour/captures
 // share one partition instead of re-deriving the same boundaries three times.
+export function isTombstone(gameId) {
+  return gameId === 33 || gameId === 34 || gameId === 83;
+}
+
 export function variantKey(gameId) {
   if (gameId < 3) return 'pente';
   if (gameId < 5) return 'keryo-pente';
@@ -38,17 +42,18 @@ export function variantKey(gameId) {
   if (gameId < 27) return 'o-pente';
   if (gameId < 29) return 'swap2-pente';
   if (gameId === 31 || gameId === 32 || gameId === 81) return 'renju';
+  if (isTombstone(gameId)) return 'tombstone-pente';
   return 'swap2-keryo';
 }
 
 // The board's CSS class for a variant — the variant key doubles as the class name.
 export const boardStyleClass = variantKey;
 
-// The selectable game variants: the 15 "standard" (odd) game ids, one per variant (Go's
+// The selectable game variants: the 17 "standard" (odd) game ids, one per variant (Go's
 // three board sizes are three of them). Even ids are the "Speed" timing pair of the
 // preceding odd id and are not separately selectable. This is the one list the game-picker
 // dropdowns iterate, so they can't drift back to offering a nonexistent id.
-export const STANDARD_GAME_IDS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31];
+export const STANDARD_GAME_IDS = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33];
 
 // Is this game id a Go board (19..24)? The geometry definition of a go board; GameClass.isGo
 // delegates here so the boundary lives in exactly one place.
@@ -77,4 +82,18 @@ export function boardSpecialPoints(gameId) {
     return CIRCLES.map((index) => ({ index, part: 51 }));
   }
   return GO_DOTS[gridSizeForGame(gameId)].map((index) => ({ index, part: 52 }));
+}
+
+// The standard ids the current server offers: a standard id g is listed iff the server's game
+// list contains g or its speed id g + 1. Without a list: every pre-existing server's set (no
+// Tombstone). Memoised on the input reference so connected modals get a stable array.
+let lastServerIds;
+let lastSelectable;
+export function selectableGameIds(serverGameIds) {
+  if (lastSelectable !== undefined && serverGameIds === lastServerIds) return lastSelectable;
+  lastServerIds = serverGameIds;
+  lastSelectable = Array.isArray(serverGameIds)
+    ? STANDARD_GAME_IDS.filter((g) => serverGameIds.includes(g) || serverGameIds.includes(g + 1))
+    : STANDARD_GAME_IDS.filter((g) => g !== 33);
+  return lastSelectable;
 }

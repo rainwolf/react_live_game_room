@@ -15,7 +15,7 @@ import Switch from '@mui/material/Switch';
 import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 import {game_name} from "../../Classes/utils";
-import {STANDARD_GAME_IDS} from '../../game/boardGeometry';
+import {selectSelectableGameIds} from '../../selectors';
 import {Commands} from '../../protocol';
 import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
 
@@ -50,6 +50,7 @@ const mapStateToProps = state => {
    return {
       open: isModalOpen(state, MODALS.CREATE_ARENA),
       me: state.me,
+      gameIds: selectSelectableGameIds(state),
    }
 };
 
@@ -123,7 +124,7 @@ const UnconnectedCreateArenaTableModal = (props) => {
                            />
                         }
                      >
-                        {STANDARD_GAME_IDS.map(game =>
+                        {props.gameIds.map(game =>
                            <MenuItem key={game} value={game}>{game_name(game)}</MenuItem>
                         )}
                      </Select>

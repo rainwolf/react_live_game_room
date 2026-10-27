@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { selectCurrentTable, isGuestName, tableVisibleToGuest, selectArenaJoinRequests, selectArenaOwnerPending, arenaTableStatus } from '../index';
+import { selectCurrentTable, isGuestName, tableVisibleToGuest, selectArenaJoinRequests, selectArenaOwnerPending, arenaTableStatus, selectSelectableGameIds } from '../index';
 
 describe('selectCurrentTable — the current-table reach, in one place', () => {
   test('returns the table object keyed by the current table id', () => {
@@ -103,5 +103,13 @@ describe('arenaTableStatus — the requester lobby card state', () => {
 
   test('missing lists count as empty', () => {
     expect(arenaTableStatus(3, undefined, undefined)).toBe('none');
+  });
+});
+
+describe('selectSelectableGameIds', () => {
+  test('lists only what the server offers', () => {
+    expect(selectSelectableGameIds({ serverGameIds: [33, 34] })).toEqual([33]);
+    expect(selectSelectableGameIds({ serverGameIds: [1, 2, 3, 4] })).toEqual([1, 3]);
+    expect(selectSelectableGameIds({})).not.toContain(33);
   });
 });

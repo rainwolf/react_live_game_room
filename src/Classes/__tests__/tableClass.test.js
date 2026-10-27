@@ -44,6 +44,7 @@ describe('table_color — lobby card colour per variant (derived from variantKey
     [11, '#EDA3FD'], [13, '#EDA3FD'], [15, '#25BAFF'], [17, '#FFA500'], [19, '#FAC832'],
     [24, '#FAC832'], [25, '#52BE80'], [27, '#E5AA70'], [29, '#50C878'], [30, '#50C878'],
     [31, '#D98880'], [81, '#D98880'], // renju (live + TB): distinct rose, NOT gomoku aqua (#A3FDEB)
+    [33, '#D7BDE2'], [34, '#D7BDE2'], [83, '#D7BDE2'],
   ];
   test.each(cases)('game %i -> %s', (g, expected) => {
     expect(tableForGame(g).table_color()).toBe(expected);
@@ -52,7 +53,7 @@ describe('table_color — lobby card colour per variant (derived from variantKey
     expect(tableForGame(11).table_color()).toBe(tableForGame(13).table_color());
   });
   test('VARIANT_COLORS covers every variant key (no undefined colour) + unset-game fallback', () => {
-    for (let g = 1; g <= 32; g++) {
+    for (let g = 1; g <= 34; g++) {
       expect(typeof tableForGame(g).table_color()).toBe('string'); // missing key -> undefined would fail
     }
     expect(new Table().table_color()).toBe('#50C878'); // default-constructed table, this.game unset
@@ -66,6 +67,7 @@ describe('gameHasCaptures derives from variantKey (gomoku is the only no-capture
     expect(tableForGame(1).gameHasCaptures()).toBe(true);
     expect(tableForGame(7).gameHasCaptures()).toBe(true);
     expect(tableForGame(19).gameHasCaptures()).toBe(true);
+    expect(tableForGame(33).gameHasCaptures()).toBe(true);
   });
 });
 
@@ -124,5 +126,22 @@ describe('myRenjuChoice + board helpers', () => {
     g.moves = [0]; expect(g.renjuBoxRadius()).toBe(1);     // placing move 2 -> 3x3
     g.moves = [0, 0, 0, 0]; expect(g.renjuBoxRadius()).toBe(4); // placing move 5 -> 9x9
     g.moves = [0, 0, 0, 0, 0]; expect(g.renjuBoxRadius()).toBe(0); // move 6 -> anywhere
+  });
+});
+
+describe('canUndo — Tombstone whole-turn rule', () => {
+  const tsTable = (me) => { const t = tableForGame(33); t.seats = [undefined, 'p1', 'p2']; t.me = me; return t; };
+  const tsGame = (moves, closed) => {
+    const g = new Game(); g.setGame(33); g.gameState.state = GameState.State.STARTED;
+    moves.forEach((m) => g.addMove(m)); g.gameState.tombstone.trailingClosed = closed; return g;
+  };
+  test('the player who completed the last turn may ask, the mover may not', () => {
+    expect(tsTable('p2').canUndo(tsGame([180, 100, 361], true))).toBe(true);
+    expect(tsTable('p1').canUndo(tsGame([180, 100, 361], true))).toBe(false);
+  });
+  test('nobody while a dead stone is pending, nobody on the centre alone', () => {
+    expect(tsTable('p2').canUndo(tsGame([180, 100], false))).toBe(false);
+    expect(tsTable('p1').canUndo(tsGame([180, 100], false))).toBe(false);
+    expect(tsTable('p1').canUndo(tsGame([180], true))).toBe(false);
   });
 });

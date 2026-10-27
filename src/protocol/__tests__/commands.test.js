@@ -88,3 +88,16 @@ describe('arena join-request commands (spec 2026-10-10)', () => {
       .toEqual(['dsgArenaRejectTableJoinEvent']);
   });
 });
+
+describe('tombstone commands', () => {
+  test('tombstoneSkipDead frame', () => {
+    expect(Commands.tombstoneSkipDead({ player: 'alice', table: 5 }))
+      .toEqual({ dsgTombstoneSkipDeadTableEvent: { player: 'alice', table: 5, time: 0 } });
+  });
+  test('own pass and dead stone are single-code move frames', () => {
+    expect(Commands.move({ move: 722, moves: [722], player: 'alice', table: 5 }))
+      .toEqual({ dsgMoveTableEvent: { move: 722, moves: [722], player: 'alice', table: 5, time: 0 } });
+    expect(Commands.move({ move: 361, moves: [361], player: 'alice', table: 5 }))
+      .toEqual({ dsgMoveTableEvent: { move: 361, moves: [361], player: 'alice', table: 5, time: 0 } });
+  });
+});
