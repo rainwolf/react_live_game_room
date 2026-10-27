@@ -49,6 +49,7 @@ export const MESSAGES = {
   dsgRenjuTaraguchi10Select1TableEvent: { dir: 'both', cmd: 'renjuSelect1', out: ['move', 'player', 'table'],         req: TBL },
   dsgRenjuAcceptDrawTableEvent:         { dir: 'both', cmd: 'renjuAcceptDraw', out: ['player', 'table'], req: TBL },
   dsgRenjuRejectDrawTableEvent:         { dir: 'both', cmd: 'renjuRejectDraw', out: ['player', 'table'], req: TBL },
+  dsgTombstoneSkipDeadTableEvent:       { dir: 'both', cmd: 'tombstoneSkipDead', out: ['player', 'table'], req: TBL },
   dsgRejectGoStateEvent:    { dir: 'both', cmd: 'rejectGoState', out: ['player', 'table'], req: TBL },
   dsgResignTableEvent:      { dir: 'out', cmd: 'resign',    out: ['player', 'table'] },
   dsgForceCancelResignTableEvent: { dir: 'out', cmd: 'forceCancelResign', out: ['action', 'player', 'table'] },
@@ -94,6 +95,7 @@ export const ERROR_EVENTS = [
   'dsgStandTableErrorEvent',
   'dsgCancelRequestTableErrorEvent',
   'dsgRenjuDrawTableErrorEvent',
+  'dsgTombstoneSkipDeadTableErrorEvent',
 ];
 
 // The pinger message — answered by middleware, but a valid inbound type.

@@ -798,6 +798,19 @@
         "time": 1781365568847
       }
     },
+    "dsgTombstoneSkipDeadTableEvent": {
+      "in": {
+        "player": "graviton",
+        "silent": false,
+        "table": 1,
+        "time": 1781365568849
+      },
+      "out": {
+        "player": "guest55",
+        "table": 1,
+        "time": 0
+      }
+    },
     "dsgUndoReplyTableEvent": {
       "in": {
         "accepted": true,
@@ -1118,6 +1131,14 @@
         "player": "guest4",
         "table": 1,
         "time": 1781357643256
+      }
+    },
+    "dsgTombstoneSkipDeadTableErrorEvent": {
+      "26": {
+        "error": 26,
+        "player": "guest55",
+        "table": 1,
+        "time": 1781365568849
       }
     },
     "dsgUndoReplyTableErrorEvent": {

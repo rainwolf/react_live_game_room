@@ -165,3 +165,20 @@ describe('arena join-request events (spec 2026-10-10)', () => {
     }
   });
 });
+
+describe('decode — tombstone events', () => {
+  test('inbound skip carries silent', () => {
+    const r = decode(wrap('dsgTombstoneSkipDeadTableEvent', { player: 'bob', table: 5, silent: true, time: 1 }));
+    expect(r.ok).toBe(true);
+    expect(r.event.payload.silent).toBe(true);
+  });
+  test('skip without a table id is rejected', () => {
+    const r = decode(wrap('dsgTombstoneSkipDeadTableEvent', { player: 'bob' }));
+    expect(r.ok).toBe(false);
+    expect(r.error.kind).not.toBe('unknown'); // rejected for the missing table, not the unknown type
+  });
+  test('skip error event (NOT_AWAITING_DEAD_STONE = 26) is a known type', () => {
+    const r = decode(wrap('dsgTombstoneSkipDeadTableErrorEvent', { player: 'bob', table: 5, error: 26, time: 1 }));
+    expect(r.ok).toBe(true);
+  });
+});
