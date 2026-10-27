@@ -1,6 +1,15 @@
 import {useEffect, useRef} from "react";
 import {GameState, freshRenjuTracking} from '../game/gameState';
-import {gridSizeForGame, isGoBoard, variantKey} from '../game/boardGeometry';
+import {gridSizeForGame, isGoBoard, isTombstone, variantKey} from '../game/boardGeometry';
+import {
+   DEAD_CELL,
+   decodeTombstone,
+   parseTombstoneTurns,
+   tombstoneEntryPlayer,
+   tombstonePhase,
+   tombstoneStepTarget,
+   tombstoneTurnLabel,
+} from '../game/tombstoneTurn';
 import {
    swap2OpeningPlayer,
    dPenteOpeningPlayer,
@@ -40,6 +49,7 @@ const VARIANT_RULES = {
    'swap2-pente': {replay: 'pente',    disableRatedOnReplay: false, add: 'pente',  goMove: false, player: 'standard', postRule: 'none'},
    'swap2-keryo': {replay: 'keryo',    disableRatedOnReplay: false, add: 'keryo',  goMove: false, player: 'standard', postRule: 'none'},
    'renju':       {replay: 'renju',    disableRatedOnReplay: false, add: 'gomoku', goMove: false, player: 'renju',    postRule: 'none'},
+   'tombstone-pente': {replay: 'tombstone', disableRatedOnReplay: false, add: 'tombstone', goMove: false, player: 'tombstone', postRule: 'none'},
 };
 
 export class Game {
@@ -90,6 +100,7 @@ export class Game {
             ...this.gameState.renjuState,
             offered: [...this.gameState.renjuState.offered],
          },
+         tombstone: {...this.gameState.tombstone},
       };
       // for (let i = 0; i < 19; i++) {
       //     for (let j = 0; j < 19; j++) {
@@ -129,6 +140,18 @@ export class Game {
       if (this.until === undefined) {
          l = this.moves.length - 1;
       }
+      if (this.isTombstoneGame()) {
+         // Decoded points of the last displayed turn. Never compare against gridSize*gridSize:
+         // code 361 is a dead stone on A19.
+         const turn = parseTombstoneTurns(this.moves.slice(0, l + 1)).pop();
+         if (!turn) return [];
+         const points = [];
+         const own = decodeTombstone(turn.own);
+         if (own && own.kind === 'own') points.push(own.point);
+         const dead = decodeTombstone(turn.dead);
+         if (dead) points.push(dead.point);
+         return points;
+      }
       if (this.isConnect6()) {
          if (l === 0 || l % 4 === 1 || l % 4 === 3) {
             return [this.moves[l]];
@@ -152,6 +175,19 @@ export class Game {
    goForwardBack = (forward) => {
       if (this.until === undefined) {
          this.until = this.moves.length;
+      }
+      if (this.isTombstoneGame()) {
+         const target = tombstoneStepTarget(this.moves, this.until, forward);
+         if (forward) {
+            while (this.until < target) {
+               this.until += 1;
+               this.addMoveFromList(this.until - 1);
+            }
+         } else if (target !== this.until) {
+            this.until = target;
+            this.replayGame(this.until);
+         }
+         return;
       }
       if (forward) {
          if (this.isConnect6()) {
@@ -201,7 +237,11 @@ export class Game {
       }
    };
 
-   moves_strings = () => {
+   moves_strings = () => this.isTombstoneGame()
+      ? this.tombstone_turn_cells().map(c => c.label)
+      : this.#standardMovesStrings();
+
+   #standardMovesStrings = () => {
       if (this.isConnect6()) {
          const movestrs = [];
          if (this.moves.length > 0) {
@@ -231,6 +271,9 @@ export class Game {
    };
 
    currentPlayer = () => {
+      if (this.isTombstoneGame()) {
+         return this.tombstonePhaseNow().player;
+      }
       if (this.isConnect6()) {
          return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
       } else if (this.#isDPente()) {
@@ -256,6 +299,10 @@ export class Game {
       return (1 + (this.moves.length % 2));
    };
    currentColor = () => {
+      if (this.isTombstoneGame()) {
+         const p = this.tombstonePhaseNow();
+         return p.phase === 'DEAD' ? DEAD_CELL : p.player;
+      }
       if (this.isConnect6()) {
          return (((this.moves.length % 4) === 0) || ((this.moves.length % 4) === 3)) ? 1 : 2;
       }
@@ -298,6 +345,46 @@ export class Game {
    };
    #isRenju = () => this.isRenjuGame();
 
+   isTombstoneGame = () => isTombstone(this.game);
+   tombstoneTrailingClosed = () => !this.gameState.tombstone || this.gameState.tombstone.trailingClosed;
+   tombstonePhaseNow = () => tombstonePhase(this.moves, this.tombstoneTrailingClosed());
+   tombstone_turn_cells = () => parseTombstoneTurns(this.moves).map(t => ({
+      label: tombstoneTurnLabel(t, this.getMoveCoord),
+      until: t.end + 1,
+   }));
+   // Remove the last turn (new array: newInstance shares this.moves) and replay, keeping a
+   // browsing `until` valid.
+   undoTurn = () => {
+      const turns = parseTombstoneTurns(this.moves);
+      const last = turns[turns.length - 1];
+      if (!last) return;
+      const newMoves = this.moves.slice(0, last.start);
+      if (this.until !== undefined) {
+         this.until = Math.min(this.until, newMoves.length);
+      }
+      this.moves = newMoves;
+      this.gameState.tombstone = {trailingClosed: true};
+      this.replayGame(this.until);
+   };
+   // Apply one Tombstone entry. Own stones capture like Pente; dead stones (value 3) never
+   // capture and are never passed to #detectPenteCapture (its opponentColor would be 2).
+   #applyTombstoneEntry = (code, player) => {
+      const d = decodeTombstone(code);
+      if (d === null || d.kind === 'pass') return;
+      const x = d.point % 19, y = Math.floor(d.point / 19);
+      if (d.kind === 'own') {
+         this.abstractBoard[x][y] = player;
+         this.#detectPenteCapture(x, y, player);
+      } else {
+         this.abstractBoard[x][y] = DEAD_CELL;
+      }
+   };
+   #replayTombstoneGame = (until) => {
+      for (let i = 0; i < Math.min(this.moves.length, until); i++) {
+         this.#applyTombstoneEntry(this.moves[i], tombstoneEntryPlayer(this.moves, i));
+      }
+   };
+
    #started = () => this.gameState.state === GameState.State.STARTED;
 
    dPenteChoice = () => {
@@ -335,6 +422,7 @@ export class Game {
          swap2State: GameState.Swap2State.NO_CHOICE,
          goState: GameState.GoState.PLAY,
          renjuState: freshRenjuTracking(),
+         tombstone: {trailingClosed: true},
       }
    };
    resetBoard = () => {
@@ -379,6 +467,7 @@ export class Game {
          pente: this.#replayPenteGame, keryo: this.#replayKeryoPenteGame, gomoku: this.#replayGomokuGame,
          gPente: this.#replayGPenteGame, poof: this.#replayPoofPenteGame, connect6: this.#replayConnect6Game,
          go: this.#replayGoGame, oPente: this.#replayOPenteGame, renju: this.#replayRenjuGame,
+         tombstone: this.#replayTombstoneGame,
       }[rules.replay];
       if (rules.disableRatedOnReplay) {
          // d-pente / dk-pente replay through the pente / keryo engine, which applies its own
@@ -395,8 +484,12 @@ export class Game {
 
    addMoveFromList = (i) => {
       const move = this.moves[i];
-      const x = move % this.gridSize, y = Math.floor(move / this.gridSize);
       const rules = VARIANT_RULES[variantKey(this.game)];
+      if (rules.add === 'tombstone') {
+         this.#applyTombstoneEntry(move, tombstoneEntryPlayer(this.moves, i));
+         return;
+      }
+      const x = move % this.gridSize, y = Math.floor(move / this.gridSize);
       const player = rules.player === 'connect6'
          ? ((((i % 4) === 0) || ((i % 4) === 3)) ? 1 : 2)
          : rules.player === 'renju'
@@ -416,6 +509,10 @@ export class Game {
       this.moves.push(move);
       this.until = this.moves.length;
       const rules = VARIANT_RULES[variantKey(this.game)];
+      if (rules.add === 'tombstone') {
+         this.#applyTombstoneEntry(move, tombstoneEntryPlayer(this.moves, this.moves.length - 1));
+         return;
+      }
       const player = rules.player === 'connect6'
          ? ((((this.moves.length % 4) === 1) || ((this.moves.length % 4) === 0)) ? 1 : 2)
          : rules.player === 'renju'
