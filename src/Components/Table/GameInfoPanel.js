@@ -16,6 +16,8 @@ import InviteModal from './InviteModal';
 import {Commands} from '../../protocol';
 import {selectCurrentTable} from '../../selectors';
 import {RenjuPhase} from '../../game/openingPhase';
+import {tombstoneButton, TOMBSTONE_OWN_PASS} from '../../game/tombstoneTurn';
+import {tombstoneMarkPending} from '../../ui/tombstoneUi';
 
 const styles = theme => ({
    root: {
@@ -39,6 +41,7 @@ const mapStateToProps = state => {
       arena: state.arena,
       draw_armed: state.draw_armed,
       draw_pending: state.draw_pending,
+      tombstone_pending: state.tombstoneUi.pending,
    }
 };
 
@@ -55,6 +58,7 @@ const mapDispatchToProps = dispatch => {
       },
       arm_draw: () => dispatch({type: ARM_DRAW_OFFER}),
       disarm_draw: () => dispatch({type: DISARM_DRAW_OFFER}),
+      tombstoneMarkPending: () => dispatch(tombstoneMarkPending()),
    }
 };
 
@@ -85,6 +89,18 @@ const UnconnectedGameInfoPanel = (props) => {
          table: table.table,
          ...(props.draw_armed ? {drawOffer: true} : {}),
       }));
+   };
+   const tsButton = game.isTombstoneGame()
+      ? tombstoneButton(game.moves, game.tombstoneTrailingClosed(), props.tombstone_pending) : null;
+   const tombstoneAct = () => {
+      if (tsButton.action === 'skipDead') {
+         props.send_message(Commands.tombstoneSkipDead({player: table.me, table: table.table}));
+      } else {
+         props.send_message(Commands.move({
+            move: TOMBSTONE_OWN_PASS, moves: [TOMBSTONE_OWN_PASS], player: table.me, table: table.table,
+         }));
+      }
+      props.tombstoneMarkPending();
    };
    const toggleDraw = () => {
       props.draw_armed ? props.disarm_draw() : props.arm_draw();
@@ -172,12 +188,12 @@ const UnconnectedGameInfoPanel = (props) => {
                            </div>
                         </Grid>
                      }
-                     {(table.isMyTurn(game) && (game.isGo() || renjuPostOpening)
+                     {(table.isMyTurn(game) && (game.isGo() || renjuPostOpening || tsButton)
                            && game.gameState.state === GameState.State.STARTED) &&
                         <Grid item xs>
                            <div style={{display: 'table', margin: '0 auto'}}>
-                              <Button variant="outlined" color="primary" onClick={pass}>
-                                 PASS
+                              <Button variant="outlined" color="primary" onClick={tsButton ? tombstoneAct : pass}>
+                                 {tsButton ? tsButton.label : 'PASS'}
                               </Button>
                            </div>
                         </Grid>

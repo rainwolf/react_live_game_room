@@ -128,3 +128,20 @@ describe('myRenjuChoice + board helpers', () => {
     g.moves = [0, 0, 0, 0, 0]; expect(g.renjuBoxRadius()).toBe(0); // move 6 -> anywhere
   });
 });
+
+describe('canUndo — Tombstone whole-turn rule', () => {
+  const tsTable = (me) => { const t = tableForGame(33); t.seats = [undefined, 'p1', 'p2']; t.me = me; return t; };
+  const tsGame = (moves, closed) => {
+    const g = new Game(); g.setGame(33); g.gameState.state = GameState.State.STARTED;
+    moves.forEach((m) => g.addMove(m)); g.gameState.tombstone.trailingClosed = closed; return g;
+  };
+  test('the player who completed the last turn may ask, the mover may not', () => {
+    expect(tsTable('p2').canUndo(tsGame([180, 100, 361], true))).toBe(true);
+    expect(tsTable('p1').canUndo(tsGame([180, 100, 361], true))).toBe(false);
+  });
+  test('nobody while a dead stone is pending, nobody on the centre alone', () => {
+    expect(tsTable('p2').canUndo(tsGame([180, 100], false))).toBe(false);
+    expect(tsTable('p1').canUndo(tsGame([180, 100], false))).toBe(false);
+    expect(tsTable('p1').canUndo(tsGame([180], true))).toBe(false);
+  });
+});

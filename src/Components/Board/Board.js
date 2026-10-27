@@ -11,6 +11,8 @@ import {gridSizeForGame, boardStyleClass, boardSpecialPoints} from '../../game/b
 import {renjuTogglePick, renjuMarkPending} from '../../ui/renjuOpeningUi';
 import {RenjuPhase, isRenjuSelection} from '../../game/openingPhase';
 import {renjuStabilizer, isOfferDup} from '../../game/renjuSymmetry';
+import {tombstoneMarkPending} from '../../ui/tombstoneUi';
+import {TOMBSTONE_DEAD_OFFSET} from '../../game/tombstoneTurn';
 
 const mapStateToProps = state => {
    const table = selectCurrentTable(state);
@@ -19,6 +21,7 @@ const mapStateToProps = state => {
       game: state.game,
       table: table,
       renjuUi: state.renjuOpeningUi,
+      tombstoneUi: state.tombstoneUi,
       draw_armed: state.draw_armed
    }
 };
@@ -30,6 +33,7 @@ const mapDispatchToProps = dispatch => {
       },
       togglePick: move => dispatch(renjuTogglePick(move)),
       markPending: () => dispatch(renjuMarkPending()),
+      tombstoneMarkPending: () => dispatch(tombstoneMarkPending()),
    }
 };
 
@@ -44,6 +48,10 @@ const UnconnectedBoard = (props) => {
 
    // Each opening decision is SENT then the UI goes 'pending' — we do NOT mutate the board or
    // re-open the modal locally; the stone/seat/phase only change when the server echoes back.
+   const sendTombstone = (c) => {
+      send_message(Commands.move({move: c, moves: [c], player: table.me, table: table.table}));
+      props.tombstoneMarkPending();
+   };
    const sendRenjuDecline = (move) => {
       send_message(Commands.renjuSwap({swap: false, move: move, player: table.me, table: table.table}));
       markPending();
@@ -64,9 +72,9 @@ const UnconnectedBoard = (props) => {
          return [];
       }
       let board = [];
-      let player_colors = [undefined, 'white-stone-gradient', 'black-stone-gradient'];
+      let player_colors = [undefined, 'white-stone-gradient', 'black-stone-gradient', 'gray-stone-gradient'];
       if (game.isGo()) {
-         player_colors = [undefined, 'black-stone-gradient', 'white-stone-gradient'];
+         player_colors = [undefined, 'black-stone-gradient', 'white-stone-gradient', 'gray-stone-gradient'];
       }
       let hover = player_colors[game.currentColor()];
       if (game.isGo() && game.gameState.goState === GameState.GoState.MARK_STONES) {
@@ -78,6 +86,8 @@ const UnconnectedBoard = (props) => {
       // console.log('my turn: ', table.isMyTurn(game));
       // console.log('makeBoard');
       // --- renju (Taraguchi-10) opening context, computed once before the cell loop ---
+      const isTs = game.isTombstoneGame();
+      const tsDead = isTs && game.tombstonePhaseNow().phase === 'DEAD';
       const isRenju = game.isRenjuGame && game.isRenjuGame();
       const renjuPhaseNow = isRenju ? game.renjuPhaseNow() : null;
       const boxRadius = isRenju ? game.renjuBoxRadius() : 0;
@@ -130,7 +140,14 @@ const UnconnectedBoard = (props) => {
             const empty = game.abstractBoard[i][j] === 0;
             let clickHandler = undefined;
             if (myTurn) {
-               if (isRenju && renjuUi.mode === 'pending') {
+               if (isTs) {
+                  if (props.tombstoneUi.pending) {
+                     // a move was just sent; inert until the server echoes or rejects it
+                  } else if (empty) {
+                     const c = tsDead ? TOMBSTONE_DEAD_OFFSET + m : m;
+                     clickHandler = () => sendTombstone(c);
+                  }
+               } else if (isRenju && renjuUi.mode === 'pending') {
                   // a decision was just sent; the board stays inert until the server echo arrives
                } else if (isRenju && renjuUi.mode === 'placing') {
                   // decline + box-constrained Branch-A / window stone

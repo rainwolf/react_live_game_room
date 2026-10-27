@@ -16,8 +16,7 @@ import {connect} from 'react-redux';
 import {send_message} from "../../redux_actions/actionTypes";
 import {Commands} from '../../protocol';
 import {MODALS, toggleModal, isModalOpen} from '../../ui/modals';
-import {selectCurrentTable} from '../../selectors';
-import {STANDARD_GAME_IDS} from '../../game/boardGeometry';
+import {selectCurrentTable, selectSelectableGameIds} from '../../selectors';
 
 function getModalStyle() {
    const top = 50;
@@ -49,7 +48,8 @@ const styles = theme => ({
 const mapStateToProps = state => {
    return {
       table: selectCurrentTable(state),
-      open: isModalOpen(state, MODALS.SETTINGS)
+      open: isModalOpen(state, MODALS.SETTINGS),
+      gameIds: selectSelectableGameIds(state),
    }
 };
 
@@ -125,7 +125,7 @@ const UnconnectedSettingsModal = (props) => {
                            />
                         }
                      >
-                        {STANDARD_GAME_IDS.map(game =>
+                        {props.gameIds.map(game =>
                            <MenuItem key={game} value={game}>{table.game_name(game)}</MenuItem>
                         )}
                      </Select>
