@@ -38,6 +38,6 @@
     "@rsbuild/core": "^1.7.4",
     "@rsbuild/plugin-react": "^1.4.6",
     "jsdom": "^30.0.1",
-    "vitest": "4.1.11"
+    "vitest": "4.1.12"
   }
 }
