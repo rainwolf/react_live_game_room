@@ -69,8 +69,8 @@ describe('tombstoneTurnLabel', () => {
   test('the four shapes', () => {
     const t = parseTombstoneTurns(H);
     expect(tombstoneTurnLabel(t[0], coord)).toBe('K10');
-    expect(tombstoneTurnLabel(t[1], coord)).toBe(coord(100) + ' + dead A19');
-    expect(tombstoneTurnLabel(t[2], coord)).toBe('PASS + dead ' + coord(50));
+    expect(tombstoneTurnLabel(t[1], coord)).toBe(coord(100) + ' - A19');
+    expect(tombstoneTurnLabel(t[2], coord)).toBe('PASS - ' + coord(50));
     expect(tombstoneTurnLabel(t[4], coord)).toBe('PASS');
   });
 });

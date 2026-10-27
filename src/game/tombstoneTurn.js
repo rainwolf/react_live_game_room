@@ -72,7 +72,7 @@ export function tombstoneButton(moves, trailingClosed, pending) {
 
 export function tombstoneTurnLabel(turn, coord) {
   const own = turn.own === TOMBSTONE_OWN_PASS ? 'PASS' : coord(turn.own);
-  const dead = turn.dead !== -1 ? ' + dead ' + coord(turn.dead - TOMBSTONE_DEAD_OFFSET) : '';
+  const dead = turn.dead !== -1 ? ' - ' + coord(turn.dead - TOMBSTONE_DEAD_OFFSET) : '';
   return own + dead;
 }
 

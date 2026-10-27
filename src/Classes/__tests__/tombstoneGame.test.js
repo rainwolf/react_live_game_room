@@ -77,7 +77,7 @@ describe('Tombstone last_move / moves_strings / cells', () => {
   });
   test('moves_strings labels 361 as dead A19, one cell per turn', () => {
     const g = ts([180, 100, 361, 722]);
-    expect(g.moves_strings()).toEqual(['K10', g.getMoveCoord(100) + ' + dead A19', 'PASS']);
+    expect(g.moves_strings()).toEqual(['K10', g.getMoveCoord(100) + ' - A19', 'PASS']);
     expect(g.tombstone_turn_cells().map((c) => c.until)).toEqual([1, 3, 4]);
   });
 });
