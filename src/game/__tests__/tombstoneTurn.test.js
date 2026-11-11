@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import {
   decodeTombstone, isOwnEntry, turnPlayer, parseTombstoneTurns, tombstoneEntryPlayer,
-  tombstonePhase, tombstoneButton, tombstoneTurnLabel, tombstoneUndoSeat, tombstoneStepTarget,
+  tombstonePhase, tombstoneButton, tombstoneTurnLabel, tombstoneTurnParts, tombstoneDeadOutline, tombstoneUndoSeat, tombstoneStepTarget,
 } from '../tombstoneTurn';
 
 const coord = (p) => 'ABCDEFGHJKLMNOPQRST'[p % 19] + (19 - Math.floor(p / 19));
@@ -101,5 +101,21 @@ describe('tombstoneStepTarget', () => {
   test('partial trailing turn (own entry, dead pending) is one step', () => {
     expect(tombstoneStepTarget([180, 100], 1, true)).toBe(2);
     expect(tombstoneStepTarget([180, 100], 2, false)).toBe(1);
+  });
+});
+
+describe('dead-stone presentation helpers', () => {
+  test('tombstoneTurnParts splits own / dead coordinate; label stays joined', () => {
+    const turns = parseTombstoneTurns(H);
+    expect(tombstoneTurnParts(turns[1], coord)).toEqual({ own: coord(100), dead: coord(0) });
+    expect(tombstoneTurnParts(turns[0], coord)).toEqual({ own: coord(180), dead: '' });
+    expect(tombstoneTurnParts(turns[2], coord)).toEqual({ own: 'PASS', dead: coord(50) });
+    expect(tombstoneTurnLabel(turns[2], coord)).toBe('PASS - ' + coord(50));
+  });
+  test('outline colour: 1 = white, 2 = black, unknown = none', () => {
+    expect(tombstoneDeadOutline(1)).toBe('white');
+    expect(tombstoneDeadOutline(2)).toBe('black');
+    expect(tombstoneDeadOutline(undefined)).toBeNull();
+    expect(tombstoneDeadOutline(0)).toBeNull();
   });
 });

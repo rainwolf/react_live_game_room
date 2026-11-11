@@ -70,10 +70,28 @@ export function tombstoneButton(moves, trailingClosed, pending) {
     : { label: 'Place only a dead stone', action: 'ownPass' };
 }
 
-export function tombstoneTurnLabel(turn, coord) {
+// Split a turn's move-list label into its own-stone part and (if any) dead-stone coordinate, so the
+// move list can colour the dead coordinate.
+export function tombstoneTurnParts(turn, coord) {
   const own = turn.own === TOMBSTONE_OWN_PASS ? 'PASS' : coord(turn.own);
-  const dead = turn.dead !== -1 ? ' - ' + coord(turn.dead - TOMBSTONE_DEAD_OFFSET) : '';
-  return own + dead;
+  const dead = turn.dead !== -1 ? coord(turn.dead - TOMBSTONE_DEAD_OFFSET) : '';
+  return { own, dead };
+}
+
+export function tombstoneTurnLabel(turn, coord) {
+  const { own, dead } = tombstoneTurnParts(turn, coord);
+  return dead ? own + ' - ' + dead : own;
+}
+
+// Dead-stone look: pale desaturated red (see #tombstone-dead-stone-gradient in App.css), outlined
+// in the colour of the player who placed it (player 1 = white, 2 = black).
+export const TOMBSTONE_DEAD_GRADIENT = 'tombstone-dead-stone-gradient';
+export const TOMBSTONE_DEAD_TEXT_COLOR = '#C62828';
+
+export function tombstoneDeadOutline(owner) {
+  if (owner === 1) return 'white';
+  if (owner === 2) return 'black';
+  return null;
 }
 
 export function tombstoneUndoSeat(moves, trailingClosed) {

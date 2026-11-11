@@ -126,10 +126,10 @@ class BoardSquare extends Component {
             <rect id={"\"" + this.props.id + "\""} width={size} height={size}
                   fillOpacity={0.0} pointerEvents={'all'}/>
             {this.boardpart(size)}
-            {this.props.stone && Stone({size: 10, id: this.props.stone})}
+            {this.props.stone && Stone({size: 10, id: this.props.stone, outline: this.props.stoneOutline})}
             {this.props.deadStone && SimpleStone({size: 10, id: this.props.deadStone, opacity: 0.6})}
             {this.props.territory && Territory({size: 10, id: this.props.territory})}
-            {this.state.showStone && SimpleStone({size: 10, id: this.props.hover, opacity: 0.7})}
+            {this.state.showStone && SimpleStone({size: 10, id: this.props.hover, opacity: 0.7, outline: this.props.hoverOutline})}
             {this.props.last_move && LastMove({size: 10})}
          </g>
       );

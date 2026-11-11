@@ -12,7 +12,9 @@ import {renjuTogglePick, renjuMarkPending} from '../../ui/renjuOpeningUi';
 import {RenjuPhase, isRenjuSelection} from '../../game/openingPhase';
 import {renjuStabilizer, isOfferDup} from '../../game/renjuSymmetry';
 import {tombstoneMarkPending} from '../../ui/tombstoneUi';
-import {TOMBSTONE_DEAD_OFFSET} from '../../game/tombstoneTurn';
+import {
+   TOMBSTONE_DEAD_OFFSET, TOMBSTONE_DEAD_GRADIENT, DEAD_CELL, tombstoneDeadOutline
+} from '../../game/tombstoneTurn';
 
 const mapStateToProps = state => {
    const table = selectCurrentTable(state);
@@ -88,6 +90,12 @@ const UnconnectedBoard = (props) => {
       // --- renju (Taraguchi-10) opening context, computed once before the cell loop ---
       const isTs = game.isTombstoneGame();
       const tsDead = isTs && game.tombstonePhaseNow().phase === 'DEAD';
+      // Tombstone dead stones: pale red, outlined in the placing player's colour
+      let hoverOutline;
+      if (tsDead) {
+         hover = TOMBSTONE_DEAD_GRADIENT;
+         hoverOutline = tombstoneDeadOutline(game.tombstonePhaseNow().player);
+      }
       const isRenju = game.isRenjuGame && game.isRenjuGame();
       const renjuPhaseNow = isRenju ? game.renjuPhaseNow() : null;
       const boxRadius = isRenju ? game.renjuBoxRadius() : 0;
@@ -136,7 +144,12 @@ const UnconnectedBoard = (props) => {
                squaretype = 5;
             }
 
-            const stone = player_colors[game.abstractBoard[i][j]];
+            let stone = player_colors[game.abstractBoard[i][j]];
+            let stoneOutline;
+            if (isTs && game.abstractBoard[i][j] === DEAD_CELL) {
+               stone = TOMBSTONE_DEAD_GRADIENT;
+               stoneOutline = tombstoneDeadOutline(game.tombstoneDeadOwners[m]);
+            }
             const empty = game.abstractBoard[i][j] === 0;
             let clickHandler = undefined;
             if (myTurn) {
@@ -189,9 +202,9 @@ const UnconnectedBoard = (props) => {
             }
             board.push({
                key: m, gridsize: gridsize, id: m,
-               part: squaretype, stone: stone,
+               part: squaretype, stone: stone, stoneOutline: stoneOutline,
                clickHandler: clickHandler,
-               hover: hover
+               hover: hover, hoverOutline: hoverOutline
             });
          }
       }

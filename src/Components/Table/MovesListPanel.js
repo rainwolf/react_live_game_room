@@ -31,6 +31,15 @@ const styles = theme => ({
    },
 });
 
+// Pill behind a tombstone dead-stone coordinate. Its own colours keep it legible inside
+// error-red (selected / latest-move) rows, where the surrounding text is red.
+const DEAD_PILL_STYLE = {
+   background: '#F4C7C7',
+   color: '#8E1B1B',
+   borderRadius: 4,
+   padding: '0 4px',
+};
+
 const mapStateToProps = state => {
    return {
       game: state.game,
@@ -63,7 +72,7 @@ const UnconnectedMovesListPanel = (props) => {
          <TableCell key={i} align='center' onClick={() => props.goto_move(c.until)} padding={'none'}>
             <Typography variant={(game.until === c.until) ? 'h5' : 'h6'}
                         color={(game.until === c.until) ? 'error' : 'textPrimary'}>
-               {c.label}
+               {c.dead ? <>{c.own} - <span style={DEAD_PILL_STYLE}>{c.dead}</span></> : c.own}
             </Typography>
          </TableCell>));
    } else if (game.isConnect6()) {

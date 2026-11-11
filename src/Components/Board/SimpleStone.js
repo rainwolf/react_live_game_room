@@ -7,8 +7,10 @@ function SimpleStone(props) {
             <stop offset="0%" stopColor='var(--color1)'/>
             <stop offset="100%" stopColor='var(--color2)'/>
          </radialGradient>
-         <circle cx={props.size / 2} cy={props.size / 2} r={props.size / 2}
+         <circle cx={props.size / 2} cy={props.size / 2}
+                 r={props.outline ? props.size / 2 - props.size / 20 : props.size / 2}
                  fill={"url(#" + props.id + ")"} fillOpacity={props.opacity}
+                 stroke={props.outline || undefined} strokeWidth={props.outline ? props.size / 10 : undefined}
                  pointerEvents={'none'}/>
       </svg>
    );
