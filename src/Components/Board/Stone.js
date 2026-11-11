@@ -17,8 +17,10 @@ function Stone(props) {
          {/*<feGaussianBlur result="blurOut" in="offOut" stdDeviation="0.75" />*/}
          {/*<feBlend in="SourceGraphic" in2="blurOut" mode="normal" />*/}
          {/*</filter>*/}
-         <circle cx={props.size / 2} cy={props.size / 2} r={props.size / 2}
+         <circle cx={props.size / 2} cy={props.size / 2}
+                 r={props.outline ? props.size / 2 - props.size / 20 : props.size / 2}
                  fill={"url(#" + props.id + ")"} fillOpacity={props.opacity}
+                 stroke={props.outline || undefined} strokeWidth={props.outline ? props.size / 10 : undefined}
                  pointerEvents={'none'} filter={"url(#shadow)"}/>
       </svg>
    );

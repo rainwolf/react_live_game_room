@@ -117,3 +117,29 @@ describe('Tombstone history stepping and undo', () => {
     expect(h.until).toBe(3);
   });
 });
+
+describe('Tombstone dead-stone owners and move-list parts', () => {
+  test('owner recorded per dead stone, reset on replay/undo', () => {
+    const g = ts([180, 100, 361, 722, 411]); // P1 180 | P2 100 + dead 0 | P1 pass + dead 50
+    expect(g.tombstoneDeadOwners).toEqual({ 0: 2, 50: 1 });
+    g.replayGame(3);
+    expect(g.tombstoneDeadOwners).toEqual({ 0: 2 });
+    close(g).undoTurn();
+    expect(g.tombstoneDeadOwners).toEqual({ 0: 2 });
+    const h = close(ts([180, 100, 361]));
+    h.undoTurn();
+    expect(h.tombstoneDeadOwners).toEqual({});
+  });
+  test('newInstance shares the owners map', () => {
+    const g = ts([180, 100, 361]);
+    expect(g.newInstance().tombstoneDeadOwners).toEqual({ 0: 2 });
+  });
+  test('tombstone_turn_cells exposes own/dead/player parts alongside the label', () => {
+    const cells = ts([180, 100, 361, 722]).tombstone_turn_cells();
+    expect(cells[1].player).toBe(2);
+    expect(cells[1].dead).not.toBe('');
+    expect(cells[1].label).toBe(cells[1].own + ' - ' + cells[1].dead);
+    expect(cells[0]).toMatchObject({ dead: '', player: 1 });
+    expect(cells[2]).toMatchObject({ own: 'PASS', dead: '', player: 1 });
+  });
+});

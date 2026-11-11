@@ -9,6 +9,7 @@ import {
    tombstonePhase,
    tombstoneStepTarget,
    tombstoneTurnLabel,
+   tombstoneTurnParts,
 } from '../game/tombstoneTurn';
 import {
    swap2OpeningPlayer,
@@ -108,6 +109,7 @@ export class Game {
       //     }
       // }
       newGame.abstractBoard = this.abstractBoard;
+      newGame.tombstoneDeadOwners = this.tombstoneDeadOwners;
       newGame.mark_dead_stones_player = this.mark_dead_stones_player;
       newGame.evaluate_stones_player = this.evaluate_stones_player;
       newGame.until = this.until;
@@ -350,6 +352,8 @@ export class Game {
    tombstonePhaseNow = () => tombstonePhase(this.moves, this.tombstoneTrailingClosed());
    tombstone_turn_cells = () => parseTombstoneTurns(this.moves).map(t => ({
       label: tombstoneTurnLabel(t, this.getMoveCoord),
+      ...tombstoneTurnParts(t, this.getMoveCoord),
+      player: t.player,
       until: t.end + 1,
    }));
    // Remove the last turn (new array: newInstance shares this.moves) and replay, keeping a
@@ -377,6 +381,7 @@ export class Game {
          this.#detectPenteCapture(x, y, player);
       } else {
          this.abstractBoard[x][y] = DEAD_CELL;
+         this.tombstoneDeadOwners[d.point] = player;
       }
    };
    #replayTombstoneGame = (until) => {
@@ -438,7 +443,11 @@ export class Game {
       this.goDeadStonesByPlayer = {1: [], 2: []};
       this.#resetAbstractBoard();
    };
+   // point -> player (1 = white, 2 = black) who placed the dead stone there. Mutated in place, like
+   // abstractBoard, because newInstance() shares the reference.
+   tombstoneDeadOwners = {};
    #resetAbstractBoard = () => {
+      Object.keys(this.tombstoneDeadOwners).forEach(k => delete this.tombstoneDeadOwners[k]);
       for (let i = 0; i < 19; i++) {
          for (let j = 0; j < 19; j++) {
             this.abstractBoard[i][j] = 0;
